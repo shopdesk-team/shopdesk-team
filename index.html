@@ -324,7 +324,28 @@ body.dark .msgs{background:rgba(28,28,30,.5)}
 .quote{display:flex;gap:6px;padding:5px 9px;border-radius:7px;background:rgba(120,120,128,.09);border-left:2.5px solid var(--blue);font-size:11.5px;color:var(--text-2);margin-bottom:5px;max-width:100%}
 .quote .qn{font-weight:620;color:var(--blue);font-size:10.5px}
 .msg.mine .quote{background:rgba(255,255,255,.2);border-left-color:#fff}
-.mention{color:#007aff;background:rgba(0,122,255,.12);padding:0 4px;border-radius:4px;font-weight:650}
+./* @ 提及 - 白底蓝字 */
+.mention{display:inline-block;color:#003d99;background:#dbeaff;padding:1px 6px;border-radius:5px;font-weight:700;border:1px solid rgba(0,122,255,.25)}
+.msg.mine .mention{color:#003d99;background:#ffffff;border:1px solid rgba(255,255,255,.5);font-weight:700}
+.mention-me{background:#ff9500!important;color:#fff!important;font-weight:700;border:1px solid #ff9500!important}
+.msg.mine .mention{
+  color:#003d99;
+  background:#ffffff;
+  border:1px solid rgba(255,255,255,.4);
+  font-weight:700;
+}
+.mention-me{
+  background:#ff9500!important;
+  color:#ffffff!important;
+  font-weight:700;
+  border:1px solid #ff9500!important;
+}
+.msg.mine .mention-me{
+  background:#ff9500!important;
+  color:#ffffff!important;
+  border:1px solid #ffd580!important;
+  box-shadow:0 0 0 2px rgba(255,149,0,.25);
+}
 .msg.mine .mention{color:#fff;background:rgba(255,255,255,.25)}
 .mention-me{background:rgba(255,149,0,.22)!important;color:#b25000!important;font-weight:700}
 .bubble img{max-width:200px;max-height:200px;border-radius:8px;display:block;cursor:pointer;margin-top:2px}
@@ -695,7 +716,30 @@ body.dark .msgs{background:rgba(28,28,30,.5)}
             </button>
           </div><div style="padding:16px"><div id="formCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px"></div></div></div>
         </section>
-
+<section class="view hide" id="v-categories">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div class="card">
+      <div class="card-head"><h3>任务状态</h3><div class="spacer"></div>
+        <button class="btn btn-p btn-xs" data-cat-add="statuses">+ 新增状态</button></div>
+      <div style="padding:14px" id="catStatuses"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>班次</h3><div class="spacer"></div>
+        <button class="btn btn-p btn-xs" data-cat-add="shifts">+ 新增班次</button></div>
+      <div style="padding:14px" id="catShifts"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>职位</h3><div class="spacer"></div>
+        <button class="btn btn-p btn-xs" data-cat-add="positions">+ 新增职位</button></div>
+      <div style="padding:14px" id="catPositions"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>处理店铺</h3><div class="spacer"></div>
+        <button class="btn btn-p btn-xs" data-cat-add="shops">+ 新增店铺</button></div>
+      <div style="padding:14px" id="catShops"></div>
+    </div>
+  </div>
+</section>
         <section class="view hide" id="v-accounts">
           <div class="card"><div class="card-head"><h3>账号管理</h3><div class="spacer"></div>
             <button class="btn btn-g btn-sm" id="btnAccBulk">批量操作</button><button class="btn btn-p btn-sm" id="btnCreateAccount">
@@ -839,7 +883,96 @@ body.dark .msgs{background:rgba(28,28,30,.5)}
 <div id="toasts"></div>
 <div class="danmaku-layer" id="danmakuLayer"></div>
 
-<script>
+<script/* ============ 分类管理 ============ */
+function renderCategories(){
+  if(!isAdmin())return;
+  // 初始化默认值
+  if(!S.data.shifts)S.data.shifts=SHIFTS.slice();
+  if(!S.data.positions)S.data.positions=POSITIONS.slice();
+  if(!S.data.shops)S.data.shops=SHOPS.slice();
+  if(!S.data.statuses)S.data.statuses=JSON.parse(JSON.stringify(DEFAULT_STATUSES));
+
+  // 状态
+  $('#catStatuses').innerHTML=S.data.statuses.map((s,i)=>`
+    <div class="cat-item">
+      <div style="width:10px;height:10px;border-radius:50%;background:var(--blue);flex:0 0 10px"></div>
+      <input class="cat-input" data-cat-edit="statuses:${i}" value="${esc(s.label)}">
+      <span class="muted" style="font-family:monospace;font-size:10.5px">${s.id}</span>
+      ${S.data.statuses.length>1?`<button class="row-btn del" data-cat-del="statuses:${i}">${ICON.trash}</button>`:''}
+    </div>`).join('');
+
+  // 班次
+  $('#catShifts').innerHTML=S.data.shifts.map((s,i)=>`
+    <div class="cat-item">
+      <input class="cat-input" data-cat-edit="shifts:${i}" value="${esc(s)}">
+      <button class="row-btn del" data-cat-del="shifts:${i}">${ICON.trash}</button>
+    </div>`).join('');
+
+  // 职位
+  $('#catPositions').innerHTML=S.data.positions.map((p,i)=>`
+    <div class="cat-item">
+      <input class="cat-input" data-cat-edit="positions:${i}" value="${esc(p)}">
+      <button class="row-btn del" data-cat-del="positions:${i}">${ICON.trash}</button>
+    </div>`).join('');
+
+  // 店铺
+  $('#catShops').innerHTML=S.data.shops.map((s,i)=>`
+    <div class="cat-item">
+      <input class="cat-input" data-cat-edit="shops:${i}" value="${esc(s)}">
+      <button class="row-btn del" data-cat-del="shops:${i}">${ICON.trash}</button>
+    </div>`).join('');
+
+  // 绑定编辑
+  $$('[data-cat-edit]').forEach(inp=>{
+    inp.oninput=()=>{
+      const [type,idx]=inp.dataset.catEdit.split(':');
+      const i=+idx;
+      if(type==='statuses')S.data.statuses[i].label=inp.value;
+      else if(type==='shifts')S.data.shifts[i]=inp.value;
+      else if(type==='positions')S.data.positions[i]=inp.value;
+      else if(type==='shops')S.data.shops[i]=inp.value;
+      persist();
+    };
+    inp.onblur=()=>toast('已更新');
+  });
+
+  // 绑定删除
+  $$('[data-cat-del]').forEach(btn=>{
+    btn.onclick=()=>{
+      const [type,idx]=btn.dataset.catDel.split(':');
+      const i=+idx;
+      if(!confirm('确定删除？'))return;
+      if(type==='statuses')S.data.statuses.splice(i,1);
+      else if(type==='shifts')S.data.shifts.splice(i,1);
+      else if(type==='positions')S.data.positions.splice(i,1);
+      else if(type==='shops')S.data.shops.splice(i,1);
+      persist();renderCategories();toast('已删除','warn');
+    };
+  });
+
+  // 绑定新增
+  $$('[data-cat-add]').forEach(btn=>{
+    btn.onclick=()=>{
+      const type=btn.dataset.catAdd;
+      if(type==='statuses'){
+        const name=prompt('新状态名称：');
+        if(!name)return;
+        const id=name.replace(/\s+/g,'_').toLowerCase();
+        S.data.statuses.push({id,label:name,cls:'st-closed'});
+      }else if(type==='shifts'){
+        const name=prompt('新班次名称（如：早班 09:00-18:00）：');
+        if(!name)return;S.data.shifts.push(name);
+      }else if(type==='positions'){
+        const name=prompt('新职位名称：');
+        if(!name)return;S.data.positions.push(name);
+      }else if(type==='shops'){
+        const name=prompt('新店铺名称：');
+        if(!name)return;S.data.shops.push(name);
+      }
+      persist();renderCategories();toast('已添加');
+    };
+  });
+}>
 /* ============ 工具 ============ */
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
@@ -1021,6 +1154,7 @@ function switchView(view){
   if(view==='logistics')renderLogistics();
   if(view==='forms')renderFormCards();
   if(view==='accounts')renderAccounts();
+if(view==='categories')renderCategories();
   if(view==='groups')renderGroups();
 }
 
@@ -1295,7 +1429,8 @@ function renderStaff(){
   });
   // 按班次分组
   const groups={};
-  SHIFTS.forEach(s=>groups[s]=[]);
+  const shiftsList=S.data.shifts||SHIFTS;
+shiftsList.forEach(s=>groups[s]=[]);
   groups['未设置']=[];
   users.forEach(u=>{
     const s=u.shift||'未设置';
@@ -1412,30 +1547,124 @@ function renderFormCards(){
 }
 
 /* ============ 账号管理 ============ */
-function renderAccounts(){
+function renderAccounts(){function renderAccounts(){
   if(!isAdmin())return;
+  const shifts=S.data.shifts||SHIFTS;
+  const positions=S.data.positions||POSITIONS;
+  const shopsList=S.data.shops||SHOPS;
+  const statuses=S.data.statuses||DEFAULT_STATUSES;
   const roles={admin:'管理员',agent:'客服',viewer:'只读'};
   const hasBulk=S.selectedAccounts.size>0;
   $('#accThWrap').classList.toggle('hide',!hasBulk);
   $('#accountRows').innerHTML=S.data.users.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).map(u=>{
     const isMe=u.id===S.user.id;
-    let st=u.status==='active'?'<span class="bdg st-resolved">已启用</span>':u.status==='pending'?'<span class="bdg st-pending">待审批</span>':'<span class="bdg st-closed">已禁用</span>';
-    let ac='';
-    if(u.status==='pending')ac+=`<button class="row-btn" data-approve="${u.id}" style="background:#e3f8ea;color:#1a7f37">通过</button>`;
-    ac+=`<button class="row-btn" data-edit-acc="${u.id}" style="margin-left:4px">${ICON.edit}</button>`;
-    if(!isMe)ac+=`<button class="row-btn del" data-del-acc="${u.id}" style="margin-left:4px">${ICON.trash}</button>`;
     const avHtml=u.avatar?`<img src="${u.avatar}">`:initials(u.name);
+    const shopText=(u.shops||[]).length?u.shops.slice(0,2).join('/')+(u.shops.length>2?' +'+(u.shops.length-2):''):'未设置';
+    let stCls='st-closed';
+    if(u.status==='active')stCls='st-resolved';
+    else if(u.status==='pending')stCls='st-pending';
     return `<tr class="${S.selectedAccounts.has(u.id)?'sel':''}">
       ${hasBulk?`<td onclick="event.stopPropagation()"><input type="checkbox" data-acc-cb="${u.id}" ${S.selectedAccounts.has(u.id)?'checked':''}></td>`:''}
-      <td><div style="display:flex;align-items:center;gap:9px"><div class="avatar" style="background:${avColor(u.name)};width:30px;height:30px;flex:0 0 30px">${avHtml}</div><div><div style="font-weight:560;font-size:12.5px">${esc(u.name)}</div><div class="tk-sub">${esc(u.dept||'—')}</div></div></div></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:9px">
+          <div class="avatar" style="background:${avColor(u.name)};width:30px;height:30px;flex:0 0 30px">${avHtml}</div>
+          <div><div style="font-weight:560;font-size:12.5px">${esc(u.name)}</div><div class="tk-sub">${esc(u.dept||'—')}</div></div>
+        </div>
+      </td>
       <td><span class="tk-no">${u.phone}</span></td>
-      <td><span class="chip">${roles[u.role]||u.role}</span></td>
-      <td>${u.position?`<span class="chip">${esc(u.position)}</span>`:'<span class="muted">—</span>'}</td>
-      <td>${u.shift?`<span class="chip" style="background:var(--blue-l);color:var(--blue-d)">${esc(u.shift.split(' ')[0])}</span>`:'<span class="muted">—</span>'}</td>
-      <td>${(u.shops||[]).length?u.shops.slice(0,2).map(s=>`<span class="chip">${esc(s)}</span>`).join(' ')+(u.shops.length>2?` +${u.shops.length-2}`:''):'<span class="muted">—</span>'}</td>
-      <td>${st}</td><td>${ac}</td></tr>`;
+      <td onclick="event.stopPropagation()">
+        <select class="inline-sel" data-inline-role="${u.id}">
+          ${Object.keys(roles).map(r=>`<option value="${r}" ${u.role===r?'selected':''}>${roles[r]}</option>`).join('')}
+        </select>
+      </td>
+      <td onclick="event.stopPropagation()">
+        <select class="inline-sel" data-inline-position="${u.id}">
+          <option value="">未设置</option>
+          ${positions.map(p=>`<option ${u.position===p?'selected':''}>${esc(p)}</option>`).join('')}
+        </select>
+      </td>
+      <td onclick="event.stopPropagation()">
+        <select class="inline-sel" data-inline-shift="${u.id}">
+          <option value="">未设置</option>
+          ${shifts.map(s=>`<option ${u.shift===s?'selected':''}>${esc(s)}</option>`).join('')}
+        </select>
+      </td>
+      <td onclick="event.stopPropagation()" style="cursor:pointer;position:relative">
+        <span class="chip inline-shops" data-inline-shops="${u.id}" title="点击编辑店铺">${esc(shopText)}</span>
+      </td>
+      <td onclick="event.stopPropagation()">
+        <select class="inline-sel" data-inline-status="${u.id}">
+          <option value="active" ${u.status==='active'?'selected':''}>已启用</option>
+          <option value="pending" ${u.status==='pending'?'selected':''}>待审批</option>
+          <option value="disabled" ${u.status==='disabled'?'selected':''}>已禁用</option>
+        </select>
+      </td>
+      <td onclick="event.stopPropagation()">
+        ${u.status==='pending'?`<button class="row-btn" data-approve="${u.id}" style="background:#e3f8ea;color:#1a7f37">通过</button>`:''}
+        <button class="row-btn" data-edit-acc="${u.id}" style="margin-left:4px">${ICON.edit}</button>
+        ${!isMe?`<button class="row-btn del" data-del-acc="${u.id}" style="margin-left:4px">${ICON.trash}</button>`:''}
+      </td>
+    </tr>`;
   }).join('');
   updateBadges();
+  bindInlineEdits();
+}
+
+/* 账号列表内联编辑事件绑定 */
+function bindInlineEdits(){
+  // 角色
+  $$('[data-inline-role]').forEach(sel=>{
+    sel.onchange=()=>{
+      const u=S.data.users.find(x=>x.id===sel.dataset.inlineRole);
+      if(u&&u.id!==S.user.id){u.role=sel.value;persist();toast('已更新角色');renderAccounts();}
+      else if(u&&u.id===S.user.id){toast('不能修改自己的角色','warn');renderAccounts();}
+    };
+  });
+  // 职位
+  $$('[data-inline-position]').forEach(sel=>{
+    sel.onchange=()=>{
+      const u=S.data.users.find(x=>x.id===sel.dataset.inlinePosition);
+      if(u){u.position=sel.value;persist();toast('已更新职位');}
+    };
+  });
+  // 班次
+  $$('[data-inline-shift]').forEach(sel=>{
+    sel.onchange=()=>{
+      const u=S.data.users.find(x=>x.id===sel.dataset.inlineShift);
+      if(u){u.shift=sel.value;persist();toast('已更新班次');}
+    };
+  });
+  // 状态
+  $$('[data-inline-status]').forEach(sel=>{
+    sel.onchange=()=>{
+      const u=S.data.users.find(x=>x.id===sel.dataset.inlineStatus);
+      if(u&&u.id!==S.user.id){u.status=sel.value;persist();toast('已更新状态');renderAccounts();}
+      else if(u&&u.id===S.user.id){toast('不能修改自己的状态','warn');renderAccounts();}
+    };
+  });
+  // 店铺（弹窗多选）
+  $$('[data-inline-shops]').forEach(el=>{
+    el.onclick=(e)=>{
+      e.stopPropagation();
+      const u=S.data.users.find(x=>x.id===el.dataset.inlineShops);
+      if(!u)return;
+      const shopsList=S.data.shops||SHOPS;
+      closeAllPanels('mModal');
+      $('#mTitle').textContent='编辑 '+u.name+' 的处理店铺';
+      $('#mBody').innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:8px">${shopsList.map(s=>`
+        <label style="display:flex;gap:6px;align-items:center;padding:8px 14px;border-radius:9px;background:rgba(120,120,128,.08);cursor:pointer;font-size:13px;border:1.5px solid ${(u.shops||[]).includes(s)?'var(--blue)':'transparent'}">
+          <input type="checkbox" data-shop-pick="${s}" ${(u.shops||[]).includes(s)?'checked':''} style="accent-color:var(--blue)">
+          ${esc(s)}
+        </label>`).join('')}</div>`;
+      $('#mFoot').innerHTML=`<button class="btn btn-g" id="shopCancel">取消</button><button class="btn btn-p" id="shopSave">保存</button>`;
+      $('#mModal').classList.add('on');
+      $('#shopCancel').onclick=()=>$('#mModal').classList.remove('on');
+      $('#shopSave').onclick=()=>{
+        u.shops=$$('[data-shop-pick]:checked').map(x=>x.dataset.shopPick);
+        persist();$('#mModal').classList.remove('on');renderAccounts();toast('已保存');
+      };
+    };
+  });
 }
 function renderGroups(){
   if(!isAdmin())return;
@@ -1512,8 +1741,11 @@ function updateBadges(){
 }
 
 /* ============ 群聊 ============ */
-function openChatDrawer(){
-  S.chatOpen=true;$('#chatDrawer').classList.add('on');$('#btnChatToggle').classList.add('on');
+function openChatDrawer(){function openChatDrawer(){
+  closeAllPanels('chatDrawer');
+  S.chatOpen=true;
+  $('#chatDrawer').classList.add('on');
+  $('#btnChatToggle').classList.add('on');
   if(S.currentGroupId&&S.data.groups.find(g=>g.id===S.currentGroupId))renderChatMain();
   else renderGroupSelector();
 }
@@ -1885,12 +2117,35 @@ function submitFill(){
 }
 
 /* ============ 通用模态 ============ */
+function showModal(title,body,buttons=[],wide=false){/* 关闭所有面板，只保留exceptId指定的那个 */
+function closeAllPanels(exceptId){
+  ['mModal','mDesigner','strongModal','shiftModal','urgeLock'].forEach(id=>{
+    if(id!==exceptId){const el=$('#'+id);if(el&&el.classList.contains('on'))el.classList.remove('on');}
+  });
+  if(exceptId!=='tkRightPanel')$('#tkRightPanel')?.classList.remove('on');
+  if(exceptId!=='tkDownPanel')$('#tkDownPanel')?.classList.remove('on');
+  if(exceptId!=='bigCard')$('#bigCard')?.classList.remove('on');
+  if(exceptId!=='sidePanel')$('#sidePanel')?.classList.remove('on');
+  if(exceptId!=='notifPanel')$('#notifPanel')?.classList.add('hide');
+  if(exceptId!=='userMenu')$('#userMenu')?.remove();
+  if(exceptId!=='searchDropdown')$('#searchDropdown')?.remove();
+  if(exceptId!=='ctxMenu')closeAllPopups();
+}
+
 function showModal(title,body,buttons=[],wide=false){
-  $('#mTitle').textContent=title;$('#mBody').innerHTML=body;
+  closeAllPanels('mModal');
+  $('#mTitle').textContent=title;
+  $('#mBody').innerHTML=body;
   $('#mFoot').innerHTML=buttons.map((b,i)=>`<button class="btn ${b.cls}" data-btn="${i}">${b.label}</button>`).join('');
   $('#mModal .modal-card').classList.toggle('lg',wide);
   $('#mModal').classList.add('on');
-  $$('[data-btn]').forEach(el=>{el.onclick=()=>{const b=buttons[+el.dataset.btn];if(b.onclick){const r=b.onclick();if(r!==false&&r!==undefined)closeModal();}else closeModal();};});
+  $$('[data-btn]').forEach(el=>{
+    el.onclick=()=>{
+      const b=buttons[+el.dataset.btn];
+      if(b.onclick){const r=b.onclick();if(r!==false&&r!==undefined)closeModal();}
+      else closeModal();
+    };
+  });
 }
 function closeModal(id='mModal'){$('#'+id).classList.remove('on');}
 
@@ -1961,6 +2216,7 @@ function enterApp(){if(window.Security&&S.user) window.Security.applyWatermark(S
   $('#admLabel').style.display=adm?'':'none';
   $('#navAcc').style.display=adm?'':'none';
   $('#navGroups').style.display=adm?'':'none';
+  $('#navCategories').style.display=adm?'':'none';
   $('#navForms').style.display=adm?'':'none';
   S.viewPref=S.data.settings?.viewPref||'right';
   $('#viewModeLabel').textContent={right:'右侧挤压',down:'向下挤压',card:'大卡片'}[S.viewPref]||'右侧挤压';
@@ -1982,7 +2238,12 @@ function bindApp(){
   $$('.nav-item').forEach(el=>{if(el.dataset.view)el.onclick=()=>switchView(el.dataset.view);});
   $('#btnTheme').onclick=toggleTheme;
   $('#btnChatToggle').onclick=()=>S.chatOpen?closeChatDrawer():openChatDrawer();
-  $('#btnSidePanel').onclick=()=>{$('#sidePanel').classList.toggle('on');renderSidePanel();};
+  $('#btnSidePanel').onclick=$('#btnBell').onclick=(e)=>{
+  e.stopPropagation();
+  const p=$('#notifPanel');
+  if(p.classList.contains('hide')){closeAllPanels('notifPanel');p.classList.remove('hide');renderNotifPanel();}
+  else p.classList.add('hide');
+};
   $('#spClose').onclick=()=>$('#sidePanel').classList.remove('on');
   $$('.sp-tab').forEach(t=>t.onclick=()=>{S.sidePanel.tab=t.dataset.sp;renderSidePanel();});
   $('#btnAddItem').onclick=()=>{const title=prompt('标题');if(!title)return;addQuickItem(S.sidePanel.tab,title);};
