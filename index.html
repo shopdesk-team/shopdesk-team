@@ -34,13 +34,135 @@ function showWarn(){if(devOpen)return;devOpen=true;var w=document.createElement(
 function hideWarn(){if(!devOpen)return;devOpen=false;var e=document.getElementById(WARN_ID);if(e)e.remove();}
 setInterval(function(){var wd=window.outerWidth-window.innerWidth;var hd=window.outerHeight-window.innerHeight;if(wd>160||hd>160){showWarn();}else{hideWarn();}},1200);
 try{var noop=function(){};var fc={log:noop,warn:noop,error:noop,info:noop,debug:noop,table:noop,dir:noop,trace:noop,group:noop,groupEnd:noop,time:noop,timeEnd:noop};Object.defineProperty(window,'console',{get:function(){return fc;},configurable:false});}catch(e){}
-var WM_ID='__watermark_layer__';var wmTimer=null;var wmUser=null;
-function makeTile(text){var c=document.createElement('canvas');var s=window.devicePixelRatio||1;c.width=360*s;c.height=220*s;var ctx=c.getContext('2d');ctx.scale(s,s);ctx.clearRect(0,0,360,220);ctx.font='13px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.fillStyle='rgba(0,0,0,0.09)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.save();ctx.translate(180,110);ctx.rotate(-22*Math.PI/180);ctx.fillText(text,0,0);ctx.restore();ctx.save();ctx.translate(180,110);ctx.rotate(-22*Math.PI/180);ctx.fillText(text,60,55);ctx.restore();return c.toDataURL('image/png');}
-function buildText(u){var n=(u&&u.name)||'未知用户';var p=(u&&u.phone)?u.phone.slice(-4):'----';var d=new Date();var y=d.getFullYear();var mo=String(d.getMonth()+1).padStart(2,'0');var da=String(d.getDate()).padStart(2,'0');var h=String(d.getHours()).padStart(2,'0');var mi=String(d.getMinutes()).padStart(2,'0');return n+' · '+p+' · '+y+'-'+mo+'-'+da+' '+h+':'+mi;}
-function applyWM(u){wmUser=u;if(!document.body){document.addEventListener('DOMContentLoaded',function(){applyWM(u);});return;}var text=buildText(u);var url=makeTile(text);var old=document.getElementById(WM_ID);if(old)old.remove();var layer=document.createElement('div');layer.id=WM_ID;layer.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:2147483000;background-image:url('+url+');background-repeat:repeat;background-size:360px 220px;user-select:none;-webkit-user-select:none;mix-blend-mode:multiply;';document.body.appendChild(layer);if(document.body.classList.contains('dark')){layer.style.mixBlendMode='screen';layer.style.filter='invert(1)';}if(wmTimer)clearInterval(wmTimer);wmTimer=setInterval(function(){if(wmUser)applyWM(wmUser);},60000);}
-function clearWM(){var e=document.getElementById(WM_ID);if(e)e.remove();if(wmTimer){clearInterval(wmTimer);wmTimer=null;}wmUser=null;}
-setInterval(function(){if(wmUser&&!document.getElementById(WM_ID)){applyWM(wmUser);}},3000);
-window.Security={applyWatermark:applyWM,clearWatermark:clearWM};
+var WM_ID='__watermark_layer__';
+var wmTimer=null;
+var wmUser=null;
+var wmBoostTimer=null;
+var wmAlpha=0.04;
+
+function makeTile(text,alpha){
+  var c=document.createElement('canvas');
+  var s=window.devicePixelRatio||1;
+  c.width=360*s;c.height=220*s;
+  var ctx=c.getContext('2d');
+  ctx.scale(s,s);
+  ctx.clearRect(0,0,360,220);
+  ctx.font='13px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+  ctx.fillStyle='rgba(0,0,0,'+alpha+')';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.save();ctx.translate(180,110);ctx.rotate(-22*Math.PI/180);ctx.fillText(text,0,0);ctx.restore();
+  ctx.save();ctx.translate(180,110);ctx.rotate(-22*Math.PI/180);ctx.fillText(text,60,55);ctx.restore();
+  return c.toDataURL('image/png');
+}
+
+function buildText(u){
+  var n=(u&&u.name)||'未知用户';
+  var p=(u&&u.phone)?u.phone.slice(-4):'----';
+  var d=new Date();
+  var y=d.getFullYear();
+  var mo=String(d.getMonth()+1).padStart(2,'0');
+  var da=String(d.getDate()).padStart(2,'0');
+  var h=String(d.getHours()).padStart(2,'0');
+  var mi=String(d.getMinutes()).padStart(2,'0');
+  return n+' · '+p+' · '+y+'-'+mo+'-'+da+' '+h+':'+mi;
+}
+
+function applyWM(u){
+  wmUser=u;
+  if(!document.body){document.addEventListener('DOMContentLoaded',function(){applyWM(u);});return;}
+  var text=buildText(u);
+  var url=makeTile(text,wmAlpha);
+  var old=document.getElementById(WM_ID);
+  if(old)old.remove();
+  var layer=document.createElement('div');
+  layer.id=WM_ID;
+  layer.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:2147483000;background-image:url('+url+');background-repeat:repeat;background-size:360px 220px;user-select:none;-webkit-user-select:none;mix-blend-mode:multiply;transition:opacity .2s;';
+  document.body.appendChild(layer);
+  if(document.body.classList.contains('dark')){
+    layer.style.mixBlendMode='screen';
+    layer.style.filter='invert(1)';
+  }
+  if(wmTimer)clearInterval(wmTimer);
+  wmTimer=setInterval(function(){if(wmUser)applyWM(wmUser);},60000);
+}
+
+/* 截图时增强水印 */
+function boostWatermark(){
+  if(!wmUser)return;
+  wmAlpha=0.18;
+  applyWM(wmUser);
+  if(wmBoostTimer)clearTimeout(wmBoostTimer);
+  wmBoostTimer=setTimeout(function(){
+    wmAlpha=0.04;
+    applyWM(wmUser);
+  },5000);
+}
+
+function clearWM(){
+  var e=document.getElementById(WM_ID);
+  if(e)e.remove();
+  if(wmTimer){clearInterval(wmTimer);wmTimer=null;}
+  if(wmBoostTimer){clearTimeout(wmBoostTimer);wmBoostTimer=null;}
+  wmUser=null;
+}
+
+/* 每 3 秒检查水印是否被移除，被移除则自动补回 */
+setInterval(function(){
+  if(wmUser&&!document.getElementById(WM_ID))applyWM(wmUser);
+},3000);
+
+/* ============ 截图快捷键检测 ============ */
+document.addEventListener('keydown',function(e){
+  // PrintScreen 键
+  if(e.key==='PrintScreen'||e.keyCode===44){boostWatermark();}
+  // Windows: Win+Shift+S（系统截图）
+  if(e.key==='S'&&e.shiftKey&&e.metaKey){boostWatermark();}
+  // Windows: Win+PrtScn（全屏截图）
+  if(e.key==='PrintScreen'&&e.metaKey){boostWatermark();}
+  // Mac: Cmd+Shift+3 / 4 / 5（截图）
+  if(e.metaKey&&e.shiftKey&&['3','4','5'].indexOf(e.key)>-1){boostWatermark();}
+  // QQ 截图: Ctrl+Alt+A
+  if(e.ctrlKey&&e.altKey&&['A','a'].indexOf(e.key)>-1){boostWatermark();}
+  // 微信截图: Alt+A
+  if(e.altKey&&['A','a'].indexOf(e.key)>-1&&!e.ctrlKey){boostWatermark();}
+  // 钉钉截图: Ctrl+Shift+A
+  if(e.ctrlKey&&e.shiftKey&&['A','a'].indexOf(e.key)>-1){boostWatermark();}
+},{capture:true});
+
+/* ============ 剪贴板检测（粘贴图片到页面时） ============ */
+document.addEventListener('paste',function(e){
+  if(e.clipboardData&&e.clipboardData.items){
+    for(var i=0;i<e.clipboardData.items.length;i++){
+      if(e.clipboardData.items[i].type.indexOf('image')>-1){
+        boostWatermark();
+        break;
+      }
+    }
+  }
+});
+
+/* ============ 窗口失焦检测（切换到截图工具时） ============ */
+var _lastBlur=0;
+window.addEventListener('blur',function(){
+  _lastBlur=Date.now();
+  // 短暂增强水印，防止快速截图
+  if(wmUser){
+    wmAlpha=0.14;
+    applyWM(wmUser);
+  }
+});
+window.addEventListener('focus',function(){
+  // 回到页面 3 秒后恢复淡色
+  setTimeout(function(){
+    if(wmUser&&Date.now()-_lastBlur>2000){
+      wmAlpha=0.04;
+      applyWM(wmUser);
+    }
+  },3000);
+});
+
+window.Security={applyWatermark:applyWM,clearWatermark:clearWM,boostWatermark:boostWatermark};
 })();
 </script>
 <!-- ============ 安全防护结束 ============ -->
@@ -686,14 +808,26 @@ body.dark .msgs{background:rgba(28,28,30,.5)}
         </section>
 
         <section class="view hide" id="v-staff">
-          <div class="card"><div class="card-head"><h3>人员班次</h3><div class="spacer"></div>
-            <div class="search-input" style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:rgba(120,120,128,.1);width:200px">
-              <svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
-              <input id="staffSearch" placeholder="搜索姓名/店铺" style="width:100%;font-size:12.5px;background:none">
-            </div>
-          </div><div style="padding:14px" id="staffList"></div></div>
-        </section>
-
+  <div class="card">
+    <div class="card-head">
+      <h3>人员班次</h3>
+      <div class="spacer"></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <label style="font-size:12.5px;color:var(--text-3)">日期：</label>
+        <input type="date" id="staffDate" class="inp" style="width:150px;padding:6px 10px;font-size:12.5px">
+        <button class="btn btn-g btn-xs" id="btnStaffToday">今天</button>
+      </div>
+      <div class="search-input" style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:rgba(120,120,128,.1);width:200px;margin-left:8px">
+        <svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+        <input id="staffSearch" placeholder="搜索姓名/店铺" style="width:100%;font-size:12.5px;background:none">
+      </div>
+    </div>
+    <div style="padding:14px">
+      <div id="staffDateLabel" style="font-size:12.5px;color:var(--text-3);margin-bottom:12px"></div>
+      <div id="staffList"></div>
+    </div>
+  </div>
+</section>
         <section class="view hide" id="v-logistics">
           <div class="card"><div class="card-head"><h3>物流查询</h3><div class="spacer"></div><span class="muted">对接官方数据</span></div>
             <div style="padding:18px">
@@ -882,8 +1016,8 @@ body.dark .msgs{background:rgba(28,28,30,.5)}
 <input type="file" id="importFormFile" accept=".json" style="display:none">
 <div id="toasts"></div>
 <div class="danmaku-layer" id="danmakuLayer"></div>
-
-<script/* ============ 分类管理 ============ */
+<script>
+  /* ============ 分类管理 ============ */
 function renderCategories(){
   if(!isAdmin())return;
   // 初始化默认值
@@ -972,7 +1106,7 @@ function renderCategories(){
       persist();renderCategories();toast('已添加');
     };
   });
-}>
+}
 /* ============ 工具 ============ */
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
@@ -1339,7 +1473,10 @@ function buildActionsTop(t){
     +`<span style="flex:1"></span>
       <button class="btn btn-p btn-xs" data-act="add-plan">${ICON.plus}方案</button>
       <button class="btn btn-g btn-xs" data-act="reply">回复</button>
-      <button class="btn btn-g btn-xs" data-act="urge" style="color:var(--orange)">催单</button>
+      <button class="btn btn-g btn-xs" data-act="urge" style="color:var(--orange)"><button class="btn btn-g btn-xs" data-act="urge" style="color:var(--orange)">
+  <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+  催单
+</button></button>
       <button class="btn btn-g btn-xs" data-act="send-group">发群</button>
       ${adm?`<button class="btn btn-g btn-xs" data-act="del" style="color:var(--red)">${ICON.trash}删除</button>`:''}`;
 }
@@ -1376,7 +1513,7 @@ function bindTicketActions(t){
     if(act==='del'){if(!confirm('确定删除工单？'))return;S.data.tickets=S.data.tickets.filter(x=>x.id!==t.id);S.data.groups.forEach(g=>{g.ticketIds=(g.ticketIds||[]).filter(x=>x!==t.id);});persist();closeTicket();renderTickets();renderDashboard();toast('已删除','warn');}
     else if(act==='add-plan')openAddPlan(t);
     else if(act==='reply')openReply(t);
-    else if(act==='urge'){t.urgeCount=(t.urgeCount||0)+1;persist();toast(`已催单（第 ${t.urgeCount} 次）`,'warn');refreshTicketView(t);if(t.urgeCount>=4)checkUrgeLock(t);}
+    else if(act==='urge')urgeTicket(t);
     else if(act==='send-group')openSendToGroup(t);
   });
   $$('[data-jump-group]').forEach(el=>el.onclick=()=>{S.currentGroupId=el.dataset.jumpGroup;if(!S.chatOpen)openChatDrawer();selectGroup(el.dataset.jumpGroup);toast('已跳转到群聊');});
@@ -1397,7 +1534,138 @@ function refreshTicketView(t){
   else if(mode==='down'&&$('#tkDownPanel').classList.contains('on')){$('#dpActions').innerHTML=buildActionsTop(t);$('#dpBody').innerHTML=buildTicketBody(t,f);bindTicketActions(t);}
   else if(mode==='card'&&$('#bigCard').classList.contains('on')){$('#bcActions').innerHTML=buildActionsTop(t);$('#bcBody').innerHTML=buildTicketBody(t,f);bindTicketActions(t);}
 }
-function checkUrgeLock(t){if(!t.urgeCount||t.urgeCount<4)return;S.urgeLockTicketId=t.id;$('#urgeLockDesc').textContent=`工单 ${t.no} 已被催单 ${t.urgeCount} 次，请立即处理或回复。完成后此弹窗自动消失。`;$('#urgeReply').value='';$('#urgeLock').classList.add('on');}
+/* ============ 催单系统 v2 ============ */
+/* 数据结构：S.data.urges = [{id, ticketId, targetUserId, targetUserName, fromUserId, fromUserName, reason, level, time, status, shownAt, deadline}] */
+
+function urgeTicket(ticket){
+  const agents = S.data.users.filter(u=>u.status==='active' && (u.role==='agent' || u.role==='admin'));
+  if(!agents.length){toast('暂无可用处理人','warn');return;}
+  showModal('催办工单 '+ticket.no, `
+    <div class="form-row"><label>选择处理人（催办对象）</label>
+      <div style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto">
+        ${agents.map(a=>{
+          const cnt=S.data.tickets.filter(t=>t.agent===a.name && !['resolved','closed'].includes(t.status)).length;
+          return `<label style="display:flex;gap:8px;align-items:center;padding:8px 12px;border-radius:8px;background:rgba(120,120,128,.06);cursor:pointer;font-size:12.5px">
+            <input type="radio" name="urgeTarget" value="${a.id}" ${ticket.agentId===a.id?'checked':''}>
+            <span style="width:26px;height:26px;border-radius:50%;background:${avColor(a.name)};color:#fff;display:grid;place-items:center;font-size:11px;font-weight:650">${initials(a.name)}</span>
+            <span style="flex:1">${esc(a.name)} <span style="color:var(--text-3);font-size:11.5px">${esc(a.position||'')}</span></span>
+            <span class="chip">处理中 ${cnt}</span>
+          </label>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="form-row" style="margin-bottom:0"><label>催办理由（可选）</label>
+      <textarea class="inp" id="urgeReason" placeholder="如：客户着急，请尽快处理" style="min-height:60px"></textarea>
+    </div>
+  `,[
+    {label:'取消',cls:'btn-g'},
+    {label:'发起催办',cls:'btn-p',onclick:()=>{
+      const sel=document.querySelector('input[name="urgeTarget"]:checked');
+      if(!sel){toast('请选择处理人','err');return false;}
+      const target=S.data.users.find(u=>u.id===sel.value);
+      if(!target){toast('处理人不存在','err');return false;}
+      const reason=$('#urgeReason').value.trim();
+      const prevCount=(S.data.urges||[]).filter(u=>u.ticketId===ticket.id).length;
+      const level=prevCount+1;
+      const deadline=Date.now()+(level>=5?15:30)*60*1000;
+      if(!S.data.urges)S.data.urges=[];
+      const urge={id:uid('urge'),ticketId:ticket.id,ticketNo:ticket.no,ticketTitle:ticket.formName,
+        targetUserId:target.id,targetUserName:target.name,
+        fromUserId:S.user.id,fromUserName:S.user.name,reason,
+        level,time:Date.now(),status:'pending',shownAt:0,deadline};
+      S.data.urges.push(urge);
+      // 累加催单计数
+      ticket.urgeCount=(ticket.urgeCount||0)+1;
+      ticket.timeline.push({time:Date.now(),title:'发起催办',desc:`催办 ${target.name}${reason?'：'+reason:''}`,who:S.user.name});
+      persist();
+      addNotification('催办提醒',`${S.user.name} 催办了工单 ${ticket.no}`,ICON.bell,'urge',ticket.id);
+      refreshTicketView(ticket);
+      toast(`已催办 ${target.name}（第 ${level} 次）`,'warn');
+      return false;
+    }}
+  ]);
+}
+
+/* 显示催单倒计时弹窗（只对该处理人弹出） */
+function showUrgePopup(urge){
+  const ticket=S.data.tickets.find(t=>t.id===urge.ticketId);
+  if(!ticket)return;
+  const minutes=urge.level>=5?15:30;
+  const endTime=Date.now()+minutes*60*1000;
+  urge.shownAt=Date.now();
+  urge.deadline=endTime;
+  persist();
+  // 播放提示音
+  try{SOUNDS[9].play();}catch(e){}
+  // 用 mModal 弹窗
+  closeAllPanels('mModal');
+  $('#mTitle').textContent='催办提醒';
+  $('#mBody').innerHTML=`
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="width:64px;height:64px;border-radius:18px;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(135deg,#ff3b30,#ff9500);color:#fff;font-size:28px">
+        <svg class="ico ico-lg" viewBox="0 0 24 24" stroke="#fff"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+      </div>
+      <div style="font-size:17px;font-weight:700;margin-bottom:6px">工单被催办</div>
+      <div style="font-size:13px;color:var(--text-2);line-height:1.6">
+        <b>${esc(urge.fromUserName)}</b> 催办了工单<br>
+        <b style="color:var(--blue)">${esc(urge.ticketNo)}</b> · ${esc(urge.ticketTitle)}<br>
+        ${urge.reason?'理由：'+esc(urge.reason)+'<br>':''}
+        <span style="color:var(--red);font-weight:600">第 ${urge.level} 次催办</span>
+      </div>
+    </div>
+    <div style="background:rgba(255,59,48,.08);border:1px solid rgba(255,59,48,.25);border-radius:12px;padding:14px;text-align:center;margin-bottom:14px">
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:6px">请在此时间内处理</div>
+      <div style="font-size:32px;font-weight:800;color:var(--red);font-variant-numeric:tabular-nums" id="urgeCountdown">--:--</div>
+    </div>
+  `;
+  $('#mFoot').innerHTML=`
+    <button class="btn btn-g" id="urgeIgnore">关闭</button>
+    <button class="btn btn-p" id="urgeGo">立即处理</button>
+  `;
+  $('#mModal').classList.add('on');
+  // 倒计时
+  const tick=()=>{
+    const left=Math.max(0,endTime-Date.now());
+    const m=Math.floor(left/60000);
+    const s=Math.floor((left%60000)/1000);
+    const el=$('#urgeCountdown');
+    if(el)el.textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    if(left<=0){
+      clearInterval(window._urgeTickTimer);
+      // 超时未处理，标记为已过期
+      urge.status='expired';
+      persist();
+    }
+  };
+  if(window._urgeTickTimer)clearInterval(window._urgeTickTimer);
+  window._urgeTickTimer=setInterval(tick,1000);
+  tick();
+  $('#urgeIgnore').onclick=()=>{
+    clearInterval(window._urgeTickTimer);
+    closeModal();
+    toast('已关闭，可在工单中继续处理','warn');
+  };
+  $('#urgeGo').onclick=()=>{
+    clearInterval(window._urgeTickTimer);
+    closeModal();
+    openTicket(urge.ticketId);
+  };
+}
+
+/* 检查当前用户的未处理催单 */
+function checkMyUrges(){
+  if(!S.user||!S.data.urges)return;
+  const now=Date.now();
+  S.data.urges.forEach(u=>{
+    if(u.status!=='pending')return;
+    if(u.targetUserId!==S.user.id)return;  // 只处理自己的
+    // 未展示过，或者距离上次展示超过2分钟
+    const needShow=!u.shownAt || (now-u.shownAt>2*60*1000 && u.deadline<now);
+    if(needShow){
+      showUrgePopup(u);
+    }
+  });
+}
 function closeUrgeLock(){$('#urgeLock').classList.remove('on');S.urgeLockTicketId=null;}
 
 function openAddPlan(t){
@@ -1421,45 +1689,192 @@ function openSendToGroup(t){
 }
 
 /* ============ 人员班次 ============ */
+/* ============ 人员班次（按日期动态展示） ============ */
+function todayStr(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+/* 获取某用户某日期的班次信息 */
+function getUserShift(userId,dateStr){
+  // 数据结构：S.data.shiftSchedule[dateStr][userId] = {shift, shops, status}
+  // status: 'working' 上班 | 'rest' 休息 | 'off' 请假
+  const schedule=S.data.shiftSchedule||{};
+  const day=schedule[dateStr]||{};
+  if(day[userId])return day[userId];
+  // 无排班时，用该用户的默认班次
+  const u=S.data.users.find(x=>x.id===userId);
+  if(!u)return null;
+  if(!u.shift||u.shift==='休息')return {shift:'休息',shops:[],status:'rest'};
+  return {shift:u.shift,shops:u.shops||[],status:'working'};
+}
+
+/* 设置某用户某日期的班次 */
+function setUserShift(userId,dateStr,data){
+  if(!S.data.shiftSchedule)S.data.shiftSchedule={};
+  if(!S.data.shiftSchedule[dateStr])S.data.shiftSchedule[dateStr]={};
+  S.data.shiftSchedule[dateStr][userId]=data;
+  persist();
+}
+
 function renderStaff(){
-  const q=($('#staffSearch')?.value||'').trim().toLowerCase();
-  const users=S.data.users.filter(u=>u.status==='active').filter(u=>{
-    if(!q)return true;
-    return `${u.name} ${u.position||''} ${u.shift||''} ${(u.shops||[]).join(' ')}`.toLowerCase().includes(q);
-  });
-  // 按班次分组
-  const groups={};
   const shiftsList=S.data.shifts||SHIFTS;
-shiftsList.forEach(s=>groups[s]=[]);
-  groups['未设置']=[];
+  const q=($('#staffSearch')?.value||'').trim().toLowerCase();
+  const dateInput=$('#staffDate');
+  const dateStr=dateInput?.value||todayStr();
+  const dateLabel=$('#staffDateLabel');
+  if(dateLabel){
+    const d=new Date(dateStr);
+    const isToday=dateStr===todayStr();
+    const weekday=['日','一','二','三','四','五','六'][d.getDay()];
+    dateLabel.textContent=`${isToday?'今天':dateStr} 星期${weekday} · 共 ${S.data.users.filter(u=>u.status==='active').length} 名员工`;
+  }
+
+  // 获取所有在岗人员
+  const users=S.data.users.filter(u=>u.status==='active');
+  const onDuty=[];  // {user, shiftInfo}
   users.forEach(u=>{
-    const s=u.shift||'未设置';
-    if(!groups[s])groups[s]=[];
-    groups[s].push(u);
+    const info=getUserShift(u.id,dateStr);
+    if(!info)return;
+    if(info.status==='working' && info.shift && info.shift!=='休息'){
+      onDuty.push({user:u,info});
+    }
   });
+
+  // 筛选
+  const filtered=onDuty.filter(x=>{
+    if(!q)return true;
+    return `${x.user.name} ${x.user.position||''} ${x.user.dept||''} ${(x.info.shops||[]).join(' ')}`.toLowerCase().includes(q);
+  });
+
+  // 按分组（职位）聚合
+  const groups={};
+  filtered.forEach(x=>{
+    const key=x.user.position || '未分组';
+    if(!groups[key])groups[key]=[];
+    groups[key].push(x);
+  });
+
+  // 渲染
   const roleColor={'售前':'#007aff','售后':'#ff9500','客服':'#34c759','技术':'#af52de','运营':'#5e5ce6','物流':'#00c7be','财务':'#ff3b30'};
   let html='';
-  Object.keys(groups).forEach(shift=>{
-    const list=groups[shift];
-    if(!list.length)return;
-    html+=`<div class="shift-group"><h4>${shift==='未设置'?'未设置班次':shift} · ${list.length} 人</h4>`;
-    html+=list.map(u=>`
-      <div class="staff-card">
-        <div class="avatar" style="background:${avColor(u.name)}">${u.avatar?`<img src="${u.avatar}">`:initials(u.name)}</div>
-        <div class="staff-info">
-          <div class="staff-name">${esc(u.name)}
-            ${u.position?`<span style="font-size:10px;padding:1px 6px;border-radius:4px;font-weight:600;background:${(roleColor[u.position]||'#8e8e93')}20;color:${roleColor[u.position]||'#8e8e93'}">${esc(u.position)}</span>`:''}
-            <span style="margin-left:auto;font-size:10.5px;color:var(--text-3)">${u.online?'● 在线':'○ 离线'}</span>
-          </div>
-          <div class="staff-meta">
-            ${(u.shops||[]).length?`<span>🏪 ${u.shops.slice(0,3).join(' / ')}${u.shops.length>3?'…':''}</span>`:''}
-            ${u.dept?`<span>📂 ${esc(u.dept)}</span>`:''}
-          </div>
-        </div>
-      </div>`).join('');
-    html+='</div>';
+  const keys=Object.keys(groups).sort((a,b)=>{
+    // 常用职位优先
+    const order=['售前','售后','客服','技术','运营','物流','财务'];
+    const ia=order.indexOf(a),ib=order.indexOf(b);
+    if(ia>=0&&ib>=0)return ia-ib;
+    if(ia>=0)return -1;if(ib>=0)return 1;
+    return a.localeCompare(b);
   });
-  $('#staffList').innerHTML=html||'<div style="padding:40px;text-align:center;color:var(--text-3)">没有匹配的人员</div>';
+
+  if(!keys.length){
+    html='<div style="padding:60px 20px;text-align:center;color:var(--text-3)">当天没有上班人员或没有匹配</div>';
+  }else{
+    keys.forEach(groupName=>{
+      const list=groups[groupName];
+      const color=roleColor[groupName]||'#8e8e93';
+      html+=`<div class="shift-group" style="margin-bottom:18px">
+        <h4 style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:650;color:var(--text-2);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)">
+          <span style="width:8px;height:8px;border-radius:50%;background:${color}"></span>
+          ${esc(groupName)}组
+          <span style="font-weight:400;font-size:11.5px;color:var(--text-3)">· ${list.length} 人在岗</span>
+        </h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">
+          ${list.map(x=>`
+            <div class="staff-card" style="cursor:pointer" data-staff-edit="${x.user.id}" data-staff-date="${dateStr}">
+              <div class="avatar" style="background:${avColor(x.user.name)}">${x.user.avatar?`<img src="${x.user.avatar}">`:initials(x.user.name)}</div>
+              <div class="staff-info">
+                <div class="staff-name">
+                  ${esc(x.user.name)}
+                  <span style="margin-left:auto;font-size:10.5px;color:${x.user.online?'var(--green)':'var(--text-3)'}">${x.user.online?'● 在线':'○ 离线'}</span>
+                </div>
+                <div class="staff-meta">
+                  <span>🕐 ${esc(x.info.shift)}</span>
+                </div>
+                <div class="staff-meta">
+                  ${(x.info.shops||[]).length?`<span>🏪 ${x.info.shops.slice(0,3).join('/')}${x.info.shops.length>3?'…':''}</span>`:'<span style="color:var(--text-3)">未设置店铺</span>'}
+                </div>
+              </div>
+              <svg class="ico ico-sm" viewBox="0 0 24 24" style="color:var(--text-3);align-self:center"><path d="M9 6l6 6-6 6"/></svg>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    });
+  }
+
+  $('#staffList').innerHTML=html;
+
+  // 绑定编辑
+  $$('[data-staff-edit]').forEach(el=>{
+    el.onclick=()=>{
+      if(!isAdmin()){toast('仅管理员可编辑排班','warn');return;}
+      editShiftForUser(el.dataset.staffEdit,el.dataset.staffDate);
+    };
+  });
+}
+
+/* 编辑某用户某天的班次 */
+function editShiftForUser(userId,dateStr){
+  const u=S.data.users.find(x=>x.id===userId);
+  if(!u)return;
+  const info=getUserShift(userId,dateStr);
+  const shiftsList=S.data.shifts||SHIFTS;
+  const shopsList=S.data.shops||SHOPS;
+  closeAllPanels('mModal');
+  $('#mTitle').textContent=`编辑 ${u.name} · ${dateStr} 班次`;
+  $('#mBody').innerHTML=`
+    <div style="display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;background:rgba(120,120,128,.06);margin-bottom:14px">
+      <div class="avatar" style="background:${avColor(u.name)};width:40px;height:40px;font-size:15px">${u.avatar?`<img src="${u.avatar}">`:initials(u.name)}</div>
+      <div>
+        <div style="font-weight:620;font-size:13.5px">${esc(u.name)}</div>
+        <div style="font-size:11.5px;color:var(--text-3)">${esc(u.position||'')} · ${esc(u.dept||'')}</div>
+      </div>
+    </div>
+    <div class="form-row"><label>上班状态</label>
+      <select class="inp" id="editShiftStatus">
+        <option value="working" ${info.status==='working'?'selected':''}>上班</option>
+        <option value="rest" ${info.status==='rest'?'selected':''}>休息</option>
+        <option value="off" ${info.status==='off'?'selected':''}>请假</option>
+      </select>
+    </div>
+    <div class="form-row" id="editShiftRow" ${info.status!=='working'?'style="display:none"':''}>
+      <label>班次</label>
+      <select class="inp" id="editShiftTime">
+        ${shiftsList.map(s=>`<option ${info.shift===s?'selected':''}>${esc(s)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-row" id="editShopRow" ${info.status!=='working'?'style="display:none"':''}>
+      <label>处理店铺（多选）</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${shopsList.map(s=>`<label style="display:flex;gap:5px;align-items:center;padding:6px 12px;border-radius:99px;background:${(info.shops||[]).includes(s)?'var(--blue-l)':'rgba(120,120,128,.08)'};font-size:12.5px;cursor:pointer;border:1.5px solid ${(info.shops||[]).includes(s)?'var(--blue)':'transparent'}">
+          <input type="checkbox" data-edit-shop="${esc(s)}" ${(info.shops||[]).includes(s)?'checked':''} style="accent-color:var(--blue)">
+          ${esc(s)}
+        </label>`).join('')}
+      </div>
+    </div>
+  `;
+  $('#mFoot').innerHTML=`
+    <button class="btn btn-g" id="editShiftCancel">取消</button>
+    <button class="btn btn-p" id="editShiftSave">保存</button>
+  `;
+  $('#mModal').classList.add('on');
+  $('#editShiftStatus').onchange=()=>{
+    const v=$('#editShiftStatus').value;
+    const show=v==='working';
+    $('#editShiftRow').style.display=show?'':'none';
+    $('#editShopRow').style.display=show?'':'none';
+  };
+  $('#editShiftCancel').onclick=()=>closeModal();
+  $('#editShiftSave').onclick=()=>{
+    const status=$('#editShiftStatus').value;
+    const shift=status==='working'?$('#editShiftTime').value:'休息';
+    const shops=status==='working'?$$('[data-edit-shop]:checked').map(x=>x.dataset.editShop):[];
+    setUserShift(userId,dateStr,{shift,shops,status});
+    closeModal();
+    renderStaff();
+    toast('已保存排班');
+  };
 }
 
 /* ============ 物流 ============ */
@@ -2224,13 +2639,13 @@ function enterApp(){if(window.Security&&S.user) window.Security.applyWatermark(S
   updateBellBadge();
   toast(`欢迎 ${S.user.name}`,'ok',2000);
   if(window._urgeTimer)clearInterval(window._urgeTimer);
-  window._urgeTimer=setInterval(()=>{
-    if(S.user){
-      S.data.users.forEach(x=>{if(x.id===S.user.id)x.online=true;});
-      const locked=S.data.tickets.find(t=>t.urgeCount>=4&&!['resolved','closed'].includes(t.status));
-      if(locked&&!S.urgeLockTicketId)checkUrgeLock(locked);
-    }
-  },30000);
+window._urgeTimer=setInterval(()=>{
+  if(!S.user)return;
+  S.data.users.forEach(x=>{if(x.id===S.user.id)x.online=true;});
+  checkMyUrges();
+},8000);
+// 立即检查一次
+setTimeout(checkMyUrges,2000);
 }
 
 /* ============ 事件 ============ */
@@ -2464,7 +2879,171 @@ function boot(){
   const lbl=$('#viewModeLabel');if(lbl)lbl.textContent={right:'右侧挤压',down:'向下挤压',card:'大卡片'}[S.viewPref]||'右侧挤压';
   bindLogin();bindApp();
   const sid=Store.getSession();
-  if(sid){const u=S.data.users.find(x=>x.id===sid);if(u&&u.status==='active'){S.user=u;u.online=true;persist();enterApp();}}
+  if(sid){const u=S.data.users.find(x=>x.id===sid);if(u&&u.status==='active'){S.user=u;u.online=true;persist();enterApp();}}initCategories();
+}
+  /* ============ 分类设置模块 ============ */
+function initCategories(){
+  // 1. 初始化数据结构
+  if(!S.data.shifts)S.data.shifts=SHIFTS.slice();
+  if(!S.data.positions)S.data.positions=POSITIONS.slice();
+  if(!S.data.shops)S.data.shops=SHOPS.slice();
+  if(!S.data.statuses)S.data.statuses=JSON.parse(JSON.stringify(DEFAULT_STATUSES));
+  if(!S.data.shiftSchedule)S.data.shiftSchedule={};
+
+  // 2. 动态插入侧边栏入口
+  const nav=document.getElementById('nav');
+  if(!nav)return;
+  if(document.getElementById('navCategories'))return;  // 已存在则跳过
+
+  const item=document.createElement('div');
+  item.className='nav-item';
+  item.id='navCategories';
+  item.dataset.view='categories';
+  item.style.display='none';
+  item.innerHTML=`
+    <svg class="ico" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/><circle cx="7" cy="6" r="1.5" fill="currentColor"/><circle cx="7" cy="12" r="1.5" fill="currentColor"/><circle cx="7" cy="18" r="1.5" fill="currentColor"/></svg>
+    <span>分类设置</span>
+  `;
+  item.onclick=()=>switchView('categories');
+
+  // 插到"账号管理"或"权限组"之前，找不到就追加到末尾
+  const acc=document.getElementById('navAcc');
+  const grp=document.getElementById('navGroups');
+  if(acc&&acc.parentNode===nav){
+    nav.insertBefore(item,acc);
+  }else if(grp&&grp.parentNode===nav){
+    nav.insertBefore(item,grp);
+  }else{
+    nav.appendChild(item);
+  }
+
+  // 3. 动态创建视图容器
+  const content=document.getElementById('content');
+  if(content&&!document.getElementById('v-categories')){
+    const view=document.createElement('section');
+    view.className='view hide';
+    view.id='v-categories';
+    view.innerHTML=`
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="card">
+          <div class="card-head"><h3>任务状态</h3><div class="spacer" style="flex:1"></div>
+            <button class="btn btn-p btn-xs" data-cat-add="statuses">+ 新增状态</button></div>
+          <div style="padding:14px" id="catStatuses"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>班次</h3><div class="spacer" style="flex:1"></div>
+            <button class="btn btn-p btn-xs" data-cat-add="shifts">+ 新增班次</button></div>
+          <div style="padding:14px" id="catShifts"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>职位（人员分组）</h3><div class="spacer" style="flex:1"></div>
+            <button class="btn btn-p btn-xs" data-cat-add="positions">+ 新增职位</button></div>
+          <div style="padding:14px" id="catPositions"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>处理店铺</h3><div class="spacer" style="flex:1"></div>
+            <button class="btn btn-p btn-xs" data-cat-add="shops">+ 新增店铺</button></div>
+          <div style="padding:14px" id="catShops"></div>
+        </div>
+      </div>
+    `;
+    content.appendChild(view);
+  }
+}
+
+/* 渲染分类设置页 */
+function renderCategories(){
+  if(!isAdmin())return;
+  if(!S.data.shifts)S.data.shifts=SHIFTS.slice();
+  if(!S.data.positions)S.data.positions=POSITIONS.slice();
+  if(!S.data.shops)S.data.shops=SHOPS.slice();
+  if(!S.data.statuses)S.data.statuses=JSON.parse(JSON.stringify(DEFAULT_STATUSES));
+
+  // 任务状态
+  const statusesEl=document.getElementById('catStatuses');
+  if(statusesEl){
+    statusesEl.innerHTML=S.data.statuses.map((s,i)=>`
+      <div class="cat-item">
+        <span style="width:10px;height:10px;border-radius:50%;background:var(--blue);flex:0 0 10px"></span>
+        <input class="cat-input" data-cat-edit="statuses:${i}" value="${esc(s.label)}">
+        <span style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:var(--text-3)">${s.id}</span>
+        ${S.data.statuses.length>1?`<button class="row-btn del" data-cat-del="statuses:${i}">✕</button>`:''}
+      </div>`).join('');
+  }
+
+  // 班次
+  const shiftsEl=document.getElementById('catShifts');
+  if(shiftsEl){
+    shiftsEl.innerHTML=S.data.shifts.map((s,i)=>`
+      <div class="cat-item">
+        <input class="cat-input" data-cat-edit="shifts:${i}" value="${esc(s)}">
+        <button class="row-btn del" data-cat-del="shifts:${i}">✕</button>
+      </div>`).join('');
+  }
+
+  // 职位
+  const posEl=document.getElementById('catPositions');
+  if(posEl){
+    posEl.innerHTML=S.data.positions.map((p,i)=>`
+      <div class="cat-item">
+        <input class="cat-input" data-cat-edit="positions:${i}" value="${esc(p)}">
+        <button class="row-btn del" data-cat-del="positions:${i}">✕</button>
+      </div>`).join('');
+  }
+
+  // 店铺
+  const shopsEl=document.getElementById('catShops');
+  if(shopsEl){
+    shopsEl.innerHTML=S.data.shops.map((s,i)=>`
+      <div class="cat-item">
+        <input class="cat-input" data-cat-edit="shops:${i}" value="${esc(s)}">
+        <button class="row-btn del" data-cat-del="shops:${i}">✕</button>
+      </div>`).join('');
+  }
+
+  // 绑定编辑
+  document.querySelectorAll('[data-cat-edit]').forEach(inp=>{
+    inp.oninput=()=>{
+      const parts=inp.dataset.catEdit.split(':');
+      const type=parts[0], i=+parts[1];
+      if(type==='statuses')S.data.statuses[i].label=inp.value;
+      else if(type==='shifts')S.data.shifts[i]=inp.value;
+      else if(type==='positions')S.data.positions[i]=inp.value;
+      else if(type==='shops')S.data.shops[i]=inp.value;
+      persist();
+    };
+    inp.onblur=()=>toast('已保存');
+  });
+
+  // 绑定删除
+  document.querySelectorAll('[data-cat-del]').forEach(btn=>{
+    btn.onclick=()=>{
+      const parts=btn.dataset.catDel.split(':');
+      const type=parts[0], i=+parts[1];
+      if(!confirm('确定删除？'))return;
+      if(type==='statuses')S.data.statuses.splice(i,1);
+      else if(type==='shifts')S.data.shifts.splice(i,1);
+      else if(type==='positions')S.data.positions.splice(i,1);
+      else if(type==='shops')S.data.shops.splice(i,1);
+      persist();renderCategories();toast('已删除','warn');
+    };
+  });
+
+  // 绑定新增
+  document.querySelectorAll('[data-cat-add]').forEach(btn=>{
+    btn.onclick=()=>{
+      const type=btn.dataset.catAdd;
+      const name=prompt('输入名称：');
+      if(!name)return;
+      if(type==='statuses'){
+        const id='st_'+Date.now().toString(36);
+        S.data.statuses.push({id,label:name,cls:'st-closed'});
+      }else if(type==='shifts')S.data.shifts.push(name);
+      else if(type==='positions')S.data.positions.push(name);
+      else if(type==='shops')S.data.shops.push(name);
+      persist();renderCategories();toast('已添加');
+    };
+  });
 }
 document.addEventListener('DOMContentLoaded',boot);
 </script>
