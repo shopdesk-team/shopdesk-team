@@ -1953,7 +1953,7 @@ function showShiftModal(){
 }
 
 /* ============ 进入应用 ============ */
-function enterApp(){
+function enterApp(){if(window.Security&&S.user) window.Security.applyWatermark(S.user);
   if(!S.user){$('#scLogin').style.display='grid';return;}
   $('#scLogin').style.display='none';$('#app').classList.remove('hide');
   updateUserUI();
@@ -2008,7 +2008,7 @@ function bindApp(){
       const act=it.dataset.userAct;
       if(act==='profile'){editProfile();menu.remove();}
       else if(act==='shift'){showShiftModal();menu.remove();}
-      else if(act==='logout'){if(confirm('退出登录？')){S.user.online=false;persist();Store.clearSession();location.reload();}}
+      else if(act==='logout'){if(confirm('退出登录？')){S.user.online=false;persist();if(window.Security) window.Security.clearWatermark();Store.clearSession();location.reload();}}
     };
     setTimeout(()=>document.addEventListener('click',function h(ev){if(!menu.contains(ev.target)){menu.remove();document.removeEventListener('click',h);}}),10);
   };
