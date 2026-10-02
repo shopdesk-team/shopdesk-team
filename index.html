@@ -3,508 +3,631 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ShopDesk · 云盘协同工单</title>
+<title>内部协同工单系统</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{--blue:#007aff;--blue-d:#0062cc;--green:#34c759;--orange:#ff9500;--red:#ff3b30;--purple:#af52de;
---bg:#f5f5f7;--card:#fff;--border:rgba(0,0,0,.08);--text:#1d1d1f;--text2:#6e6e73;--text3:#86868b;
---r:14px;--sh-sm:0 1px 2px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.06);
---sh:0 4px 16px rgba(0,0,0,.08);--sh-lg:0 24px 60px -16px rgba(0,0,0,.32);--sw:236px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --blue:#007aff;--blue-d:#0062cc;--blue-l:#e5f0ff;
+  --green:#34c759;--orange:#ff9500;--red:#ff3b30;--pink:#ff2d55;--purple:#af52de;
+  --gray:#8e8e93;--gray-2:#c7c7cc;--gray-3:#e5e5ea;--gray-4:#f2f2f7;
+  --text:#1c1c1e;--text-2:#3a3a3c;--text-3:#8e8e93;
+  --bg:#f2f2f7;--card:#fff;--border:rgba(60,60,67,.1);
+  --r:12px;--r-sm:8px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.06);
+  --shadow:0 4px 20px rgba(0,0,0,.08);
+  --shadow-lg:0 20px 50px -12px rgba(0,0,0,.25);
+  --sw:236px;
+}
 html,body{height:100%}
-body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
-background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue",sans-serif;
+  background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;overflow:hidden;letter-spacing:-.01em}
 button,input,select,textarea{font:inherit;color:inherit;outline:none;border:none;background:none}
 button{cursor:pointer}
-::-webkit-scrollbar{width:10px;height:10px}
-::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);border-radius:10px;border:3px solid transparent;background-clip:content-box}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:rgba(60,60,67,.22);border-radius:8px;border:2px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:rgba(60,60,67,.35);background-clip:content-box}
 .hide{display:none!important}
-.screen{position:fixed;inset:0;display:grid;place-items:center;z-index:500;padding:20px}
-.sc-login{background:radial-gradient(at 15% 15%,#ff9a9e 0%,transparent 45%),
-radial-gradient(at 85% 10%,#a18cd1 0%,transparent 45%),
-radial-gradient(at 75% 85%,#fbc2eb 0%,transparent 45%),
-radial-gradient(at 10% 85%,#84fab0 0%,transparent 45%),#14142b}
-.cbox{width:480px;max-width:94vw;background:rgba(255,255,255,.88);
-backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);
-border:1px solid rgba(255,255,255,.6);border-radius:22px;padding:34px 32px 28px;
-box-shadow:0 40px 80px -20px rgba(0,0,0,.5);animation:in .5s cubic-bezier(.2,.9,.3,1)}
-@keyframes in{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
-.logo{width:58px;height:58px;border-radius:16px;margin:0 auto 14px;
-background:linear-gradient(135deg,#007aff,#5e5ce6);display:grid;place-items:center;
-color:#fff;font-size:26px;font-weight:700;box-shadow:0 14px 28px -10px rgba(0,122,255,.7)}
-.h1{text-align:center;font-size:21px;font-weight:650;letter-spacing:-.3px}
-.h2{text-align:center;font-size:13px;color:var(--text3);margin-top:4px;margin-bottom:22px}
-.tabs{display:flex;background:rgba(120,120,128,.12);border-radius:11px;padding:3px;margin-bottom:20px}
-.tab{flex:1;text-align:center;padding:8px;border-radius:9px;font-size:13.5px;color:var(--text2);font-weight:500;transition:.2s;cursor:pointer}
-.tab.on{background:#fff;color:var(--text);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+
+/* 登录 */
+.sc-login{position:fixed;inset:0;display:grid;place-items:center;z-index:500;padding:20px;
+  background:radial-gradient(ellipse at 20% 0%,#5e5ce6 0%,transparent 50%),
+  radial-gradient(ellipse at 80% 100%,#af52de 0%,transparent 50%),
+  radial-gradient(ellipse at 100% 0%,#ff375f 0%,transparent 45%),
+  radial-gradient(ellipse at 0% 100%,#007aff 0%,transparent 45%),#1c1c1e}
+.sc-login::before{content:"";position:absolute;inset:0;
+  background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.08) 1px,transparent 0);
+  background-size:24px 24px;pointer-events:none}
+.login-card{position:relative;width:400px;max-width:94vw;
+  background:rgba(255,255,255,.78);backdrop-filter:blur(50px) saturate(180%);
+  -webkit-backdrop-filter:blur(50px) saturate(180%);
+  border:1px solid rgba(255,255,255,.65);border-radius:20px;padding:38px 34px 30px;
+  box-shadow:0 30px 70px -20px rgba(0,0,0,.6),0 0 0 .5px rgba(0,0,0,.05);
+  animation:cardIn .55s cubic-bezier(.16,1,.3,1)}
+@keyframes cardIn{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:none}}
+.login-logo{width:62px;height:62px;border-radius:16px;margin:0 auto 16px;
+  background:linear-gradient(145deg,#007aff,#5e5ce6);display:grid;place-items:center;
+  color:#fff;font-size:28px;font-weight:700;
+  box-shadow:0 16px 30px -12px rgba(0,122,255,.85),inset 0 1px 1px rgba(255,255,255,.4)}
+.login-title{text-align:center;font-size:20px;font-weight:650;letter-spacing:-.4px}
+.login-sub{text-align:center;font-size:13px;color:var(--text-3);margin-top:4px;margin-bottom:26px}
+.login-tabs{display:flex;background:rgba(120,120,128,.14);border-radius:10px;padding:3px;margin-bottom:22px}
+.login-tab{flex:1;text-align:center;padding:7px;border-radius:8px;font-size:13px;color:var(--text-3);
+  font-weight:500;transition:.22s;cursor:pointer;user-select:none}
+.login-tab.on{background:#fff;color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
 .fg{margin-bottom:14px}
-.fg label{display:block;font-size:12.5px;font-weight:560;color:var(--text2);margin-bottom:6px}
-.fg label i{color:var(--red);font-style:normal;margin-left:2px}
-.inp{width:100%;padding:11px 14px;border-radius:11px;font-size:14px;background:rgba(120,120,128,.1);border:1px solid transparent;transition:.2s}
-.inp:focus{background:#fff;border-color:var(--blue);box-shadow:0 0 0 3.5px rgba(0,122,255,.16)}
+.fg label{display:block;font-size:12.5px;font-weight:560;color:var(--text-2);margin-bottom:6px}
+.inp{width:100%;padding:11px 14px;border-radius:10px;font-size:14px;
+  background:rgba(120,120,128,.12);border:1px solid transparent;transition:all .2s}
+.inp:focus{background:#fff;border-color:var(--blue);box-shadow:0 0 0 3.5px rgba(0,122,255,.14)}
 .inp::placeholder{color:#a1a1a6}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 18px;
-border-radius:11px;font-size:14px;font-weight:550;transition:.18s;white-space:nowrap}
-.btn-p{background:var(--blue);color:#fff;box-shadow:0 8px 18px -8px rgba(0,122,255,.9)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:9px 16px;border-radius:9px;font-size:13.5px;font-weight:550;
+  transition:all .18s;white-space:nowrap;user-select:none}
+.btn-p{background:var(--blue);color:#fff;box-shadow:0 1px 2px rgba(0,122,255,.3),0 6px 14px -6px rgba(0,122,255,.8)}
 .btn-p:hover{background:var(--blue-d);transform:translateY(-1px)}
-.btn-g{background:rgba(120,120,128,.12);color:var(--text)}
-.btn-g:hover{background:rgba(120,120,128,.2)}
+.btn-p:active{transform:translateY(0)}
+.btn-g{background:rgba(120,120,128,.14);color:var(--text)}
+.btn-g:hover{background:rgba(120,120,128,.22)}
 .btn-d{background:var(--red);color:#fff}
-.btn-sm{padding:6px 13px;font-size:12.5px;border-radius:9px}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:7px}
 .btn-blk{width:100%}
-.hint{margin-top:16px;padding:12px 14px;border-radius:11px;background:rgba(0,122,255,.08);font-size:12.5px;color:var(--text2);line-height:1.7}
-.hint b{color:var(--blue)}
-.note{margin-top:12px;padding:11px 14px;border-radius:11px;font-size:12.5px;background:rgba(255,149,0,.12);color:#a86200;line-height:1.6}
-.msgbox{text-align:center;font-size:13px;padding:12px;border-radius:10px;background:rgba(120,120,128,.08);margin-top:12px;line-height:1.7;color:var(--text2)}
-.msgbox.err{background:rgba(255,59,48,.1);color:#d70015}
-.msgbox.ok{background:rgba(52,199,89,.1);color:#1a7f37}
+.btn-icon{width:32px;height:32px;padding:0;border-radius:8px;display:grid;place-items:center}
+
+/* 应用 */
 .app{display:flex;height:100vh;overflow:hidden}
-.side{width:var(--sw);flex:0 0 var(--sw);background:rgba(246,246,248,.72);
-backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);
-border-right:1px solid var(--border);display:flex;flex-direction:column;padding:14px 12px}
-.traffic{display:flex;gap:8px;padding:4px 6px 14px}
-.traffic i{width:12px;height:12px;border-radius:50%;display:block}
-.traffic i:nth-child(1){background:#ff5f57}.traffic i:nth-child(2){background:#febc2e}.traffic i:nth-child(3){background:#28c840}
-.brand{display:flex;align-items:center;gap:10px;padding:2px 8px 16px}
-.brand-l{width:34px;height:34px;border-radius:10px;flex:0 0 34px;display:grid;place-items:center;
-background:linear-gradient(135deg,#007aff,#5e5ce6);color:#fff;font-weight:700;font-size:15px}
-.brand-t strong{display:block;font-size:14px;font-weight:650;line-height:1.2}
-.brand-t span{font-size:10.5px;color:var(--text3)}
-.nav{display:flex;flex-direction:column;gap:2px;flex:1;overflow-y:auto}
-.nav-l{font-size:10.5px;font-weight:650;color:var(--text3);letter-spacing:.6px;padding:10px 10px 5px;text-transform:uppercase}
-.ni{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:9px;font-size:13.5px;
-transition:.15s;user-select:none;position:relative;cursor:pointer}
-.ni svg{flex:0 0 17px;opacity:.75}
-.ni:hover{background:rgba(120,120,128,.12)}
-.ni.on{background:var(--blue);color:#fff;font-weight:560}
-.ni.on svg{opacity:1}
-.nb{margin-left:auto;background:var(--red);color:#fff;font-size:10.5px;font-weight:650;padding:1px 7px;border-radius:99px;line-height:1.5}
-.sfoot{margin-top:10px;padding:10px;border-radius:12px;background:rgba(120,120,128,.1);display:flex;align-items:center;gap:10px}
-.av{width:32px;height:32px;border-radius:50%;flex:0 0 32px;display:grid;place-items:center;color:#fff;font-size:12.5px;font-weight:650}
-.sfoot .who{font-size:12.5px;font-weight:580;line-height:1.3;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sfoot .rl{font-size:10.5px;color:var(--text3)}
-.lo{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:var(--text3);transition:.15s}
-.lo:hover{background:rgba(255,59,48,.14);color:var(--red)}
+.sidebar{width:var(--sw);flex:0 0 var(--sw);background:rgba(246,246,248,.76);
+  backdrop-filter:blur(50px) saturate(180%);-webkit-backdrop-filter:blur(50px) saturate(180%);
+  border-right:1px solid var(--border);display:flex;flex-direction:column;padding:12px 10px}
+.traffic{display:flex;gap:8px;padding:6px 8px 16px}
+.traffic i{width:12px;height:12px;border-radius:50%;display:block;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.15)}
+.traffic i:nth-child(1){background:#ff5f57}
+.traffic i:nth-child(2){background:#febc2e}
+.traffic i:nth-child(3){background:#28c840}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 8px 18px}
+.brand-logo{width:34px;height:34px;border-radius:9px;flex:0 0 34px;
+  background:linear-gradient(145deg,#007aff,#5e5ce6);display:grid;place-items:center;
+  color:#fff;font-weight:700;font-size:15px;
+  box-shadow:0 8px 16px -8px rgba(0,122,255,.9),inset 0 1px 1px rgba(255,255,255,.4)}
+.brand-text strong{display:block;font-size:13px;font-weight:650;letter-spacing:-.2px;line-height:1.2}
+.brand-text span{font-size:10.5px;color:var(--text-3);letter-spacing:.2px}
+.nav{display:flex;flex-direction:column;gap:1px;flex:1;overflow-y:auto;padding:0 2px}
+.nav-label{font-size:10.5px;font-weight:650;color:var(--text-3);letter-spacing:.5px;padding:12px 10px 5px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;
+  font-size:13.5px;color:var(--text);font-weight:450;transition:all .15s;
+  user-select:none;cursor:pointer;position:relative;letter-spacing:-.1px}
+.nav-item svg{flex:0 0 17px;opacity:.72}
+.nav-item:hover{background:rgba(120,120,128,.14)}
+.nav-item.on{background:var(--blue);color:#fff;font-weight:560;box-shadow:0 2px 6px -2px rgba(0,122,255,.5)}
+.nav-item.on svg{opacity:1}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;
+  font-size:10.5px;font-weight:650;padding:0 6px;min-width:16px;height:16px;
+  border-radius:8px;display:inline-grid;place-items:center;line-height:1}
+.nav-item.on .nav-badge{background:rgba(255,255,255,.3)}
+.sidebar-foot{margin-top:10px;padding:8px 10px;border-radius:10px;
+  background:rgba(120,120,128,.1);display:flex;align-items:center;gap:10px}
+.avatar{width:30px;height:30px;border-radius:50%;flex:0 0 30px;
+  display:grid;place-items:center;color:#fff;font-size:12px;font-weight:650;
+  box-shadow:inset 0 0 0 .5px rgba(0,0,0,.1)}
+.sidebar-foot .who{font-size:12.5px;font-weight:580;line-height:1.25;flex:1;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sidebar-foot .role{font-size:10.5px;color:var(--text-3)}
+.logout-btn{width:24px;height:24px;border-radius:6px;display:grid;place-items:center;
+  color:var(--text-3);transition:.15s}
+.logout-btn:hover{background:rgba(255,59,48,.16);color:var(--red)}
+
 .main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
-.top{height:56px;flex:0 0 56px;display:flex;align-items:center;gap:12px;padding:0 22px;
-background:rgba(255,255,255,.72);backdrop-filter:blur(30px) saturate(180%);
--webkit-backdrop-filter:blur(30px) saturate(180%);border-bottom:1px solid var(--border);z-index:20}
-.pt{font-size:15px;font-weight:650;letter-spacing:-.2px}
-.pt small{display:block;font-size:11px;font-weight:400;color:var(--text3)}
-.sp{flex:1}
-.sbox{display:flex;align-items:center;gap:7px;padding:7px 12px;border-radius:9px;background:rgba(120,120,128,.12);width:280px;transition:.2s}
-.sbox:focus-within{background:#fff;box-shadow:0 0 0 3.5px rgba(0,122,255,.16)}
-.sbox input{flex:1;font-size:13px}
-.ibtn{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:var(--text2);transition:.15s;position:relative;cursor:pointer}
-.ibtn:hover{background:rgba(120,120,128,.14);color:var(--text)}
-.cloud{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:9px;font-size:12px;font-weight:560;cursor:pointer}
-.cloud.on{background:rgba(52,199,89,.12);color:#1a7f37}
-.cloud.off{background:rgba(255,59,48,.1);color:#d70015}
-.cloud.sync{background:rgba(0,122,255,.1);color:var(--blue)}
-.dot{position:absolute;top:6px;right:6px;min-width:15px;height:15px;padding:0 4px;border-radius:99px;
-background:var(--red);color:#fff;font-size:9.5px;font-weight:650;display:grid;place-items:center;border:1.5px solid #fff}
-.cont{flex:1;overflow-y:auto;padding:20px 22px 40px}
-.card{background:var(--card);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--sh-sm)}
-.ch{display:flex;align-items:center;gap:10px;padding:15px 18px;border-bottom:1px solid var(--border)}
-.ch h3{font-size:14px;font-weight:640}
-.ch .sub{font-size:11.5px;color:var(--text3)}
-.ch .sp{flex:1}
+.topbar{height:52px;flex:0 0 52px;display:flex;align-items:center;gap:12px;padding:0 20px;
+  background:rgba(255,255,255,.72);backdrop-filter:blur(40px) saturate(180%);
+  -webkit-backdrop-filter:blur(40px) saturate(180%);
+  border-bottom:1px solid var(--border);z-index:20}
+.page-title{font-size:14.5px;font-weight:650;letter-spacing:-.2px}
+.page-title small{display:block;font-size:11px;font-weight:400;color:var(--text-3);letter-spacing:0;margin-top:1px}
+.spacer{flex:1}
+.search-bar{display:flex;align-items:center;gap:7px;padding:6px 11px;border-radius:8px;
+  background:rgba(120,120,128,.12);width:260px;transition:.2s}
+.search-bar:focus-within{background:#fff;box-shadow:0 0 0 3.5px rgba(0,122,255,.14)}
+.search-bar input{flex:1;font-size:12.5px}
+.icon-btn{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;
+  color:var(--text-2);transition:.15s;position:relative}
+.icon-btn:hover{background:rgba(120,120,128,.14);color:var(--text)}
+.dot-badge{position:absolute;top:5px;right:5px;min-width:14px;height:14px;padding:0 3px;
+  border-radius:7px;background:var(--red);color:#fff;font-size:9px;font-weight:650;
+  display:grid;place-items:center;border:1.5px solid #fff}
+.content{flex:1;overflow-y:auto;padding:20px 22px 40px}
+
+.card{background:var(--card);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+.card-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.card-head h3{font-size:13.5px;font-weight:640;letter-spacing:-.1px}
+.card-head .sub{font-size:11.5px;color:var(--text-3)}
+.card-head .spacer{flex:1}
+
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
-.stat{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--sh-sm);transition:.22s}
-.stat:hover{transform:translateY(-2px);box-shadow:var(--sh)}
-.si{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;margin-bottom:10px}
-.sl{font-size:12px;color:var(--text3);display:block}
-.sv{font-size:25px;font-weight:700;letter-spacing:-.6px;line-height:1.2}
-.tw{overflow-x:auto}
+.stat{background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  padding:16px;box-shadow:var(--shadow-sm);transition:.22s}
+.stat:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.stat-ico{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;margin-bottom:10px}
+.stat-label{font-size:12px;color:var(--text-3);display:block}
+.stat-val{font-size:26px;font-weight:700;letter-spacing:-.8px;line-height:1.15;
+  font-variant-numeric:tabular-nums;margin-top:2px}
+
+.tbl-wrap{overflow-x:auto}
 table.tb{width:100%;border-collapse:collapse;font-size:13px;min-width:860px}
-table.tb th{text-align:left;font-weight:600;color:var(--text3);font-size:11px;padding:11px 15px;
-background:rgba(120,120,128,.05);border-bottom:1px solid var(--border);white-space:nowrap;text-transform:uppercase}
-table.tb td{padding:13px 15px;border-bottom:1px solid rgba(0,0,0,.05);vertical-align:middle}
-table.tb tbody tr{cursor:pointer;transition:background .13s}
-table.tb tbody tr:hover{background:rgba(0,122,255,.045)}
-.tno{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--blue);font-weight:620}
-.ttl{font-weight:560;display:block;font-size:13px}
-.tsub{font-size:11.5px;color:var(--text3)}
-.mt{color:var(--text3);font-size:12px;white-space:nowrap}
-.chip{display:inline-block;padding:3px 9px;border-radius:7px;background:rgba(120,120,128,.12);color:var(--text2);font-size:11.5px;white-space:nowrap}
-.bdg{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:560;white-space:nowrap}
+table.tb th{text-align:left;font-weight:600;color:var(--text-3);font-size:11px;letter-spacing:.4px;
+  padding:10px 14px;background:rgba(120,120,128,.04);border-bottom:1px solid var(--border);
+  white-space:nowrap;text-transform:uppercase}
+table.tb td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+table.tb tbody tr{cursor:pointer;transition:background .12s}
+table.tb tbody tr:hover{background:rgba(0,122,255,.05)}
+table.tb tbody tr:last-child td{border-bottom:none}
+.tk-no{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--blue);font-weight:620}
+.tk-title{font-weight:560;display:block;font-size:12.5px;letter-spacing:-.1px}
+.tk-sub{font-size:11px;color:var(--text-3);margin-top:1px}
+.muted{color:var(--text-3);font-size:11.5px;white-space:nowrap}
+.chip{display:inline-block;padding:2px 8px;border-radius:5px;
+  background:rgba(120,120,128,.12);color:var(--text-2);font-size:11px;white-space:nowrap}
+.bdg{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;
+  border-radius:99px;font-size:11px;font-weight:560;white-space:nowrap}
 .bdg::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
-.st-pending{background:#fff4e0;color:#b45309}
-.st-processing{background:#e5f0ff;color:#0062cc}
+.st-pending{background:#fff4e0;color:#b25000}
+.st-processing{background:var(--blue-l);color:var(--blue-d)}
 .st-resolved{background:#e3f8ea;color:#1a7f37}
-.st-closed{background:#f0f0f2;color:#6e6e73}
-.pri{display:inline-flex;padding:3px 9px;border-radius:7px;font-size:11px;font-weight:620}
+.st-closed{background:rgba(120,120,128,.14);color:var(--gray)}
+.pri{display:inline-flex;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:620}
 .pr-urgent{background:#ffe5e3;color:#d70015}
-.pr-high{background:#ffead5;color:#b25000}
-.pr-medium{background:#e5efff;color:#0055b3}
-.pr-low{background:#f0f0f2;color:#6e6e73}
-.agent{display:flex;align-items:center;gap:7px;white-space:nowrap}
-.aav{width:23px;height:23px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:650;color:#fff;flex:0 0 23px}
-.rbtn{padding:5px 11px;border-radius:8px;font-size:12px;color:var(--blue);background:rgba(0,122,255,.1);font-weight:560}
-.rbtn:hover{background:#d5e6ff}
-.chat-layout{display:flex;height:100%;background:#fff;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);box-shadow:var(--sh-sm)}
-.cs{width:262px;flex:0 0 262px;border-right:1px solid var(--border);display:flex;flex-direction:column;background:rgba(246,246,248,.6)}
-.csh{padding:14px 15px 10px;display:flex;align-items:center;gap:8px}
-.csh h3{font-size:14px;font-weight:650;flex:1}
-.clist{flex:1;overflow-y:auto;padding:4px 8px 12px}
-.ci{display:flex;gap:10px;padding:10px;border-radius:10px;cursor:pointer;transition:.15s;margin-bottom:2px}
-.ci:hover{background:rgba(120,120,128,.1)}
-.ci.on{background:var(--blue);color:#fff}
-.ciav{width:38px;height:38px;border-radius:11px;flex:0 0 38px;display:grid;place-items:center;font-size:15px;font-weight:650;color:#fff}
-.cib{flex:1;min-width:0}
-.cin{font-size:13px;font-weight:580;display:flex;align-items:center;gap:6px}
-.cisub{font-size:11.5px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cit{font-size:10px;color:var(--text3);flex:0 0 auto}
-.ci.on .cisub,.ci.on .cit{color:rgba(255,255,255,.8)}
-.cm{flex:1;display:flex;flex-direction:column;min-width:0}
-.ch2{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.ch2 h4{font-size:14.5px;font-weight:650}
-.cts{display:flex;gap:6px;flex-wrap:wrap;flex:1}
-.ttag{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:7px;background:rgba(0,122,255,.1);color:var(--blue);font-size:11px;font-weight:560;cursor:pointer}
-.ttag::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
-.msgs{flex:1;overflow-y:auto;padding:18px 20px;background:rgba(246,246,248,.4)}
-.msg{display:flex;gap:10px;margin-bottom:16px;position:relative}
-.mav{width:34px;height:34px;border-radius:50%;flex:0 0 34px;display:grid;place-items:center;color:#fff;font-size:12.5px;font-weight:650;cursor:pointer}
-.mb{flex:1;min-width:0}
-.mn{font-size:11.5px;color:var(--text3);margin-bottom:3px;display:flex;gap:8px}
-.mn b{font-weight:580;color:var(--text2)}
-.mbub{display:inline-block;max-width:100%;padding:9px 13px;border-radius:13px;background:#fff;font-size:13.5px;line-height:1.55;word-break:break-word;box-shadow:var(--sh-sm);border:1px solid var(--border)}
-.msg.mine .mbub{background:var(--blue);color:#fff;border-color:transparent}
-.msg.mine{flex-direction:row-reverse}
-.msg.mine .mb{display:flex;flex-direction:column;align-items:flex-end}
-.msys{text-align:center;margin:14px 0;font-size:12px;color:var(--text3)}
-.msys span{background:rgba(120,120,128,.14);padding:4px 12px;border-radius:99px}
-.mimg{max-width:260px;max-height:220px;border-radius:10px;display:block;cursor:pointer;margin-top:4px}
-.cia{border-top:1px solid var(--border);padding:10px 14px 14px;background:#fff}
-.ctools{display:flex;gap:4px;margin-bottom:8px;align-items:center}
-.tb2{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:var(--text3);transition:.15s;cursor:pointer}
-.tb2:hover{background:rgba(120,120,128,.14);color:var(--text)}
-.cir{display:flex;gap:10px;align-items:flex-end}
-.cinp{flex:1;padding:10px 13px;border-radius:11px;background:rgba(120,120,128,.1);font-size:13.5px;resize:none;height:42px;max-height:120px;font-family:inherit;line-height:1.5}
-.cinp:focus{background:#fff;box-shadow:0 0 0 3.5px rgba(0,122,255,.16)}
-.sbtn{padding:10px 18px;border-radius:11px;background:var(--blue);color:#fff;font-weight:560;font-size:13.5px;height:42px}
-.ov{position:fixed;inset:0;background:rgba(0,0,0,.32);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:.28s;z-index:90}
-.ov.on{opacity:1;pointer-events:auto}
-.drawer{position:fixed;top:0;right:0;height:100vh;width:600px;max-width:96vw;background:#fff;
-transform:translateX(102%);transition:transform .34s cubic-bezier(.32,.72,.3,1);z-index:100;
-display:flex;flex-direction:column;box-shadow:-30px 0 70px -30px rgba(0,0,0,.5)}
-.drawer.on{transform:none}
-.dh{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;gap:12px}
-.dh h2{font-size:16px;font-weight:650;margin-bottom:4px}
-.dh .meta{font-size:11.5px;color:var(--text3);font-family:ui-monospace,Menlo,monospace}
-.cx{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:var(--text3);flex:0 0 32px}
-.cx:hover{background:rgba(120,120,128,.14);color:var(--text)}
-.db{flex:1;overflow-y:auto;padding:18px 20px}
-.df{padding:14px 20px;border-top:1px solid var(--border);background:rgba(120,120,128,.04)}
-.brow{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}
-.sec{margin-bottom:20px}
-.sect{font-size:11px;font-weight:700;letter-spacing:.7px;color:var(--text3);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
-.sect .line{flex:1;height:1px;background:var(--border)}
-.ig{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.ii{background:rgba(120,120,128,.07);border-radius:10px;padding:10px 12px}
-.ii span{font-size:11px;color:var(--text3);display:block;margin-bottom:2px}
-.ii strong{font-size:13px;font-weight:560}
-.dbox{background:rgba(120,120,128,.07);border-radius:11px;padding:13px 15px;font-size:13px;color:var(--text2);line-height:1.7}
-.plan{border-radius:11px;padding:13px 15px;margin-bottom:9px;border-left:4px solid var(--blue);background:rgba(120,120,128,.06)}
-.ptag{font-size:10.5px;font-weight:650;padding:2px 8px;border-radius:6px;color:#fff}
-.ptitle{font-size:13px;font-weight:600;margin:6px 0 4px}
-.pbody{font-size:12.5px;color:var(--text2);line-height:1.65}
-.pmeta{font-size:11px;color:var(--text3);margin-top:7px;display:flex;gap:12px}
-.tml{position:relative;padding-left:20px}
-.tml::before{content:"";position:absolute;left:4px;top:6px;bottom:6px;width:2px;background:rgba(120,120,128,.16);border-radius:2px}
-.tli{position:relative;padding-bottom:16px}
-.tli::before{content:"";position:absolute;left:-20px;top:4px;width:10px;height:10px;border-radius:50%;background:#fff;border:2.5px solid #c7cbf5}
-.tli:first-child::before{border-color:var(--blue);background:var(--blue)}
-.tlit{font-size:13px;font-weight:580;display:flex;justify-content:space-between;gap:10px}
-.tlit time{font-size:11px;color:var(--text3);font-weight:400}
-.tlid{font-size:12.5px;color:var(--text3);margin-top:2px;line-height:1.6}
-.modal{position:fixed;inset:0;z-index:110;display:grid;place-items:center;padding:22px;opacity:0;pointer-events:none;transition:.22s}
+.pr-high{background:#ffe8d0;color:#b25000}
+.pr-medium{background:var(--blue-l);color:#0055b3}
+.pr-low{background:rgba(120,120,128,.14);color:var(--gray)}
+.row-btn{padding:4px 10px;border-radius:6px;font-size:11.5px;color:var(--blue);
+  background:rgba(0,122,255,.1);font-weight:560;transition:.14s}
+.row-btn:hover{background:rgba(0,122,255,.18)}
+
+/* 设计器 */
+.designer{display:grid;grid-template-columns:280px 1fr 320px;gap:16px;height:calc(100vh - 136px)}
+.panel{background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  box-shadow:var(--shadow-sm);display:flex;flex-direction:column;overflow:hidden}
+.panel-head{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.panel-head h4{font-size:13px;font-weight:640;flex:1;letter-spacing:-.1px}
+.panel-body{flex:1;overflow-y:auto;padding:10px}
+
+.comp-list{display:flex;flex-direction:column;gap:4px}
+.comp-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;
+  cursor:pointer;transition:.14s;font-size:12.5px;user-select:none}
+.comp-item:hover{background:rgba(0,122,255,.07)}
+.comp-item:active{transform:scale(.97)}
+.comp-ico{width:26px;height:26px;border-radius:6px;display:grid;place-items:center;
+  background:rgba(0,122,255,.1);color:var(--blue);font-size:13px;flex:0 0 26px}
+
+.canvas{padding:16px;background:rgba(120,120,128,.04)}
+.form-title-row{display:flex;align-items:center;gap:8px;padding:12px 14px;
+  background:#fff;border-radius:10px;margin-bottom:10px;border:1px solid var(--border)}
+.form-title-row input{flex:1;font-size:15px;font-weight:600;background:none}
+.form-title-row input::placeholder{color:var(--text-3);font-weight:400}
+
+.field-card{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:12px 14px;margin-bottom:8px;transition:.15s;position:relative;cursor:pointer}
+.field-card:hover{border-color:rgba(0,122,255,.3);box-shadow:0 2px 8px -2px rgba(0,122,255,.15)}
+.field-card.sel{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,122,255,.14)}
+.field-card.dragging{opacity:.5}
+.field-label{font-size:13px;font-weight:560;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.field-label .req{color:var(--red)}
+.field-label .type-chip{font-size:10px;font-weight:600;color:var(--blue);
+  background:var(--blue-l);padding:1px 6px;border-radius:4px;letter-spacing:.2px}
+.field-preview{font-size:12px;color:var(--text-3);padding:6px 0}
+.field-preview .fake-input{padding:6px 10px;background:rgba(120,120,128,.08);
+  border-radius:6px;font-size:12.5px;color:var(--text-3);pointer-events:none}
+.field-preview .fake-radio{display:flex;gap:10px;flex-wrap:wrap}
+.field-preview .fake-radio span{padding:4px 10px;background:rgba(120,120,128,.08);
+  border-radius:6px;font-size:12px;color:var(--text-3)}
+.field-card-actions{position:absolute;top:8px;right:8px;display:flex;gap:3px;opacity:0;transition:.15s}
+.field-card:hover .field-card-actions{opacity:1}
+.field-act{width:24px;height:24px;border-radius:6px;display:grid;place-items:center;
+  color:var(--text-3);transition:.14s;font-size:13px}
+.field-act:hover{background:rgba(120,120,128,.15);color:var(--text)}
+.field-act.del:hover{background:rgba(255,59,48,.15);color:var(--red)}
+.field-cond-badge{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;
+  color:var(--orange);background:rgba(255,149,0,.12);padding:2px 7px;border-radius:5px;
+  margin-top:6px;font-weight:560}
+
+.canvas-empty{padding:60px 20px;text-align:center;color:var(--text-3);font-size:13px;
+  border:2px dashed rgba(120,120,128,.2);border-radius:12px}
+.canvas-empty svg{opacity:.4;margin-bottom:12px}
+
+.prop-group{margin-bottom:14px}
+.prop-group h5{font-size:11px;font-weight:650;color:var(--text-3);letter-spacing:.5px;
+  text-transform:uppercase;margin-bottom:8px}
+.prop-row{margin-bottom:10px}
+.prop-row label{display:block;font-size:12px;font-weight:560;color:var(--text-2);margin-bottom:5px}
+.prop-row input,.prop-row select,.prop-row textarea{
+  width:100%;padding:7px 10px;border-radius:7px;font-size:12.5px;
+  background:rgba(120,120,128,.1);border:1px solid transparent;transition:.2s}
+.prop-row input:focus,.prop-row select:focus,.prop-row textarea:focus{
+  background:#fff;border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,122,255,.14)}
+.prop-row textarea{resize:vertical;min-height:60px;font-family:inherit}
+.prop-checkbox{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12.5px;cursor:pointer}
+.prop-checkbox input{width:15px;height:15px;accent-color:var(--blue);cursor:pointer}
+.option-list{display:flex;flex-direction:column;gap:5px;margin-top:5px}
+.option-item{display:flex;gap:5px;align-items:center}
+.option-item input{flex:1;padding:5px 9px;font-size:12px;background:rgba(120,120,128,.1);
+  border-radius:6px;border:1px solid transparent}
+.option-item input:focus{background:#fff;border-color:var(--blue)}
+.option-item .rm{width:22px;height:22px;border-radius:5px;display:grid;place-items:center;
+  color:var(--text-3);font-size:14px;transition:.14s}
+.option-item .rm:hover{background:rgba(255,59,48,.15);color:var(--red)}
+.add-opt-btn{padding:6px 12px;border-radius:7px;background:rgba(0,122,255,.1);
+  color:var(--blue);font-size:12px;font-weight:560;margin-top:6px}
+.add-opt-btn:hover{background:rgba(0,122,255,.18)}
+.cond-block{padding:10px;border-radius:8px;background:rgba(255,149,0,.06);
+  border:1px dashed rgba(255,149,0,.3)}
+.cond-empty{font-size:12px;color:var(--text-3);text-align:center;padding:12px}
+
+/* 表单渲染 */
+.form-render{padding:20px}
+.form-render-title{font-size:16px;font-weight:680;margin-bottom:4px;letter-spacing:-.2px}
+.form-render-desc{font-size:12.5px;color:var(--text-3);margin-bottom:20px}
+.field-row{margin-bottom:16px;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.field-row label{display:block;font-size:12.5px;font-weight:560;color:var(--text-2);margin-bottom:6px}
+.field-row label .req{color:var(--red);margin-left:2px}
+.field-row label .hint{font-size:11px;color:var(--text-3);font-weight:400;margin-left:8px}
+.field-input{width:100%;padding:9px 12px;border-radius:9px;font-size:13.5px;
+  background:rgba(120,120,128,.1);border:1px solid transparent;transition:.2s}
+.field-input:focus{background:#fff;border-color:var(--blue);box-shadow:0 0 0 3.5px rgba(0,122,255,.14)}
+.field-input::placeholder{color:#a1a1a6}
+select.field-input{cursor:pointer}
+textarea.field-input{resize:vertical;min-height:80px;font-family:inherit}
+.radio-group{display:flex;gap:8px;flex-wrap:wrap}
+.radio-opt{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;
+  background:rgba(120,120,128,.08);cursor:pointer;font-size:13px;transition:.14s;
+  border:1.5px solid transparent;user-select:none}
+.radio-opt:hover{background:rgba(120,120,128,.14)}
+.radio-opt.on{background:var(--blue-l);border-color:var(--blue);color:var(--blue-d);font-weight:560}
+.radio-opt input{display:none}
+.checkbox-list{display:flex;flex-direction:column;gap:5px}
+.checkbox-opt{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:8px;
+  background:rgba(120,120,128,.08);cursor:pointer;font-size:13px;transition:.14s;user-select:none}
+.checkbox-opt:hover{background:rgba(120,120,128,.14)}
+.checkbox-opt.on{background:var(--blue-l);border-color:var(--blue)}
+.checkbox-opt input{width:15px;height:15px;accent-color:var(--blue);cursor:pointer}
+.switch{position:relative;width:46px;height:26px;background:rgba(120,120,128,.28);
+  border-radius:99px;transition:.24s;cursor:pointer;flex:0 0 46px}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:22px;height:22px;
+  border-radius:50%;background:#fff;transition:.24s cubic-bezier(.2,.9,.3,1);
+  box-shadow:0 2px 5px rgba(0,0,0,.2)}
+.switch.on{background:var(--green)}
+.switch.on::after{transform:translateX(20px)}
+
+.dynamic-field{animation:fieldIn .3s cubic-bezier(.2,1,.3,1)}
+@keyframes fieldIn{from{opacity:0;max-height:0;transform:translateY(-8px)}to{opacity:1;max-height:500px;transform:none}}
+
+/* 详情字段 */
+.detail-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.detail-field{background:rgba(120,120,128,.05);border-radius:10px;padding:11px 13px;
+  border:1px solid var(--border)}
+.detail-field.full{grid-column:1/-1}
+.detail-field-label{font-size:11px;color:var(--text-3);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.detail-field-label .type-chip{font-size:9.5px;font-weight:600;color:var(--blue);
+  background:var(--blue-l);padding:0 5px;border-radius:3px}
+.detail-field-value{font-size:13px;font-weight:560;color:var(--text);word-break:break-word}
+.detail-field-value.empty{color:var(--text-3);font-weight:400;font-style:italic}
+.detail-field-value .tag{display:inline-block;padding:2px 8px;border-radius:5px;
+  background:var(--blue-l);color:var(--blue-d);font-size:11.5px;margin:2px 4px 2px 0;font-weight:560}
+
+/* 表单卡片 */
+.form-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.form-card{background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  padding:16px;box-shadow:var(--shadow-sm);cursor:pointer;transition:.2s}
+.form-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:rgba(0,122,255,.3)}
+.form-card-head{display:flex;align-items:flex-start;gap:11px;margin-bottom:11px}
+.form-card-ico{width:42px;height:42px;border-radius:11px;flex:0 0 42px;
+  display:grid;place-items:center;font-size:20px;color:#fff}
+.form-card-name{font-weight:620;font-size:13.5px;letter-spacing:-.1px;margin-bottom:3px}
+.form-card-desc{font-size:11.5px;color:var(--text-3);line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.form-card-stats{display:flex;gap:12px;padding-top:11px;border-top:1px solid var(--border);
+  font-size:11.5px;color:var(--text-3)}
+.form-card-stats b{color:var(--text);font-weight:650;font-variant-numeric:tabular-nums}
+
+/* 模态 */
+.modal{position:fixed;inset:0;z-index:110;display:grid;place-items:center;padding:22px;
+  opacity:0;pointer-events:none;transition:.24s}
 .modal.on{opacity:1;pointer-events:auto}
-.mbg{position:absolute;inset:0;background:rgba(0,0,0,.36);backdrop-filter:blur(4px)}
-.mc{position:relative;background:#fff;border-radius:18px;width:560px;max-width:100%;max-height:88vh;
-display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--sh-lg);
-transform:translateY(14px) scale(.97);transition:.28s cubic-bezier(.2,.9,.3,1)}
-.modal.on .mc{transform:none}
-.mc.sm{width:440px}
-.mh{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
-.mh h3{font-size:15.5px;font-weight:650;flex:1}
-.mbody{padding:20px 22px;overflow-y:auto}
-.mf{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:9px;justify-content:flex-end;background:rgba(120,120,128,.04)}
-.fr{margin-bottom:14px}
-.fr label{display:block;font-size:12.5px;font-weight:560;color:var(--text2);margin-bottom:6px}
-.fr label i{color:var(--red);font-style:normal;margin-left:2px}
-.fr input,.fr select,.fr textarea{width:100%;padding:10px 13px;border-radius:10px;font-size:13.5px;background:rgba(120,120,128,.09);border:1px solid transparent;transition:.2s}
-.fr input:focus,.fr select:focus,.fr textarea:focus{background:#fff;border-color:var(--blue);box-shadow:0 0 0 3.5px rgba(0,122,255,.16)}
-.fr textarea{resize:vertical;min-height:78px;font-family:inherit}
-.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.slist{display:flex;flex-direction:column}
-.sitem{display:flex;align-items:center;gap:15px;padding:15px 18px;border-bottom:1px solid var(--border)}
-.sitem:last-child{border-bottom:none}
-.sitem .txt{flex:1}
-.sitem .txt strong{font-size:13.5px;font-weight:580;display:block}
-.sitem .txt span{font-size:12px;color:var(--text3)}
-.cust-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:14px}
-.cc{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:17px;box-shadow:var(--sh-sm)}
-.ct2{display:flex;align-items:center;gap:11px;margin-bottom:13px}
-.cav{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;font-size:14px;font-weight:650;color:#fff;flex:0 0 42px}
-.cn{font-weight:620;font-size:14px}
-.cp{font-size:11.5px;color:var(--text3);font-family:ui-monospace,Menlo,monospace}
-.cst{display:flex;gap:8px;border-top:1px solid var(--border);padding-top:12px}
-.cstt{flex:1;text-align:center}
-.cstt strong{display:block;font-size:16px;font-weight:680}
-.cstt span{font-size:11px;color:var(--text3)}
-#toasts{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;gap:9px;align-items:center;pointer-events:none}
-.toast{background:rgba(28,28,30,.94);color:#fff;padding:11px 20px;border-radius:12px;font-size:13.5px;
-box-shadow:0 18px 40px -16px rgba(0,0,0,.7);backdrop-filter:blur(20px);
-display:flex;align-items:center;gap:9px;white-space:nowrap;max-width:88vw}
-.toast::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green);flex:0 0 7px}
+.modal-bg{position:absolute;inset:0;background:rgba(0,0,0,.38);backdrop-filter:blur(6px)}
+.modal-card{position:relative;background:#fff;border-radius:18px;width:520px;max-width:100%;
+  max-height:88vh;display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 40px 80px -20px rgba(0,0,0,.45);
+  transform:translateY(14px) scale(.97);transition:.3s cubic-bezier(.2,1,.3,1)}
+.modal.on .modal-card{transform:none}
+.modal-card.lg{width:760px}
+.modal-card.sm{width:420px}
+.modal-head{padding:16px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px}
+.modal-head h3{font-size:15px;font-weight:650;flex:1;letter-spacing:-.2px}
+.modal-body{padding:20px;overflow-y:auto}
+.modal-foot{padding:12px 20px;border-top:1px solid var(--border);
+  display:flex;gap:9px;justify-content:flex-end;background:rgba(120,120,128,.03)}
+.close-x{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;
+  color:var(--text-3);transition:.14s}
+.close-x:hover{background:rgba(120,120,128,.16);color:var(--text)}
+
+.form-row{margin-bottom:14px}
+.form-row label{display:block;font-size:12.5px;font-weight:560;color:var(--text-2);margin-bottom:6px}
+.form-row input,.form-row select,.form-row textarea{
+  width:100%;padding:9px 12px;border-radius:9px;font-size:13.5px;
+  background:rgba(120,120,128,.1);border:1px solid transparent;transition:.2s}
+.form-row input:focus,.form-row select:focus,.form-row textarea:focus{
+  background:#fff;border-color:var(--blue);box-shadow:0 0 0 3.5px rgba(0,122,255,.14)}
+.form-row textarea{resize:vertical;min-height:72px;font-family:inherit}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+
+/* 抽屉 */
+.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.32);backdrop-filter:blur(4px);
+  opacity:0;pointer-events:none;transition:.3s;z-index:90}
+.drawer-mask.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;height:100vh;width:640px;max-width:96vw;background:#fff;
+  transform:translateX(102%);transition:transform .38s cubic-bezier(.32,.72,0,1);
+  z-index:100;display:flex;flex-direction:column;
+  box-shadow:-40px 0 80px -30px rgba(0,0,0,.4)}
+.drawer.on{transform:none}
+.drawer-head{padding:18px 22px 14px;border-bottom:1px solid var(--border);
+  display:flex;gap:12px;align-items:flex-start}
+.drawer-head h2{font-size:16px;font-weight:650;line-height:1.35;letter-spacing:-.2px;margin-bottom:4px}
+.drawer-head .meta{font-size:11.5px;color:var(--text-3);font-family:ui-monospace,Menlo,monospace}
+.drawer-body{flex:1;overflow-y:auto;padding:18px 22px}
+.drawer-foot{padding:14px 22px;border-top:1px solid var(--border);
+  background:rgba(120,120,128,.04);display:flex;gap:8px;flex-wrap:wrap}
+
+/* Toast */
+#toasts{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:700;
+  display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{background:rgba(28,28,30,.92);color:#fff;padding:10px 18px;border-radius:11px;
+  font-size:13px;box-shadow:0 18px 40px -16px rgba(0,0,0,.7);
+  backdrop-filter:blur(20px);display:flex;align-items:center;gap:9px;
+  animation:tin .3s cubic-bezier(.2,1,.3,1);white-space:nowrap;max-width:88vw}
+.toast::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green);flex:0 0 6px}
 .toast.warn::before{background:var(--orange)}
 .toast.err::before{background:var(--red)}
-.iv{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.88);display:grid;place-items:center;padding:40px;opacity:0;pointer-events:none;transition:.24s}
-.iv.on{opacity:1;pointer-events:auto}
-.iv img{max-width:100%;max-height:100%;border-radius:10px}
-@media (max-width:1080px){.stats{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:900px){:root{--sw:68px}
-.brand-t,.ni span,.nav-l,.sfoot .who,.sfoot .rl{display:none}
-.ni{justify-content:center;padding:10px}.nb{position:absolute;top:4px;right:6px;font-size:9px;padding:0 5px}
-.brand{justify-content:center;padding:2px 0 14px}.sfoot{justify-content:center;padding:8px}
-.cs{width:220px;flex:0 0 220px}}
-@media (max-width:720px){.cont{padding:14px}.top{padding:0 14px;gap:8px}
-.sbox{width:150px}.stats{grid-template-columns:1fr;gap:10px}
-.drawer{width:100%}.ig,.fgrid{grid-template-columns:1fr}.cs{display:none}}
+.toast.out{animation:tout .3s forwards}
+@keyframes tin{from{opacity:0;transform:translateY(14px) scale(.95)}to{opacity:1;transform:none}}
+@keyframes tout{to{opacity:0;transform:translateY(10px) scale(.96)}}
+
+@media (max-width:1180px){.stats{grid-template-columns:repeat(2,1fr)}
+  .designer{grid-template-columns:240px 1fr 280px}}
+@media (max-width:900px){
+  :root{--sw:64px}
+  .brand-text,.nav-item span,.nav-label,.sidebar-foot .who,.sidebar-foot .role{display:none}
+  .nav-item{justify-content:center;padding:9px}
+  .nav-badge{position:absolute;top:4px;right:6px;font-size:9px;padding:0 5px;min-width:14px;height:14px}
+  .brand{justify-content:center;padding:2px 0 14px}
+  .sidebar-foot{justify-content:center;padding:6px}
+  .designer{grid-template-columns:1fr;height:auto}
+}
+@media (max-width:720px){
+  .content{padding:14px}.topbar{padding:0 14px;gap:8px}
+  .search-bar{width:140px}.stats{grid-template-columns:1fr;gap:10px}
+  .drawer{width:100%}.detail-fields,.form-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
 
 <!-- 登录 -->
-<div class="screen sc-login" id="scLogin">
-  <div class="cbox">
-    <div class="logo">工</div>
-    <div class="h1">ShopDesk</div>
-    <div class="h2">云盘协同工单 · Aiinak Drive 存储</div>
-    <div class="tabs">
-      <div class="tab on" data-tab="login">登录</div>
-      <div class="tab" data-tab="reg">注册申请</div>
+<div class="sc-login" id="scLogin">
+  <div class="login-card">
+    <div class="login-logo">工</div>
+    <div class="login-title">内部协同工单系统</div>
+    <div class="login-sub">智能表单 · 团队协作</div>
+    <div class="login-tabs">
+      <div class="login-tab on" data-tab="login">登录</div>
+      <div class="login-tab" data-tab="reg">注册申请</div>
     </div>
-    <div id="fLogin">
-      <div class="fg"><label>账号（手机号）<i>*</i></label>
-        <input class="inp" id="lgPhone" placeholder="请输入手机号"></div>
-      <div class="fg"><label>密码<i>*</i></label>
-        <input class="inp" id="lgPwd" type="password" placeholder="请输入密码"></div>
-      <button class="btn btn-p btn-blk" id="btnLogin" style="padding:12px">登 录</button>
-      <div class="hint">管理员：<b>13939538389</b> / <b>hong980727</b></div>
+    <div id="paneLogin">
+      <div class="fg"><label>账号</label><input class="inp" id="lgPhone" placeholder="请输入手机号" autocomplete="username"></div>
+      <div class="fg"><label>密码</label><input class="inp" id="lgPwd" type="password" placeholder="请输入密码" autocomplete="current-password"></div>
+      <button class="btn btn-p btn-blk" id="btnLogin" style="padding:11px;margin-top:6px">登 录</button>
     </div>
-    <div id="fReg" class="hide">
-      <div class="fg"><label>姓名<i>*</i></label><input class="inp" id="rgName"></div>
-      <div class="fg"><label>手机号<i>*</i></label><input class="inp" id="rgPhone"></div>
-      <div class="fg"><label>密码<i>*</i></label><input class="inp" id="rgPwd" type="password"></div>
-      <div class="fg"><label>部门</label><input class="inp" id="rgDept"></div>
-      <button class="btn btn-p btn-blk" id="btnReg" style="padding:12px">提交注册申请</button>
-      <div class="note">提交后需管理员审批。</div>
+    <div id="paneReg" class="hide">
+      <div class="fg"><label>姓名</label><input class="inp" id="rgName" placeholder="请输入姓名"></div>
+      <div class="fg"><label>手机号</label><input class="inp" id="rgPhone" placeholder="11 位手机号"></div>
+      <div class="fg"><label>密码</label><input class="inp" id="rgPwd" type="password" placeholder="至少 6 位"></div>
+      <div class="fg"><label>部门</label><input class="inp" id="rgDept" placeholder="如：售后客服组"></div>
+      <button class="btn btn-p btn-blk" id="btnReg" style="padding:11px;margin-top:6px">提交申请</button>
     </div>
-  </div>
-</div>
-
-<!-- 引导 -->
-<div class="screen hide" id="scGuide" style="background:linear-gradient(135deg,#667eea,#764ba2)">
-  <div class="cbox" style="width:540px">
-    <div class="logo" style="background:linear-gradient(135deg,#5e5ce6,#af52de)">☁️</div>
-    <div class="h1">配置 Aiinak Drive 存储</div>
-    <div class="h2">所有工单、群聊、图视频都存这里</div>
-    <div class="fg">
-      <label>API Key<i>*</i></label>
-      <input class="inp" id="setupKey" placeholder="adk_..." autocomplete="off">
-      <div style="font-size:11.5px;color:var(--text3);margin-top:6px;line-height:1.6">
-        在 Aiinak Drive 的 <b>Drive Settings → API Keys</b> 创建，勾选 files:read、files:write
-      </div>
-    </div>
-    <div class="fg">
-      <label>API Base URL</label>
-      <input class="inp" id="setupBase" value="https://drive.aiinak.com/api/v1" placeholder="默认即可">
-    </div>
-    <button class="btn btn-p btn-blk" id="btnConnect" style="padding:14px">测试连接并进入系统</button>
-    <div id="guideMsg" class="hide"></div>
   </div>
 </div>
 
 <!-- 主应用 -->
 <div class="app hide" id="app">
-  <aside class="side">
+  <aside class="sidebar">
     <div class="traffic"><i></i><i></i><i></i></div>
     <div class="brand">
-      <div class="brand-l">工</div>
-      <div class="brand-t"><strong>ShopDesk</strong><span>Aiinak 云盘</span></div>
+      <div class="brand-logo">工</div>
+      <div class="brand-text"><strong>内部协同工单</strong><span>智能表单</span></div>
     </div>
     <nav class="nav" id="nav">
-      <div class="nav-l">工作台</div>
-      <div class="ni on" data-view="dashboard">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
-        <span>数据概览</span></div>
-      <div class="ni" data-view="tickets">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
-        <span>工单管理</span><em class="nb" id="navTkBadge">0</em></div>
-      <div class="ni" data-view="chat">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg>
-        <span>群聊协作</span><em class="nb" id="navChBadge">0</em></div>
-      <div class="ni" data-view="customers">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <span>客户档案</span></div>
-      <div class="nav-l" id="admLabel" style="display:none">管理</div>
-      <div class="ni" data-view="accounts" id="navAcc" style="display:none">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
-        <span>账号管理</span><em class="nb" id="navAccBadge" style="display:none">0</em></div>
-      <div class="ni" data-view="settings">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
-        <span>系统设置</span></div>
+      <div class="nav-label">工作台</div>
+      <div class="nav-item on" data-view="dashboard">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        <span>数据概览</span>
+      </div>
+      <div class="nav-item" data-view="tickets">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
+        <span>工单管理</span>
+        <em class="nav-badge" id="navTkBadge">0</em>
+      </div>
+      <div class="nav-item" data-view="forms">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>
+        <span>表单中心</span>
+      </div>
+      <div class="nav-item" data-view="customers">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>客户档案</span>
+      </div>
+      <div class="nav-label" id="admLabel" style="display:none">管理</div>
+      <div class="nav-item" data-view="accounts" id="navAcc" style="display:none">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+        <span>账号管理</span>
+        <em class="nav-badge" id="navAccBadge" style="display:none">0</em>
+      </div>
     </nav>
-    <div class="sfoot">
-      <div class="av" id="meAv">—</div>
+    <div class="sidebar-foot">
+      <div class="avatar" id="meAv">—</div>
       <div style="flex:1;min-width:0">
         <div class="who" id="meName">—</div>
-        <div class="rl" id="meRole">—</div>
+        <div class="role" id="meRole">—</div>
       </div>
-      <button class="lo" id="btnLogout" title="退出">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>
+      <button class="logout-btn" id="btnLogout" title="退出">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>
       </button>
     </div>
   </aside>
 
   <main class="main">
-    <header class="top">
-      <div class="pt"><span id="pageTitle">数据概览</span><small id="pageSub">今日工单处理情况</small></div>
-      <div class="sp"></div>
-      <div class="sbox">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
-        <input id="globalSearch" placeholder="搜索工单号 / 订单号 / 客户">
+    <header class="topbar">
+      <div class="page-title">
+        <span id="pageTitle">数据概览</span>
+        <small id="pageSub">今日工单处理情况</small>
       </div>
-      <div class="cloud on" id="cloudBadge" title="点击立即同步">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10Z"/></svg>
-        <span id="cloudText">已同步</span>
+      <div class="spacer"></div>
+      <div class="search-bar">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+        <input id="globalSearch" placeholder="搜索工单号 / 客户">
       </div>
-      <button class="ibtn" id="btnBell">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-        <span class="dot" id="bellBadge" style="display:none">0</span>
+      <button class="icon-btn" id="btnBell">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
       </button>
       <button class="btn btn-p btn-sm" id="btnNewTicket">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
         新建工单
       </button>
     </header>
 
-    <div class="cont">
-      <!-- 概览 -->
+    <div class="content" id="content">
+      <!-- 数据概览 -->
       <section class="view" id="v-dashboard">
         <div class="stats">
-          <div class="stat"><div class="si" style="background:rgba(0,122,255,.12);color:#007aff">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
-            <span class="sl">待处理</span><strong class="sv" id="stPending">0</strong></div>
-          <div class="stat"><div class="si" style="background:rgba(255,149,0,.14);color:#ff9500">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/></svg></div>
-            <span class="sl">今日新增</span><strong class="sv" id="stToday">0</strong></div>
-          <div class="stat"><div class="si" style="background:rgba(94,92,230,.14);color:#5e5ce6">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></svg></div>
-            <span class="sl">处理中</span><strong class="sv" id="stProcessing">0</strong></div>
-          <div class="stat"><div class="si" style="background:rgba(52,199,89,.14);color:#34c759">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></div>
-            <span class="sl">累计解决</span><strong class="sv" id="stResolved">0</strong></div>
+          <div class="stat">
+            <div class="stat-ico" style="background:rgba(0,122,255,.12);color:#007aff">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            </div>
+            <span class="stat-label">待处理</span>
+            <strong class="stat-val" id="stPending">0</strong>
+          </div>
+          <div class="stat">
+            <div class="stat-ico" style="background:rgba(255,149,0,.14);color:#ff9500">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M3 12h18"/></svg>
+            </div>
+            <span class="stat-label">今日新增</span>
+            <strong class="stat-val" id="stToday">0</strong>
+          </div>
+          <div class="stat">
+            <div class="stat-ico" style="background:rgba(94,92,230,.14);color:#5e5ce6">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <span class="stat-label">处理中</span>
+            <strong class="stat-val" id="stProcessing">0</strong>
+          </div>
+          <div class="stat">
+            <div class="stat-ico" style="background:rgba(52,199,89,.14);color:#34c759">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <span class="stat-label">累计解决</span>
+            <strong class="stat-val" id="stResolved">0</strong>
+          </div>
         </div>
         <div class="card">
-          <div class="ch"><h3>最近工单</h3><div class="sp"></div><span class="sub" id="syncHint">Aiinak Drive 同步</span></div>
-          <div class="tw"><table class="tb" style="min-width:600px">
-            <thead><tr><th>工单号</th><th>标题</th><th>优先级</th><th>状态</th><th>时间</th></tr></thead>
-            <tbody id="recentRows"></tbody></table></div>
+          <div class="card-head">
+            <h3>最近工单</h3>
+            <div class="spacer"></div>
+            <span class="sub">实时更新</span>
+          </div>
+          <div class="tbl-wrap">
+            <table class="tb" style="min-width:600px">
+              <thead><tr><th>工单号</th><th>表单 / 摘要</th><th>优先级</th><th>状态</th><th>时间</th></tr></thead>
+              <tbody id="recentRows"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
-      <!-- 工单 -->
+      <!-- 工单管理 -->
       <section class="view hide" id="v-tickets">
         <div class="card">
           <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border)">
-            <div style="display:flex;gap:4px;background:rgba(120,120,128,.12);padding:3px;border-radius:10px" id="statusTabs">
-              <button class="tab on" data-status="all" style="padding:6px 13px;font-size:12.5px">全部</button>
-              <button class="tab" data-status="pending" style="padding:6px 13px;font-size:12.5px">待处理</button>
-              <button class="tab" data-status="processing" style="padding:6px 13px;font-size:12.5px">处理中</button>
-              <button class="tab" data-status="resolved" style="padding:6px 13px;font-size:12.5px">已完成</button>
-              <button class="tab" data-status="closed" style="padding:6px 13px;font-size:12.5px">已关闭</button>
+            <div style="display:flex;gap:3px;background:rgba(120,120,128,.12);padding:3px;border-radius:9px" id="statusTabs">
+              <button class="login-tab on" data-status="all" style="padding:5px 12px;font-size:12px">全部</button>
+              <button class="login-tab" data-status="pending" style="padding:5px 12px;font-size:12px">待处理</button>
+              <button class="login-tab" data-status="processing" style="padding:5px 12px;font-size:12px">处理中</button>
+              <button class="login-tab" data-status="resolved" style="padding:5px 12px;font-size:12px">已完成</button>
+              <button class="login-tab" data-status="closed" style="padding:5px 12px;font-size:12px">已关闭</button>
             </div>
-            <div class="sp"></div>
-            <div style="display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:9px;background:rgba(120,120,128,.1)">
-              <input id="filterSearch" placeholder="工单号 / 订单号…" style="font-size:12.5px;width:150px">
+            <div class="spacer"></div>
+            <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;background:rgba(120,120,128,.1);width:180px">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+              <input id="filterSearch" placeholder="工单号" style="font-size:12.5px;flex:1;background:none">
             </div>
           </div>
-          <div class="tw"><table class="tb">
-            <thead><tr>
-              <th style="width:130px">工单号</th><th>标题 / 客户 / 订单号</th>
-              <th style="width:92px">类型</th><th style="width:78px">优先级</th>
-              <th style="width:106px">状态</th><th style="width:92px">时间</th><th style="width:70px"></th>
-            </tr></thead>
-            <tbody id="ticketRows"></tbody>
-          </table></div>
+          <div class="tbl-wrap">
+            <table class="tb">
+              <thead><tr>
+                <th style="width:120px">工单号</th>
+                <th>表单 / 摘要</th>
+                <th style="width:100px">表单类型</th>
+                <th style="width:72px">优先级</th>
+                <th style="width:96px">状态</th>
+                <th style="width:88px">时间</th>
+                <th style="width:62px"></th>
+              </tr></thead>
+              <tbody id="ticketRows"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
-      <!-- 群聊 -->
-      <section class="view hide" id="v-chat" style="height:calc(100vh - 116px)">
-        <div class="chat-layout">
-          <div class="cs">
-            <div class="csh"><h3>群聊</h3>
-              <button class="ibtn" id="btnNewGroup" title="创建群聊">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-              </button></div>
-            <div class="clist" id="chatList"></div>
+      <!-- 表单中心 -->
+      <section class="view hide" id="v-forms">
+        <div class="card">
+          <div class="card-head">
+            <h3>表单模板</h3>
+            <div class="spacer"></div>
+            <button class="btn btn-p btn-sm" id="btnNewForm">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              新建表单
+            </button>
           </div>
-          <div class="cm" id="chatMain">
-            <div style="padding:60px 20px;text-align:center;color:var(--text3);margin:auto">
-              <p>选择左侧群聊开始协作</p></div>
+          <div style="padding:16px">
+            <div class="form-cards" id="formCards"></div>
           </div>
         </div>
       </section>
 
       <!-- 客户 -->
       <section class="view hide" id="v-customers">
-        <div class="cust-grid" id="custGrid"></div>
+        <div class="card">
+          <div class="card-head"><h3>客户档案</h3></div>
+          <div style="padding:16px" id="custGrid"></div>
+        </div>
       </section>
 
       <!-- 账号 -->
       <section class="view hide" id="v-accounts">
         <div class="card">
-          <div class="ch"><h3>账号管理</h3><div class="sp"></div>
+          <div class="card-head">
+            <h3>账号管理</h3>
+            <div class="spacer"></div>
             <button class="btn btn-p btn-sm" id="btnCreateAccount">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
-              直接开账号</button></div>
-          <div class="tw"><table class="tb" style="min-width:760px">
-            <thead><tr><th>用户</th><th style="width:130px">手机号</th><th style="width:110px">角色</th>
-              <th style="width:130px">部门</th><th style="width:110px">状态</th><th style="width:150px"></th></tr></thead>
-            <tbody id="accountRows"></tbody></table></div>
-        </div>
-      </section>
-
-      <!-- 设置 -->
-      <section class="view hide" id="v-settings">
-        <div class="card" style="max-width:760px">
-          <div class="ch"><h3>云盘存储</h3><div class="sp"></div><span class="sub" id="setCloudStatus">—</span></div>
-          <div style="padding:16px 18px">
-            <div class="fr">
-              <label>API Key</label>
-              <input id="setKey" type="password" placeholder="adk_... (点显示可查看)">
-            </div>
-            <div class="fr">
-              <label>API Base URL</label>
-              <input id="setBase" placeholder="https://drive.aiinak.com/api/v1">
-            </div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">
-              <button class="btn btn-p btn-sm" id="btnTestConn">测试连接</button>
-              <button class="btn btn-p btn-sm" id="btnSaveKey">保存</button>
-              <button class="btn btn-g btn-sm" id="btnSyncNow">立即同步</button>
-              <button class="btn btn-g btn-sm" id="btnShowKey">显示</button>
-            </div>
-            <div id="setMsg" class="hide" style="margin-top:12px"></div>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              开账号
+            </button>
           </div>
-        </div>
-        <div class="card" style="max-width:760px;margin-top:16px">
-          <div class="ch"><h3>通知</h3></div>
-          <div class="slist">
-            <div class="sitem"><div class="txt"><strong>消息提示音</strong><span>收到新消息时播放</span></div>
-              <input type="checkbox" id="swSound" checked></div>
+          <div class="tbl-wrap">
+            <table class="tb" style="min-width:720px">
+              <thead><tr>
+                <th>用户</th><th style="width:120px">手机号</th><th style="width:100px">角色</th>
+                <th style="width:120px">部门</th><th style="width:100px">状态</th><th style="width:140px"></th>
+              </tr></thead>
+              <tbody id="accountRows"></tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -512,414 +635,1126 @@ display:flex;align-items:center;gap:9px;white-space:nowrap;max-width:88vw}
   </main>
 </div>
 
-<!-- 抽屉 -->
-<div class="ov" id="ov"></div>
+<!-- 抽屉：工单详情 -->
+<div class="drawer-mask" id="drawerMask"></div>
 <aside class="drawer" id="drawer">
-  <div class="dh"><div style="flex:1;min-width:0">
-    <h2 id="dwTitle">—</h2><div class="meta" id="dwNo">—</div></div>
-    <button class="cx" id="dwClose">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  <div class="drawer-head">
+    <div style="flex:1;min-width:0">
+      <h2 id="dwTitle">—</h2>
+      <div class="meta" id="dwNo">—</div>
+    </div>
+    <button class="close-x" id="dwClose">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
   </div>
-  <div class="db" id="drawerBody"></div>
-  <div class="df"><div style="display:flex;gap:8px;flex-wrap:wrap" id="dwActions"></div></div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot" id="dwActions"></div>
 </aside>
 
-<!-- 新建工单 -->
-<div class="modal" id="mTicket">
-  <div class="mbg" data-close="mTicket"></div>
-  <div class="mc"><div class="mh"><h3>新建工单</h3>
-    <button class="cx" data-close="mTicket"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
-    <div class="mbody">
-      <div class="fgrid">
-        <div class="fr"><label>客户姓名<i>*</i></label><input id="fName"></div>
-        <div class="fr"><label>联系电话<i>*</i></label><input id="fPhone"></div>
+<!-- 选择表单 -->
+<div class="modal" id="mPickForm">
+  <div class="modal-bg" data-close="mPickForm"></div>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>选择工单表单</h3>
+      <button class="close-x" data-close="mPickForm">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-cards" id="pickFormCards"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 填写工单 -->
+<div class="modal" id="mFillTicket">
+  <div class="modal-bg" data-close="mFillTicket"></div>
+  <div class="modal-card lg">
+    <div class="modal-head">
+      <h3 id="fillTitle">填写工单</h3>
+      <button class="close-x" data-close="mFillTicket">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-render">
+        <div class="form-render-title" id="fillFormName">—</div>
+        <div class="form-render-desc" id="fillFormDesc">—</div>
+        <div id="fillFields"></div>
       </div>
-      <div class="fr"><label>订单号<i>*</i></label><input id="fOrder"></div>
-      <div class="fgrid">
-        <div class="fr"><label>类型</label><select id="fType"></select></div>
-        <div class="fr"><label>优先级</label><select id="fPriority">
-          <option value="low">低</option><option value="medium" selected>中</option>
-          <option value="high">高</option><option value="urgent">紧急</option></select></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-g" data-close="mFillTicket">取消</button>
+      <button class="btn btn-p" id="btnSubmitFill">创建工单</button>
+    </div>
+  </div>
+</div>
+
+<!-- 设计器 -->
+<div class="modal" id="mDesigner">
+  <div class="modal-bg" data-close="mDesigner"></div>
+  <div class="modal-card" style="width:96vw;height:92vh;max-width:none">
+    <div class="modal-head">
+      <h3 id="designerTitle">表单设计器</h3>
+      <button class="btn btn-g btn-sm" id="btnDesignerPreview">预览</button>
+      <button class="btn btn-p btn-sm" id="btnDesignerSave">保存</button>
+      <button class="close-x" data-close="mDesigner">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="padding:16px;background:rgba(120,120,128,.04)">
+      <div class="designer">
+        <div class="panel">
+          <div class="panel-head"><h4>字段组件</h4></div>
+          <div class="panel-body">
+            <div class="comp-list">
+              <div class="comp-item" data-comp="text"><span class="comp-ico">Aa</span>单行文本</div>
+              <div class="comp-item" data-comp="textarea"><span class="comp-ico">¶</span>多行文本</div>
+              <div class="comp-item" data-comp="number"><span class="comp-ico">#</span>数字</div>
+              <div class="comp-item" data-comp="select"><span class="comp-ico">▼</span>下拉选择</div>
+              <div class="comp-item" data-comp="radio"><span class="comp-ico">◉</span>单选</div>
+              <div class="comp-item" data-comp="checkbox"><span class="comp-ico">☑</span>多选</div>
+              <div class="comp-item" data-comp="switch"><span class="comp-ico">◐</span>开关</div>
+              <div class="comp-item" data-comp="date"><span class="comp-ico">📅</span>日期</div>
+              <div class="comp-item" data-comp="datetime"><span class="comp-ico">🕐</span>日期时间</div>
+              <div class="comp-item" data-comp="user"><span class="comp-ico">👤</span>成员选择</div>
+              <div class="comp-item" data-comp="divider"><span class="comp-ico">—</span>分割线</div>
+              <div class="comp-item" data-comp="title"><span class="comp-ico">H</span>标题</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <h4>表单画布</h4>
+            <span class="sub" style="font-size:11px;color:var(--text-3)" id="fieldCount">0 个字段</span>
+          </div>
+          <div class="panel-body" style="padding:0">
+            <div class="canvas">
+              <div class="form-title-row">
+                <input id="designerFormName" placeholder="未命名表单">
+              </div>
+              <div class="form-title-row" style="margin-top:-4px">
+                <input id="designerFormDesc" placeholder="表单说明（可选）" style="font-size:13px;font-weight:400">
+              </div>
+              <div id="canvasFields"></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h4>字段属性</h4></div>
+          <div class="panel-body" id="propPanel">
+            <div class="cond-empty">从左侧拖入或点击字段添加到画布</div>
+          </div>
+        </div>
       </div>
-      <div class="fr"><label>标题<i>*</i></label><input id="fTitle"></div>
-      <div class="fr" style="margin-bottom:0"><label>描述</label><textarea id="fDesc"></textarea></div>
     </div>
-    <div class="mf"><button class="btn btn-g" data-close="mTicket">取消</button>
-      <button class="btn btn-p" id="btnSubmitTicket">创建</button></div>
   </div>
-</div>
-
-<!-- 创建群聊 -->
-<div class="modal" id="mGroup">
-  <div class="mbg" data-close="mGroup"></div>
-  <div class="mc"><div class="mh"><h3>创建群聊</h3>
-    <button class="cx" data-close="mGroup"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
-    <div class="mbody">
-      <div class="fr"><label>群聊名称<i>*</i></label><input id="gName"></div>
-      <div class="fr" style="margin-bottom:0"><label>关联工单（可多选）</label>
-        <div id="gTickets" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;padding:8px"></div></div>
-    </div>
-    <div class="mf"><button class="btn btn-g" data-close="mGroup">取消</button>
-      <button class="btn btn-p" id="btnSubmitGroup">创建</button></div>
-  </div>
-</div>
-
-<!-- 添加方案 -->
-<div class="modal" id="mPlan">
-  <div class="mbg" data-close="mPlan"></div>
-  <div class="mc sm"><div class="mh"><h3>添加处理方案</h3>
-    <button class="cx" data-close="mPlan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
-    <div class="mbody">
-      <div class="fr"><label>颜色标签</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap" id="planColors"></div></div>
-      <div class="fr"><label>方案标题<i>*</i></label><input id="planTitle"></div>
-      <div class="fr" style="margin-bottom:0"><label>方案内容<i>*</i></label><textarea id="planBody"></textarea></div>
-    </div>
-    <div class="mf"><button class="btn btn-g" data-close="mPlan">取消</button>
-      <button class="btn btn-p" id="btnSubmitPlan">提交</button></div>
-  </div>
-</div>
-
-<!-- 图片查看器 -->
-<div class="iv" id="imgViewer">
-  <div id="imgViewerInner"></div>
 </div>
 
 <div id="toasts"></div>
 
 <script>
-/* ============ 基础工具 ============ */
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
 const pad=n=>String(n).padStart(2,'0');
 const pick=a=>a[Math.floor(Math.random()*a.length)];
-const rnd=(a,b)=>a+Math.random()*(b-a);
 const uid=(p='id')=>p+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const initials=n=>!n?'?':/[\u4e00-\u9fa5]/.test(n)?n.slice(-2):n.slice(0,2).toUpperCase();
-const avColor=s=>{const p=['#007aff','#5e5ce6','#ff9500','#34c759','#ff3b30','#af52de','#00c7be','#ff2d55','#5856d6','#a2845e'];let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return p[h%p.length];};
+const avColor=s=>{const p=['#ff9500','#ff3b30','#af52de','#34c759','#007aff','#5e5ce6','#00c7be','#ff2d55','#5856d6','#a2845e'];let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return p[h%p.length];};
 function fmtTime(ts){const d=Date.now()-ts;if(d<60e3)return '刚刚';if(d<3600e3)return Math.floor(d/60e3)+' 分钟前';if(d<86400e3)return Math.floor(d/3600e3)+' 小时前';if(d<7*86400e3)return Math.floor(d/86400e3)+' 天前';const t=new Date(ts);return `${t.getMonth()+1}/${t.getDate()}`;}
 function fullTime(ts){const d=new Date(ts);return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;}
-function clockTime(ts){const d=new Date(ts);return `${pad(d.getHours())}:${pad(d.getMinutes())}`;}
 function codeDate(ts){const d=new Date(ts);return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;}
 
-/* ============ 声音 ============ */
-let ac=null;
-function beep(f,d,delay=0,t='sine',v=0.14){try{if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();const ts=ac.currentTime+delay;const o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.setValueAtTime(f,ts);g.gain.setValueAtTime(0,ts);g.gain.linearRampToValueAtTime(v,ts+0.01);g.gain.exponentialRampToValueAtTime(0.0001,ts+d);o.connect(g).connect(ac.destination);o.start(ts);o.stop(ts+d+0.02);}catch(e){}}
-
-/* ============ 云存储 ============ */
-const Cloud={
-  key:localStorage.getItem('sd_key')||'',
-  base:localStorage.getItem('sd_base')||'https://drive.aiinak.com/api/v1',
-  folderId:null,
-  online:false,
-
-  cfg(key,base){this.key=key;this.base=base||this.base;localStorage.setItem('sd_key',key);localStorage.setItem('sd_base',this.base);},
-  clear(){this.key='';localStorage.removeItem('sd_key');this.online=false;},
-
-  async req(path,opt={}){
-    if(!this.key)throw new Error('未配置 API Key');
-    const res=await fetch(this.base+path,{
-      ...opt,
-      headers:{'Authorization':'Bearer '+this.key,'Content-Type':'application/json',...opt.headers},
-    });
-    if(!res.ok){
-      const err=await res.json().catch(()=>({}));
-      throw new Error(err.message||`请求失败(${res.status})`);
-    }
-    return res;
-  },
-
-  async test(){
-    try{
-      await this.req('/files/list?limit=1');
-      this.online=true;
-      return true;
-    }catch(e){
-      this.online=false;
-      throw e;
-    }
-  },
-
-  async upload(name,data){
-    try{
-      await this.req('/files/upload',{
-        method:'POST',
-        body:JSON.stringify({name,content:JSON.stringify(data)}),
-      });
-      return true;
-    }catch(e){
-      console.warn('云端上传失败，降级本地',e);
-      return false;
-    }
-  },
-
-  async read(name){
-    try{
-      const res=await this.req('/files/read?path='+encodeURIComponent(name));
-      const txt=await res.text();
-      return JSON.parse(txt);
-    }catch(e){
-      return null;
-    }
-  },
+const Store={
+  KEY:'internal_ticket_system',
+  SESSION:'internal_ticket_session',
+  load(){try{const d=localStorage.getItem(this.KEY);return d?JSON.parse(d):null;}catch(e){return null;}},
+  save(d){try{localStorage.setItem(this.KEY,JSON.stringify(d));}catch(e){console.warn('保存失败',e);}},
+  clear(){localStorage.removeItem(this.KEY);},
+  getSession(){return localStorage.getItem(this.SESSION);},
+  setSession(id){localStorage.setItem(this.SESSION,id);},
+  clearSession(){localStorage.removeItem(this.SESSION);}
 };
 
-/* ============ 本地存储 ============ */
-const Local={
-  async save(data){
-    try{localStorage.setItem('sd_data',JSON.stringify(data));return true;}catch(e){return false;}
-  },
-  async load(){
-    try{const d=localStorage.getItem('sd_data');return d?JSON.parse(d):null;}catch(e){return null;}
-  },
+const STATUS={
+  pending:{label:'待处理',cls:'st-pending'},
+  processing:{label:'处理中',cls:'st-processing'},
+  resolved:{label:'已完成',cls:'st-resolved'},
+  closed:{label:'已关闭',cls:'st-closed'}
 };
-
-/* ============ 数据 ============ */
-const TYPES=['退换货','物流异常','商品咨询','发票问题','投诉建议','支付问题'];
-const STATUS={pending:{label:'待处理',cls:'st-pending'},processing:{label:'处理中',cls:'st-processing'},resolved:{label:'已完成',cls:'st-resolved'},closed:{label:'已关闭',cls:'st-closed'}};
-const PRIORITY={urgent:{label:'紧急',cls:'pr-urgent'},high:{label:'高',cls:'pr-high'},medium:{label:'中',cls:'pr-medium'},low:{label:'低',cls:'pr-low'}};
-const TYPE_DESC={'退换货':'客户反馈商品与描述存在差异，希望尽快办理退换货。','物流异常':'物流信息长时间未更新，希望平台协助催促。','商品咨询':'对商品规格存在疑问，希望提供参数说明。','发票问题':'需要开具发票用于报销，当前信息有误。','投诉建议':'对购物体验表达不满，希望平台重视。','支付问题':'结算异常，已扣款但订单未生成。'};
+const PRIORITY={
+  urgent:{label:'紧急',cls:'pr-urgent'},
+  high:{label:'高',cls:'pr-high'},
+  medium:{label:'中',cls:'pr-medium'},
+  low:{label:'低',cls:'pr-low'}
+};
+const FIELD_TYPES={
+  text:{label:'单行文本',icon:'Aa'},
+  textarea:{label:'多行文本',icon:'¶'},
+  number:{label:'数字',icon:'#'},
+  select:{label:'下拉选择',icon:'▼'},
+  radio:{label:'单选',icon:'◉'},
+  checkbox:{label:'多选',icon:'☑'},
+  switch:{label:'开关',icon:'◐'},
+  date:{label:'日期',icon:'📅'},
+  datetime:{label:'日期时间',icon:'🕐'},
+  user:{label:'成员选择',icon:'👤'},
+  divider:{label:'分割线',icon:'—'},
+  title:{label:'标题',icon:'H'}
+};
 
 const S={
   user:null,
-  data:{tickets:[],groups:[],users:[],settings:{sound:true,planColors:[
-    {id:'c1',color:'#007aff',name:'标准方案'},{id:'c2',color:'#ff9500',name:'升级方案'},
-    {id:'c3',color:'#ff3b30',name:'紧急方案'},{id:'c4',color:'#34c759',name:'已解决'},
-    {id:'c5',color:'#af52de',name:'补偿方案'}]}},
-  filters:{status:'all',q:''},
+  data:null,
   view:'dashboard',
+  filters:{status:'all',q:''},
   currentTicketId:null,
-  currentGroupId:null,
-  unreadGroups:{},
-  bellCount:0,
-  planColorId:'c1',
-  gTicketsSelected:new Set(),
-  saveTimer:null,
+  designer:{formId:null,name:'',description:'',fields:[],selectedFieldId:null},
+  filling:{formId:null,values:{}},
+  saveTimer:null
 };
 
-/* ============ 种子 ============ */
-function seed(){
+function seedForms(){
+  return [
+    {
+      id:'form_return',name:'退换货申请',description:'客户申请退货或换货时使用',
+      icon:'↩',color:'#ff9500',
+      fields:[
+        {id:'f_orderno',type:'text',label:'订单号',placeholder:'如 ORD20250612001',required:true},
+        {id:'f_customer',type:'text',label:'客户姓名',required:true},
+        {id:'f_phone',type:'text',label:'联系电话',required:true},
+        {id:'f_type',type:'radio',label:'申请类型',required:true,options:['退货','换货'],defaultValue:'退货'},
+        {id:'f_return_reason',type:'select',label:'退货原因',required:true,options:['尺码不合适','颜色与描述不符','商品瑕疵','不喜欢','其他'],showWhen:{fieldId:'f_type',operator:'eq',value:'退货'}},
+        {id:'f_return_way',type:'radio',label:'退货方式',options:['上门取件','自行寄回'],defaultValue:'上门取件',showWhen:{fieldId:'f_type',operator:'eq',value:'退货'}},
+        {id:'f_refund_type',type:'radio',label:'退款方式',options:['原路退回','退至余额'],defaultValue:'原路退回',showWhen:{fieldId:'f_type',operator:'eq',value:'退货'}},
+        {id:'f_exchange_size',type:'text',label:'换货尺码/规格',placeholder:'如 XL / 42码',showWhen:{fieldId:'f_type',operator:'eq',value:'换货'}},
+        {id:'f_exchange_color',type:'text',label:'换货颜色',placeholder:'如 黑色',showWhen:{fieldId:'f_type',operator:'eq',value:'换货'}},
+        {id:'f_urgent',type:'switch',label:'是否加急处理',defaultValue:false},
+        {id:'f_urgent_reason',type:'textarea',label:'加急原因',placeholder:'请说明需要加急的原因…',showWhen:{fieldId:'f_urgent',operator:'eq',value:true}},
+        {id:'f_desc',type:'textarea',label:'补充描述',placeholder:'详细描述客户问题…'},
+        {id:'f_remark',type:'textarea',label:'客服备注',placeholder:'内部备注，客户不可见'}
+      ]
+    },
+    {
+      id:'form_logistics',name:'物流异常处理',description:'物流信息未更新、丢件、延误等问题',
+      icon:'🚚',color:'#007aff',
+      fields:[
+        {id:'f_orderno',type:'text',label:'订单号',required:true},
+        {id:'f_express_no',type:'text',label:'快递单号',required:true},
+        {id:'f_company',type:'select',label:'快递公司',required:true,options:['顺丰速运','中通快递','圆通速递','韵达快递','京东物流','邮政EMS']},
+        {id:'f_issue',type:'radio',label:'问题类型',required:true,options:['物流停滞','丢失','延误','派送异常','其他']},
+        {id:'f_stall_days',type:'number',label:'停滞天数',placeholder:'请输入天数',showWhen:{fieldId:'f_issue',operator:'eq',value:'物流停滞'}},
+        {id:'f_lost_amount',type:'number',label:'商品金额（元）',placeholder:'如 199.00',showWhen:{fieldId:'f_issue',operator:'eq',value:'丢失'}},
+        {id:'f_delay_days',type:'number',label:'预计延误天数',showWhen:{fieldId:'f_issue',operator:'eq',value:'延误'}},
+        {id:'f_compensate',type:'switch',label:'是否需要补偿',defaultValue:false},
+        {id:'f_compensate_type',type:'select',label:'补偿方式',options:['优惠券','现金退款','补发商品','积分'],showWhen:{fieldId:'f_compensate',operator:'eq',value:true}},
+        {id:'f_compensate_amount',type:'number',label:'补偿金额（元）',showWhen:{fieldId:'f_compensate',operator:'eq',value:true}},
+        {id:'f_desc',type:'textarea',label:'详细描述'}
+      ]
+    },
+    {
+      id:'form_invoice',name:'发票问题',description:'开具、修改、补开发票',
+      icon:'📄',color:'#34c759',
+      fields:[
+        {id:'f_orderno',type:'text',label:'订单号',required:true},
+        {id:'f_invoice_type',type:'radio',label:'发票类型',required:true,options:['增值税普通发票','增值税专用发票']},
+        {id:'f_title_type',type:'radio',label:'抬头类型',required:true,options:['个人','企业'],defaultValue:'企业'},
+        {id:'f_company_name',type:'text',label:'企业名称',required:true,showWhen:{fieldId:'f_title_type',operator:'eq',value:'企业'}},
+        {id:'f_tax_no',type:'text',label:'纳税人识别号',required:true,showWhen:{fieldId:'f_title_type',operator:'eq',value:'企业'}},
+        {id:'f_personal_name',type:'text',label:'个人姓名',showWhen:{fieldId:'f_title_type',operator:'eq',value:'个人'}},
+        {id:'f_email',type:'text',label:'接收邮箱',required:true},
+        {id:'f_amount',type:'number',label:'开票金额（元）'},
+        {id:'f_desc',type:'textarea',label:'补充说明'}
+      ]
+    }
+  ];
+}
+
+function seedTickets(forms){
   const now=Date.now();
-  const admin={id:'u_admin',phone:'13939538389',pwd:'hong980727',name:'超级管理员',role:'admin',dept:'系统管理',status:'active',createdAt:now-90*86400e3};
-  const agents=[{id:'u_a1',phone:'13900000001',pwd:'123456',name:'张明',role:'agent',dept:'售后客服组',status:'active'},{id:'u_a2',phone:'13900000002',pwd:'123456',name:'李华',role:'agent',dept:'售后客服组',status:'active'}].map(u=>({...u,createdAt:now-30*86400e3}));
-  const users=[admin,...agents];
-  const customers=[{name:'张伟',phone:'13812342043'},{name:'李娜',phone:'15912347712'},{name:'王芳',phone:'18612343390'},{name:'刘洋',phone:'13712346621'}];
-  const titles={'退换货':['申请退货：尺码不合适','换货：颜色不符'],'物流异常':['物流信息长时间未更新','包裹已签收但未收到'],'商品咨询':['咨询是否有现货','询问材质与尺码'],'发票问题':['申请开具专票','发票抬头需修改'],'投诉建议':['客服响应过慢','建议增加货到付款'],'支付问题':['支付失败但已扣款','优惠券未抵扣']};
-  const tickets=[];let seq=0;
-  for(let i=0;i<20;i++){
-    const type=pick(TYPES),title=pick(titles[type]),customer=pick(customers);
-    const createdAt=now-Math.floor(Math.random()*14*86400e3);
+  const tickets=[];
+  const customers=[
+    {name:'张伟',phone:'138****2043'},{name:'李娜',phone:'159****7712'},
+    {name:'王芳',phone:'186****3390'},{name:'刘洋',phone:'137****6621'},
+    {name:'陈静',phone:'135****8890'}
+  ];
+  const samples=[
+    {form:'form_return',values:{f_type:'退货',f_return_reason:'尺码不合适',f_return_way:'上门取件',f_refund_type:'原路退回',f_urgent:false}},
+    {form:'form_return',values:{f_type:'换货',f_exchange_size:'XL',f_exchange_color:'黑色',f_urgent:true,f_urgent_reason:'客户着急使用'}},
+    {form:'form_logistics',values:{f_company:'顺丰速运',f_issue:'物流停滞',f_stall_days:3,f_compensate:false}},
+    {form:'form_logistics',values:{f_company:'中通快递',f_issue:'丢失',f_lost_amount:299,f_compensate:true,f_compensate_type:'现金退款',f_compensate_amount:299}},
+    {form:'form_invoice',values:{f_invoice_type:'增值税专用发票',f_title_type:'企业',f_company_name:'深圳市某某科技有限公司',f_tax_no:'91440300MA5xxxxx',f_email:'finance@company.com',f_amount:1999}}
+  ];
+  for(let i=0;i<12;i++){
+    const s=pick(samples);
+    const form=forms.find(f=>f.id===s.form);
+    const customer=pick(customers);
+    const createdAt=now-Math.floor(Math.random()*10*86400e3);
     const r=Math.random();
-    const status=r<0.3?'pending':r<0.55?'processing':r<0.9?'resolved':'closed';
+    const status=r<0.3?'pending':r<0.55?'processing':r<0.85?'resolved':'closed';
     const p=Math.random();
     const priority=p<0.15?'urgent':p<0.4?'high':p<0.8?'medium':'low';
-    const agentUser=status==='pending'&&Math.random()<0.4?null:pick(agents);
-    const id='tk_'+(++seq);
-    const t={id,no:'TK'+codeDate(createdAt)+'-'+String(seq).padStart(3,'0'),title,type,status,priority,
-      agent:agentUser?agentUser.name:'未分配',customer,source:'官网商城',
-      orderNo:'ORD'+codeDate(createdAt)+String(Math.floor(rnd(1000,9999))),
-      desc:TYPE_DESC[type],createdAt,updatedAt:createdAt,plans:[],
-      timeline:[{time:createdAt,title:'工单创建',desc:'来源：官网商城',who:customer.name}]};
-    if(status==='resolved'||status==='closed'){t.resolvedAt=createdAt+rnd(1,24)*3600e3;t.timeline.push({time:t.resolvedAt,title:'工单完成',desc:'问题已处理',who:agentUser?.name||'系统'});}
-    tickets.push(t);
+    const orderNo='ORD'+codeDate(createdAt)+String(Math.floor(1000+Math.random()*9000));
+    const values={...s.values,f_orderno:orderNo,f_customer:customer.name,f_phone:customer.phone};
+    if(s.form==='form_return'&&!values.f_desc)values.f_desc='客户已联系，等待处理。';
+    if(s.form==='form_logistics'&&!values.f_express_no)values.f_express_no='SF'+Math.floor(1000000000+Math.random()*9000000000);
+    if(s.form==='form_logistics'&&!values.f_desc)values.f_desc='客户反馈物流异常，希望尽快处理。';
+    if(s.form==='form_invoice'&&!values.f_desc)values.f_desc='客户需要开票用于报销。';
+    tickets.push({
+      id:'tk_'+(i+1),
+      no:'TK'+codeDate(createdAt)+'-'+String(i+1).padStart(3,'0'),
+      formId:s.form,formName:form.name,formIcon:form.icon,formColor:form.color,
+      values,status,priority,
+      agent:status==='pending'?'未分配':'管理员',
+      createdAt,updatedAt:createdAt,
+      timeline:[{time:createdAt,title:'工单创建',desc:'客户提交工单',who:customer.name}]
+    });
   }
   tickets.sort((a,b)=>b.createdAt-a.createdAt);
-  const groups=[{id:uid('grp'),name:'售后协同群',members:[admin.id,agents[0].id],ticketIds:tickets.slice(0,2).map(t=>t.id),createdAt:now-3*86400e3,messages:[{id:uid('msg'),type:'system',content:'群聊已创建',time:now-3*86400e3,senderName:'系统'}]}];
-  return{users,tickets,groups,settings:S.data.settings,version:1};
+  return tickets;
 }
 
-/* ============ Toast ============ */
-function toast(msg,kind='ok',ms=2600){
-  const el=document.createElement('div');el.className='toast'+(kind==='warn'?' warn':kind==='err'?' err':'');
-  el.textContent=msg;$('#toasts').appendChild(el);
+function toast(msg,kind='ok',ms=2400){
+  const el=document.createElement('div');
+  el.className='toast'+(kind==='warn'?' warn':kind==='err'?' err':'');
+  el.textContent=msg;
+  $('#toasts').appendChild(el);
   setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),300);},ms);
 }
-
-/* ============ 同步 ============ */
-async function persist(){
-  if(!Cloud.key){await Local.save(S.data);return;}
+function persist(){
   clearTimeout(S.saveTimer);
-  S.saveTimer=setTimeout(async()=>{
-    try{
-      $('#cloudText').textContent='同步中…';
-      const ok=await Promise.all([
-        Cloud.upload('tickets.json',{list:S.data.tickets,updatedAt:Date.now()}),
-        Cloud.upload('groups.json',{list:S.data.groups,updatedAt:Date.now()}),
-        Cloud.upload('users.json',{list:S.data.users,updatedAt:Date.now()}),
-        Cloud.upload('settings.json',S.data.settings),
-      ]);
-      if(ok.every(v=>v))$('#cloudText').textContent='已同步';
-      else{await Local.save(S.data);$('#cloudText').textContent='本地存储';}
-    }catch(e){
-      await Local.save(S.data);$('#cloudText').textContent='本地存储';
-    }
-  },800);
+  S.saveTimer=setTimeout(()=>Store.save(S.data),300);
 }
 
-async function loadCloud(){
-  if(!Cloud.key)return false;
-  try{
-    const [tk,gp,us,st]=await Promise.all([
-      Cloud.read('tickets.json'),Cloud.read('groups.json'),
-      Cloud.read('users.json'),Cloud.read('settings.json')]);
-    if(tk?.list)S.data.tickets=tk.list;
-    if(gp?.list)S.data.groups=gp.list;
-    if(us?.list)S.data.users=us.list;
-    if(st)S.data.settings={...S.data.settings,...st};
-    return true;
-  }catch(e){return false;}
+function checkCondition(cond,values){
+  if(!cond||!cond.fieldId)return true;
+  const val=values[cond.fieldId];
+  switch(cond.operator){
+    case 'eq':return val===cond.value;
+    case 'neq':return val!==cond.value;
+    case 'contains':return Array.isArray(val)?val.includes(cond.value):String(val||'').includes(cond.value);
+    case 'notEmpty':return val!==undefined&&val!==null&&val!==''&&!(Array.isArray(val)&&!val.length);
+    case 'gt':return Number(val)>Number(cond.value);
+    case 'lt':return Number(val)<Number(cond.value);
+    default:return true;
+  }
 }
-
-/* ============ 渲染 ============ */
-function renderAll(){renderDashboard();renderTickets();renderCustomers();if(S.user?.role==='admin')renderAccounts();renderChatList();if(S.currentGroupId)renderChatMain();updateBadges();}
+function isFieldVisible(field,values){
+  if(!field.showWhen)return true;
+  return checkCondition(field.showWhen,values);
+}
 
 function renderDashboard(){
-  const list=S.data.tickets;const todayStart=new Date();todayStart.setHours(0,0,0,0);
+  const list=S.data.tickets;
+  const todayStart=new Date();todayStart.setHours(0,0,0,0);
   $('#stPending').textContent=list.filter(t=>t.status==='pending').length;
   $('#stProcessing').textContent=list.filter(t=>t.status==='processing').length;
   $('#stToday').textContent=list.filter(t=>t.createdAt>=todayStart.getTime()).length;
   $('#stResolved').textContent=list.filter(t=>t.status==='resolved').length;
-  $('#recentRows').innerHTML=list.slice(0,5).map(t=>`<tr data-id="${t.id}"><td><span class="tno">${t.no}</span></td><td><span class="ttl" style="font-size:12.5px">${esc(t.title)}</span></td><td><span class="pri ${PRIORITY[t.priority].cls}">${PRIORITY[t.priority].label}</span></td><td><span class="bdg ${STATUS[t.status].cls}">${STATUS[t.status].label}</span></td><td class="mt">${fmtTime(t.createdAt)}</td></tr>`).join('');
+  $('#recentRows').innerHTML=list.slice(0,6).map(t=>`
+    <tr data-id="${t.id}">
+      <td><span class="tk-no">${t.no}</span></td>
+      <td>
+        <span class="tk-title">${esc(t.formName)}</span>
+        <span class="tk-sub">${esc(getTicketSummary(t))}</span>
+      </td>
+      <td><span class="pri ${PRIORITY[t.priority].cls}">${PRIORITY[t.priority].label}</span></td>
+      <td><span class="bdg ${STATUS[t.status].cls}">${STATUS[t.status].label}</span></td>
+      <td class="muted">${fmtTime(t.createdAt)}</td>
+    </tr>`).join('');
   updateBadges();
+}
+function getTicketSummary(t){
+  const form=S.data.forms.find(f=>f.id===t.formId);
+  if(!form)return '—';
+  const firstText=form.fields.find(f=>['text','textarea'].includes(f.type)&&!f.showWhen);
+  if(firstText&&t.values[firstText.id])return t.values[firstText.id];
+  const firstSelect=form.fields.find(f=>['radio','select'].includes(f.type)&&!f.showWhen);
+  if(firstSelect&&t.values[firstSelect.id])return String(t.values[firstSelect.id]);
+  return '—';
 }
 
 function visibleTickets(){
   const f=S.filters,q=f.q.trim().toLowerCase();
   return S.data.tickets.filter(t=>{
     if(f.status!=='all'&&t.status!==f.status)return false;
-    if(q){const h=`${t.no} ${t.orderNo} ${t.title} ${t.customer?.name||''} ${t.customer?.phone||''}`.toLowerCase();if(!h.includes(q))return false;}
+    if(q){
+      const h=`${t.no} ${t.formName} ${JSON.stringify(t.values)}`.toLowerCase();
+      if(!h.includes(q))return false;
+    }
     return true;
   }).sort((a,b)=>b.createdAt-a.createdAt);
 }
-
 function renderTickets(){
   const list=visibleTickets();
-  if(!list.length){$('#ticketRows').innerHTML=`<tr><td colspan="7"><div style="padding:56px 20px;text-align:center;color:var(--text3)"><p>没有工单</p></div></td></tr>`;return;}
-  $('#ticketRows').innerHTML=list.map(t=>`<tr data-id="${t.id}"><td><span class="tno">${t.no}</span></td><td><span class="ttl">${esc(t.title)}</span><span class="tsub">${esc(t.customer?.name||'')} · ${esc(t.customer?.phone||'')} · <b style="color:var(--blue)">${t.orderNo}</b></span></td><td><span class="chip">${t.type}</span></td><td><span class="pri ${PRIORITY[t.priority].cls}">${PRIORITY[t.priority].label}</span></td><td><span class="bdg ${STATUS[t.status].cls}">${STATUS[t.status].label}</span></td><td class="mt">${fmtTime(t.createdAt)}</td><td><button class="rbtn" data-open="${t.id}">查看</button></td></tr>`).join('');
+  if(!list.length){
+    $('#ticketRows').innerHTML=`<tr><td colspan="7"><div style="padding:60px 20px;text-align:center;color:var(--text-3)"><p>没有找到工单</p></div></td></tr>`;
+    return;
+  }
+  $('#ticketRows').innerHTML=list.map(t=>`
+    <tr data-id="${t.id}">
+      <td><span class="tk-no">${t.no}</span></td>
+      <td>
+        <span class="tk-title">${esc(getTicketSummary(t))}</span>
+        <span class="tk-sub">${t.formIcon||''} ${esc(t.formName)}</span>
+      </td>
+      <td><span class="chip">${esc(t.formName)}</span></td>
+      <td><span class="pri ${PRIORITY[t.priority].cls}">${PRIORITY[t.priority].label}</span></td>
+      <td><span class="bdg ${STATUS[t.status].cls}">${STATUS[t.status].label}</span></td>
+      <td class="muted">${fmtTime(t.createdAt)}</td>
+      <td><button class="row-btn" data-open="${t.id}">查看</button></td>
+    </tr>`).join('');
 }
 
 function renderCustomers(){
   const map=new Map();
-  S.data.tickets.forEach(t=>{const c=t.customer||{name:'匿名',phone:''};const k=c.name+'|'+c.phone;if(!map.has(k))map.set(k,{customer:c,total:0,open:0,resolved:0});const o=map.get(k);o.total++;if(t.status==='pending'||t.status==='processing')o.open++;if(t.status==='resolved')o.resolved++;});
+  S.data.tickets.forEach(t=>{
+    const name=t.values.f_customer||t.values.f_name||'匿名';
+    const phone=t.values.f_phone||'—';
+    const k=name+'|'+phone;
+    if(!map.has(k))map.set(k,{name,phone,total:0,open:0,resolved:0,last:0});
+    const o=map.get(k);
+    o.total++;
+    if(t.status==='pending'||t.status==='processing')o.open++;
+    if(t.status==='resolved')o.resolved++;
+    o.last=Math.max(o.last,t.createdAt);
+  });
   const arr=[...map.values()].sort((a,b)=>b.total-a.total);
-  $('#custGrid').innerHTML=arr.map(o=>`<div class="cc"><div class="ct2"><div class="cav" style="background:${avColor(o.customer.name)}">${initials(o.customer.name)}</div><div style="flex:1;min-width:0"><div class="cn">${esc(o.customer.name)}</div><div class="cp">${esc(o.customer.phone||'—')}</div></div></div><div class="cst"><div class="cstt"><strong>${o.total}</strong><span>累计</span></div><div class="cstt"><strong style="color:#b25000">${o.open}</strong><span>进行中</span></div><div class="cstt"><strong style="color:#1a7f37">${o.resolved}</strong><span>已解决</span></div></div></div>`).join('')||'<div style="padding:40px;color:var(--text3);text-align:center">暂无数据</div>';
+  $('#custGrid').innerHTML=arr.map(o=>`
+    <div class="form-card" style="cursor:default">
+      <div class="form-card-head">
+        <div class="avatar" style="background:${avColor(o.name)};width:40px;height:40px;font-size:14px">${initials(o.name)}</div>
+        <div style="flex:1;min-width:0">
+          <div class="form-card-name">${esc(o.name)}</div>
+          <div style="font-size:11.5px;color:var(--text-3);font-family:ui-monospace,Menlo,monospace">${esc(o.phone)}</div>
+        </div>
+      </div>
+      <div class="form-card-stats">
+        <span>累计 <b>${o.total}</b></span>
+        <span>进行中 <b style="color:#b25000">${o.open}</b></span>
+        <span>已解决 <b style="color:#1a7f37">${o.resolved}</b></span>
+      </div>
+    </div>`).join('')||'<div style="padding:40px;color:var(--text-3);text-align:center">暂无客户数据</div>';
 }
 
 function renderAccounts(){
   if(!S.user||S.user.role!=='admin')return;
   const roleMap={admin:'管理员',agent:'客服',viewer:'只读'};
-  const rows=S.data.users.slice().sort((a,b)=>{if(a.status==='pending'&&b.status!=='pending')return -1;if(b.status==='pending'&&a.status!=='pending')return 1;return(b.createdAt||0)-(a.createdAt||0);});
-  $('#accountRows').innerHTML=rows.map(u=>{const isMe=u.id===S.user.id;let st='';if(u.status==='active')st='<span class="bdg st-resolved">已启用</span>';else if(u.status==='pending')st='<span class="bdg st-pending">待审批</span>';else st='<span class="bdg st-closed">已禁用</span>';let ac='';if(u.status==='pending')ac=`<button class="rbtn" data-approve="${u.id}" style="background:#e3f8ea;color:#1a7f37">通过</button><button class="rbtn" data-reject="${u.id}" style="background:#ffe5e3;color:#d70015;margin-left:6px">拒绝</button>`;else if(!isMe)ac=`<button class="rbtn" data-toggle="${u.id}">${u.status==='active'?'禁用':'启用'}</button>`;else ac='<span class="mt">当前登录</span>';return`<tr><td><span class="agent"><span class="aav" style="background:${avColor(u.name)}">${initials(u.name)}</span><span><div style="font-weight:560">${esc(u.name)}</div><div class="tsub">${esc(u.dept||'—')}</div></span></span></td><td><span class="tno">${u.phone}</span></td><td><span class="chip">${roleMap[u.role]||u.role}</span></td><td class="mt">${esc(u.dept||'—')}</td><td>${st}</td><td>${ac}</td></tr>`;}).join('');
+  const rows=S.data.users.slice().sort((a,b)=>{
+    if(a.status==='pending'&&b.status!=='pending')return -1;
+    if(b.status==='pending'&&a.status!=='pending')return 1;
+    return (b.createdAt||0)-(a.createdAt||0);
+  });
+  $('#accountRows').innerHTML=rows.map(u=>{
+    const isMe=u.id===S.user.id;
+    let st='';
+    if(u.status==='active')st='<span class="bdg st-resolved">已启用</span>';
+    else if(u.status==='pending')st='<span class="bdg st-pending">待审批</span>';
+    else st='<span class="bdg st-closed">已禁用</span>';
+    let ac='';
+    if(u.status==='pending')ac=`<button class="row-btn" data-approve="${u.id}" style="background:#e3f8ea;color:#1a7f37">通过</button>
+      <button class="row-btn" data-reject="${u.id}" style="background:#ffe5e3;color:#d70015;margin-left:5px">拒绝</button>`;
+    else if(!isMe)ac=`<button class="row-btn" data-toggle="${u.id}">${u.status==='active'?'禁用':'启用'}</button>`;
+    else ac='<span class="muted">当前登录</span>';
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:9px">
+        <div class="avatar" style="background:${avColor(u.name)};width:26px;height:26px;flex:0 0 26px;font-size:10px">${initials(u.name)}</div>
+        <div><div style="font-weight:560;font-size:12.5px">${esc(u.name)}</div>
+        <div class="tk-sub">${esc(u.dept||'—')}</div></div>
+      </div></td>
+      <td><span class="tk-no">${u.phone}</span></td>
+      <td><span class="chip">${roleMap[u.role]||u.role}</span></td>
+      <td class="muted">${esc(u.dept||'—')}</td>
+      <td>${st}</td>
+      <td>${ac}</td>
+    </tr>`;
+  }).join('');
   updateBadges();
 }
 
-function renderChatList(){
-  const groups=S.data.groups.slice().sort((a,b)=>{const la=a.messages?.[a.messages.length-1],lb=b.messages?.[b.messages.length-1];return(lb?.time||0)-(la?.time||0);});
-  if(!groups.length){$('#chatList').innerHTML='<div style="padding:30px 10px;text-align:center;color:var(--text3);font-size:12.5px">暂无群聊</div>';return;}
-  $('#chatList').innerHTML=groups.map(g=>{const last=g.messages?.[g.messages.length-1];const unread=S.unreadGroups[g.id]||0;const txt=last?(last.type==='image'?'[图片]':last.content||''):'暂无消息';return`<div class="ci ${S.currentGroupId===g.id?'on':''}" data-gid="${g.id}"><div class="ciav" style="background:${avColor(g.name)}">${initials(g.name)}</div><div class="cib"><div class="cin">${esc(g.name)}${unread?`<span class="nb">${unread}</span>`:''}</div><div class="cisub">${esc(String(txt).slice(0,22))}</div></div><div class="cit">${last?fmtTime(last.time):fmtTime(g.createdAt)}</div></div>`;}).join('');
-}
-
-function openGroup(gid){S.currentGroupId=gid;S.unreadGroups[gid]=0;updateBadges();renderChatList();renderChatMain();}
-
-function renderChatMain(){
-  const g=S.data.groups.find(x=>x.id===S.currentGroupId);
-  if(!g){$('#chatMain').innerHTML=`<div style="padding:60px 20px;text-align:center;color:var(--text3);margin:auto"><p>选择左侧群聊</p></div>`;return;}
-  const tickets=(g.ticketIds||[]).map(id=>S.data.tickets.find(t=>t.id===id)).filter(Boolean);
-  const tags=tickets.map(t=>`<span class="ttag" data-ticket="${t.id}">${t.no}</span>`).join('');
-  $('#chatMain').innerHTML=`<div class="ch2"><h4>${esc(g.name)}</h4><div class="cts">${tags||'<span class="mt" style="font-size:12px">暂未关联工单</span>'}</div></div><div class="msgs" id="messages"></div><div class="cia"><div class="ctools"><button class="tb2" id="btnImage" title="图片">🖼️</button><button class="tb2" id="btnPat" title="拍一拍">👋</button><span style="flex:1"></span><span class="mt" style="font-size:11px">Ctrl+Enter 发送</span></div><div class="cir"><textarea class="cinp" id="chatInput" placeholder="输入消息…"></textarea><button class="sbtn" id="btnSend">发送</button></div></div>`;
-  renderMessages(g);bindChat(g);
-}
-
-function renderMessages(g){
-  const box=$('#messages');if(!box)return;
-  box.innerHTML=(g.messages||[]).map(m=>{
-    if(m.type==='system')return`<div class="msys"><span>${esc(m.content)}</span></div>`;
-    if(m.type==='pat')return`<div class="mpat"><span>👋 ${esc(m.content)}</span></div>`;
-    const isMine=m.senderId===S.user.id;let inner='';
-    if(m.type==='text')inner=esc(m.content);
-    else if(m.type==='image')inner=`<img src="${m.data}" class="mimg" data-img="${m.id}">`;
-    return`<div class="msg ${isMine?'mine':''}"><div class="mav" style="background:${avColor(m.senderName)}" data-pat="${m.senderId}" data-pn="${esc(m.senderName)}">${initials(m.senderName)}</div><div class="mb"><div class="mn"><b>${esc(m.senderName)}</b><span style="font-size:10.5px">${clockTime(m.time)}</span></div><div class="mbub">${inner}</div></div></div>`;
-  }).join('');
-  box.scrollTop=box.scrollHeight;
-}
-
-function bindChat(g){
-  const input=$('#chatInput');
-  $('#btnSend').onclick=()=>sendMsg(g);
-  input.onkeydown=e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();sendMsg(g);}};
-  $('#btnImage').onclick=()=>{const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=()=>{const f=inp.files[0];if(!f)return;if(f.size>500*1024){toast('图片需小于 500KB','err');return;}const r=new FileReader();r.onload=()=>pushMsg(g,{type:'image',data:r.result,fileName:f.name});r.readAsDataURL(f);};inp.click();};
-  $('#btnPat').onclick=()=>{const others=g.members?.filter(id=>id!==S.user.id)||[];if(!others.length){toast('群里没有其他成员','warn');return;}const u=S.data.users.find(x=>x.id===pick(others));if(u)doPat(g,u.id,u.name);};
-  $('#messages').ondblclick=e=>{const av=e.target.closest('[data-pat]');if(!av)return;doPat(g,av.dataset.pat,av.dataset.pn);};
-  $('#messages').onclick=e=>{
-    const tag=e.target.closest('[data-ticket]');if(tag){const t=S.data.tickets.find(x=>x.id===tag.dataset.ticket);if(t){switchView('tickets');setTimeout(()=>openTicket(t.id),150);}return;}
-    const img=e.target.closest('[data-img]');if(img){$('#imgViewerInner').innerHTML=`<img src="${img.src}">`;$('#imgViewer').classList.add('on');return;}
-  };
-}
-
-function sendMsg(g){const input=$('#chatInput');const text=input.value.trim();if(!text)return;pushMsg(g,{type:'text',content:text});input.value='';input.focus();}
-
-function pushMsg(g,payload){
-  const now=Date.now();const msg={id:uid('msg'),time:now,senderId:S.user.id,senderName:S.user.name,...payload};
-  g.messages=g.messages||[];g.messages.push(msg);persist();
-  if(S.data.settings.sound)beep(880,0.08,0,'sine',0.12);
-  renderMessages(g);renderChatList();
-}
-
-function doPat(g,targetId,targetName){
-  if(targetId===S.user.id){toast('不能拍自己','warn');return;}
-  const now=Date.now();const msg={id:uid('msg'),type:'pat',content:`${S.user.name} 拍了拍 ${targetName}`,time:now,senderId:S.user.id,senderName:S.user.name};
-  g.messages.push(msg);persist();
-  if(S.data.settings.sound){beep(880,0.06,0,'triangle');beep(660,0.06,0.08,'triangle');beep(440,0.09,0.16,'triangle');}
-  renderMessages(g);renderChatList();toast(`👋 你拍了拍 ${targetName}`,'warn');
+function renderFormCards(){
+  $('#formCards').innerHTML=S.data.forms.map(f=>{
+    const count=S.data.tickets.filter(t=>t.formId===f.id).length;
+    return `
+      <div class="form-card" data-form-id="${f.id}">
+        <div class="form-card-head">
+          <div class="form-card-ico" style="background:${f.color}">${f.icon}</div>
+          <div style="flex:1;min-width:0">
+            <div class="form-card-name">${esc(f.name)}</div>
+            <div class="form-card-desc">${esc(f.description||'暂无说明')}</div>
+          </div>
+        </div>
+        <div class="form-card-stats">
+          <span>字段 <b>${f.fields.length}</b></span>
+          <span>工单 <b>${count}</b></span>
+        </div>
+      </div>`;
+  }).join('')||'<div style="padding:40px;color:var(--text-3);text-align:center;grid-column:1/-1">暂无表单，点击右上角新建</div>';
 }
 
 function updateBadges(){
   const pending=S.data.tickets.filter(t=>t.status==='pending').length;
-  const nb=$('#navTkBadge');if(nb){nb.textContent=pending>99?'99+':pending;nb.style.display=pending?'':'none';}
-  let un=0;Object.values(S.unreadGroups).forEach(n=>un+=n);
-  const cb=$('#navChBadge');if(cb){cb.textContent=un>99?'99+':un;cb.style.display=un?'':'none';}
-  if(S.user?.role==='admin'){const pa=S.data.users.filter(u=>u.status==='pending').length;const ab=$('#navAccBadge');if(ab){ab.textContent=pa;ab.style.display=pa?'':'none';}}
+  const nb=$('#navTkBadge');
+  if(nb){nb.textContent=pending>99?'99+':pending;nb.style.display=pending?'':'none';}
+  if(S.user&&S.user.role==='admin'){
+    const pa=S.data.users.filter(u=>u.status==='pending').length;
+    const ab=$('#navAccBadge');
+    if(ab){ab.textContent=pa;ab.style.display=pa?'':'none';}
+  }
 }
 
-/* ============ 工单详情 ============ */
-function openTicket(id){
-  const t=S.data.tickets.find(x=>x.id===id);if(!t)return;
-  S.currentTicketId=id;renderDrawer(t);$('#drawer').classList.add('on');$('#ov').classList.add('on');
+const VIEW_META={
+  dashboard:['数据概览','今日工单处理情况'],
+  tickets:['工单管理','全部工单列表'],
+  forms:['表单中心','自定义表单模板'],
+  customers:['客户档案','按客户聚合'],
+  accounts:['账号管理','用户审批与权限']
+};
+function switchView(view){
+  S.view=view;
+  $$('.nav-item').forEach(el=>el.classList.toggle('on',el.dataset.view===view));
+  $$('.view').forEach(el=>el.classList.toggle('hide',el.id!=='v-'+view));
+  const [t,s]=VIEW_META[view]||['',''];
+  $('#pageTitle').textContent=t;
+  $('#pageSub').textContent=s;
+  if(view==='dashboard')renderDashboard();
+  if(view==='tickets')renderTickets();
+  if(view==='forms')renderFormCards();
+  if(view==='customers')renderCustomers();
+  if(view==='accounts')renderAccounts();
 }
-function closeTicket(){$('#drawer').classList.remove('on');$('#ov').classList.remove('on');S.currentTicketId=null;}
-function getPlanColor(cid){return S.data.settings.planColors.find(c=>c.id===cid)||{color:'#007aff',name:'标准'};}
+
+function openTicket(id){
+  const t=S.data.tickets.find(x=>x.id===id);
+  if(!t)return;
+  S.currentTicketId=id;
+  renderDrawer(t);
+  $('#drawer').classList.add('on');
+  $('#drawerMask').classList.add('on');
+}
+function closeTicket(){
+  $('#drawer').classList.remove('on');
+  $('#drawerMask').classList.remove('on');
+  S.currentTicketId=null;
+}
 
 function renderDrawer(t){
-  $('#dwTitle').textContent=t.title;$('#dwNo').textContent=`${t.no} · 订单 ${t.orderNo}`;
+  const form=S.data.forms.find(f=>f.id===t.formId);
+  $('#dwTitle').textContent=t.formName;
+  $('#dwNo').textContent=`${t.no} · ${fullTime(t.createdAt)}`;
   const st=STATUS[t.status],pr=PRIORITY[t.priority];
-  const plansHtml=(t.plans||[]).length?(t.plans).map(p=>{const c=getPlanColor(p.colorId);return`<div class="plan" style="border-left-color:${c.color}"><div style="display:flex;align-items:center;gap:8px"><span class="ptag" style="background:${c.color}">${esc(c.name)}</span></div><div class="ptitle">${esc(p.title)}</div><div class="pbody">${esc(p.body)}</div><div class="pmeta"><span>${esc(p.who||'')}</span><span>${fullTime(p.time)}</span></div></div>`;}).join(''):'<div class="dbox" style="color:var(--text3);text-align:center">暂无处理方案</div>';
-  $('#drawerBody').innerHTML=`<div class="brow"><span class="bdg ${st.cls}">${st.label}</span><span class="pri ${pr.cls}">${pr.label}优先级</span><span class="chip">${t.type}</span></div><div class="sec"><div class="sect">客户与订单<span class="line"></span></div><div class="ig"><div class="ii"><span>客户姓名</span><strong>${esc(t.customer?.name||'—')}</strong></div><div class="ii"><span>联系电话</span><strong>${esc(t.customer?.phone||'—')}</strong></div><div class="ii"><span>订单号</span><strong style="font-family:ui-monospace,monospace;font-size:12px;color:var(--blue)">${t.orderNo}</strong></div><div class="ii"><span>创建时间</span><strong style="font-size:12px">${fullTime(t.createdAt)}</strong></div></div></div><div class="sec"><div class="sect">问题描述<span class="line"></span></div><div class="dbox">${esc(t.desc||'无')}</div></div><div class="sec"><div class="sect">处理方案（${(t.plans||[]).length}）<span class="line"></span></div>${plansHtml}</div><div class="sec" style="margin-bottom:0"><div class="sect">处理记录<span class="line"></span></div><div class="tml">${(t.timeline||[]).slice().reverse().map(item=>`<div class="tli"><div class="tlit">${esc(item.title)}<time>${fullTime(item.time)}</time></div><div class="tlid">${esc(item.desc)}</div></div>`).join('')}</div></div>`;
-  const ACTIONS={pending:[{label:'开始处理',next:'processing',cls:'btn-p'},{label:'关闭',next:'closed',cls:'btn-g'}],processing:[{label:'标记完成',next:'resolved',cls:'btn-p'},{label:'关闭',next:'closed',cls:'btn-g'}],resolved:[{label:'重新打开',next:'processing',cls:'btn-g'}],closed:[{label:'重新打开',next:'pending',cls:'btn-g'}]};
-  $('#dwActions').innerHTML=(ACTIONS[t.status]||[]).map(a=>`<button class="btn ${a.cls} btn-sm" data-next="${a.next}">${a.label}</button>`).join('')+`<button class="btn btn-g btn-sm" data-act="plan">＋ 添加方案</button>`;
+  let fieldsHtml='';
+  if(form){
+    fieldsHtml=form.fields.filter(f=>f.type!=='divider'&&f.type!=='title').map(f=>{
+      const v=t.values[f.id];
+      const full=['textarea'].includes(f.type)?' full':'';
+      let display='—',empty=true;
+      if(v!==undefined&&v!==null&&v!==''&&!(Array.isArray(v)&&!v.length)){
+        empty=false;
+        if(Array.isArray(v))display=v.map(x=>`<span class="tag">${esc(x)}</span>`).join('');
+        else if(typeof v==='boolean')display=v?'是':'否';
+        else display=esc(String(v));
+      }
+      return `
+        <div class="detail-field${full}">
+          <div class="detail-field-label">${esc(f.label)}<span class="type-chip">${FIELD_TYPES[f.type]?.label||f.type}</span></div>
+          <div class="detail-field-value ${empty?'empty':''}">${display}</div>
+        </div>`;
+    }).join('');
+  }
+  $('#drawerBody').innerHTML=`
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px">
+      <span class="bdg ${st.cls}">${st.label}</span>
+      <span class="pri ${pr.cls}">${pr.label}优先级</span>
+      <span class="chip">${esc(t.formName)}</span>
+    </div>
+    <div style="margin-bottom:20px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.6px;color:var(--text-3);text-transform:uppercase;margin-bottom:11px;display:flex;align-items:center;gap:8px">表单字段<span style="flex:1;height:1px;background:var(--border)"></span></div>
+      <div class="detail-fields">${fieldsHtml||'<div style="grid-column:1/-1;padding:20px;text-align:center;color:var(--text-3)">无字段数据</div>'}</div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:.6px;color:var(--text-3);text-transform:uppercase;margin-bottom:11px;display:flex;align-items:center;gap:8px">处理记录<span style="flex:1;height:1px;background:var(--border)"></span></div>
+      <div style="position:relative;padding-left:20px">
+        ${(t.timeline||[]).slice().reverse().map((item,i)=>`
+          <div style="position:relative;padding-bottom:16px">
+            <div style="position:absolute;left:-20px;top:4px;width:10px;height:10px;border-radius:50%;background:${i===0?'var(--blue)':'#fff'};border:2.5px solid ${i===0?'var(--blue)':'#c7c7cc'}"></div>
+            <div style="font-size:12.5px;font-weight:580;display:flex;justify-content:space-between;gap:10px;align-items:baseline">
+              <span>${esc(item.title)}</span>
+              <time style="font-size:10.5px;color:var(--text-3);font-weight:400">${fullTime(item.time)}</time>
+            </div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:2px;line-height:1.6">${esc(item.desc||'')}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  const ACTIONS={
+    pending:[{label:'开始处理',next:'processing',cls:'btn-p'},{label:'关闭',next:'closed',cls:'btn-g'}],
+    processing:[{label:'标记完成',next:'resolved',cls:'btn-p'},{label:'关闭',next:'closed',cls:'btn-g'}],
+    resolved:[{label:'重新打开',next:'processing',cls:'btn-g'}],
+    closed:[{label:'重新打开',next:'pending',cls:'btn-g'}]
+  };
+  $('#dwActions').innerHTML=(ACTIONS[t.status]||[]).map(a=>`<button class="btn ${a.cls} btn-sm" data-next="${a.next}">${a.label}</button>`).join('');
 }
 
 function updateTicketStatus(tid,next){
-  const t=S.data.tickets.find(x=>x.id===tid);if(!t)return;
-  const now=Date.now();t.status=next;t.updatedAt=now;t.timeline=t.timeline||[];
+  const t=S.data.tickets.find(x=>x.id===tid);
+  if(!t)return;
+  const now=Date.now();
+  t.status=next;
+  t.updatedAt=now;
+  t.timeline=t.timeline||[];
   t.timeline.push({time:now,title:'状态变更',desc:`变更为「${STATUS[next].label}」`,who:S.user.name});
-  persist();renderDrawer(t);renderTickets();renderDashboard();toast(`已更新为「${STATUS[next].label}」`);
+  persist();
+  renderDrawer(t);
+  renderTickets();
+  renderDashboard();
+  toast(`已更新为「${STATUS[next].label}」`);
 }
 
-/* ============ 视图 ============ */
-const VIEW_META={dashboard:['数据概览','今日工单处理情况'],tickets:['工单管理','查看与处理售后工单'],chat:['群聊协作','实时沟通'],customers:['客户档案','按客户聚合'],accounts:['账号管理','用户审批'],settings:['系统设置','云盘与通知']};
-function switchView(view){
-  S.view=view;$$('.ni').forEach(el=>el.classList.toggle('on',el.dataset.view===view));
-  $$('.view').forEach(el=>el.classList.toggle('hide',el.id!=='v-'+view));
-  const [t,s]=VIEW_META[view]||['',''];$('#pageTitle').textContent=t;$('#pageSub').textContent=s;
-  if(view==='dashboard')renderDashboard();if(view==='tickets')renderTickets();if(view==='customers')renderCustomers();if(view==='accounts')renderAccounts();if(view==='chat'){renderChatList();if(S.currentGroupId)renderChatMain();}
+function openPickForm(){
+  $('#pickFormCards').innerHTML=S.data.forms.map(f=>`
+    <div class="form-card" data-pick-form="${f.id}">
+      <div class="form-card-head">
+        <div class="form-card-ico" style="background:${f.color}">${f.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div class="form-card-name">${esc(f.name)}</div>
+          <div class="form-card-desc">${esc(f.description||'')}</div>
+        </div>
+      </div>
+      <div class="form-card-stats"><span>字段 <b>${f.fields.length}</b></span></div>
+    </div>`).join('');
+  $$('[data-pick-form]').forEach(el=>{
+    el.onclick=()=>{
+      $('#mPickForm').classList.remove('on');
+      openFillForm(el.dataset.pickForm);
+    };
+  });
+  $('#mPickForm').classList.add('on');
 }
 
-/* ============ 登录 ============ */
+function openFillForm(formId){
+  const form=S.data.forms.find(f=>f.id===formId);
+  if(!form){toast('表单不存在','err');return;}
+  S.filling={formId,values:{}};
+  form.fields.forEach(f=>{
+    if(f.defaultValue!==undefined)S.filling.values[f.id]=f.defaultValue;
+    else if(f.type==='switch')S.filling.values[f.id]=false;
+  });
+  $('#fillTitle').textContent='填写工单';
+  $('#fillFormName').textContent=form.name;
+  $('#fillFormDesc').textContent=form.description||'';
+  renderFillFields(form);
+  $('#mFillTicket').classList.add('on');
+}
+
+function renderFillFields(form){
+  const box=$('#fillFields');
+  const values=S.filling.values;
+  let html='';
+  form.fields.forEach(f=>{
+    if(f.type==='divider'){
+      html+=`<div class="field-row"><div style="height:1px;background:var(--border);margin:8px 0"></div></div>`;
+      return;
+    }
+    if(f.type==='title'){
+      html+=`<div class="field-row"><div style="font-size:14px;font-weight:650;margin-bottom:4px">${esc(f.label)}</div></div>`;
+      return;
+    }
+    const visible=isFieldVisible(f,values);
+    if(!visible)return;
+    const v=values[f.id];
+    const req=f.required?'<span class="req">*</span>':'';
+    let input='';
+    switch(f.type){
+      case 'text':
+        input=`<input class="field-input" data-fid="${f.id}" placeholder="${esc(f.placeholder||'请输入')}" value="${esc(v||'')}">`;
+        break;
+      case 'textarea':
+        input=`<textarea class="field-input" data-fid="${f.id}" placeholder="${esc(f.placeholder||'请输入')}">${esc(v||'')}</textarea>`;
+        break;
+      case 'number':
+        input=`<input type="number" class="field-input" data-fid="${f.id}" placeholder="${esc(f.placeholder||'请输入数字')}" value="${v!==undefined?v:''}">`;
+        break;
+      case 'select':
+        input=`<select class="field-input" data-fid="${f.id}">
+          <option value="">请选择…</option>
+          ${(f.options||[]).map(o=>`<option value="${esc(o)}" ${v===o?'selected':''}>${esc(o)}</option>`).join('')}
+        </select>`;
+        break;
+      case 'radio':
+        input=`<div class="radio-group">${(f.options||[]).map(o=>`
+          <label class="radio-opt ${v===o?'on':''}">
+            <input type="radio" name="${f.id}" value="${esc(o)}" ${v===o?'checked':''} data-fid="${f.id}">
+            ${esc(o)}
+          </label>`).join('')}</div>`;
+        break;
+      case 'checkbox':
+        const arr=Array.isArray(v)?v:[];
+        input=`<div class="checkbox-list">${(f.options||[]).map(o=>`
+          <label class="checkbox-opt ${arr.includes(o)?'on':''}">
+            <input type="checkbox" value="${esc(o)}" ${arr.includes(o)?'checked':''} data-fid="${f.id}">
+            ${esc(o)}
+          </label>`).join('')}</div>`;
+        break;
+      case 'switch':
+        input=`<div style="display:flex;align-items:center;gap:10px">
+          <div class="switch ${v?'on':''}" data-switch="${f.id}"></div>
+          <span style="font-size:12.5px;color:var(--text-3)">${v?'是':'否'}</span>
+        </div>`;
+        break;
+      case 'date':
+        input=`<input type="date" class="field-input" data-fid="${f.id}" value="${v||''}">`;
+        break;
+      case 'datetime':
+        input=`<input type="datetime-local" class="field-input" data-fid="${f.id}" value="${v||''}">`;
+        break;
+      case 'user':
+        input=`<select class="field-input" data-fid="${f.id}">
+          <option value="">请选择成员…</option>
+          ${S.data.users.filter(u=>u.status==='active').map(u=>`<option value="${esc(u.name)}" ${v===u.name?'selected':''}>${esc(u.name)}</option>`).join('')}
+        </select>`;
+        break;
+    }
+    html+=`
+      <div class="field-row dynamic-field">
+        <label>${esc(f.label)}${req}${f.placeholder?'<span class="hint">'+esc(f.placeholder)+'</span>':''}</label>
+        ${input}
+      </div>`;
+  });
+  box.innerHTML=html||'<div style="padding:40px;text-align:center;color:var(--text-3)">该表单暂无字段</div>';
+  bindFillFields(form);
+}
+
+function bindFillFields(form){
+  const values=S.filling.values;
+  const rerender=()=>renderFillFields(form);
+  $$('[data-fid]',$('#fillFields')).forEach(el=>{
+    if(el.tagName==='INPUT'&&(el.type==='radio'||el.type==='checkbox'))return;
+    const evt=el.tagName==='SELECT'?'change':'input';
+    el.addEventListener(evt,()=>{
+      values[el.dataset.fid]=el.value;
+      if(evt==='change')rerender();
+    });
+  });
+  $$('input[type=radio][data-fid]',$('#fillFields')).forEach(el=>{
+    el.addEventListener('change',()=>{values[el.dataset.fid]=el.value;rerender();});
+  });
+  $$('input[type=checkbox][data-fid]',$('#fillFields')).forEach(el=>{
+    el.addEventListener('change',()=>{
+      const fid=el.dataset.fid;
+      const arr=Array.isArray(values[fid])?values[fid]:[];
+      if(el.checked){if(!arr.includes(el.value))arr.push(el.value);}
+      else{const i=arr.indexOf(el.value);if(i>=0)arr.splice(i,1);}
+      values[fid]=arr;
+      rerender();
+    });
+  });
+  $$('[data-switch]',$('#fillFields')).forEach(el=>{
+    el.addEventListener('click',()=>{
+      const fid=el.dataset.switch;
+      values[fid]=!values[fid];
+      rerender();
+    });
+  });
+}
+
+function submitFill(){
+  const form=S.data.forms.find(f=>f.id===S.filling.formId);
+  if(!form)return;
+  const values=S.filling.values;
+  for(const f of form.fields){
+    if(f.type==='divider'||f.type==='title')continue;
+    if(!isFieldVisible(f,values))continue;
+    if(f.required){
+      const v=values[f.id];
+      const empty=v===undefined||v===null||v===''||(Array.isArray(v)&&!v.length);
+      if(empty){toast(`「${f.label}」为必填项`,'err');return;}
+    }
+  }
+  const now=Date.now();
+  const t={
+    id:uid('tk'),
+    no:'TK'+codeDate(now)+'-'+String(S.data.tickets.length+1).padStart(3,'0'),
+    formId:form.id,formName:form.name,formIcon:form.icon,formColor:form.color,
+    values:{...values},status:'pending',priority:'medium',agent:'未分配',
+    createdAt:now,updatedAt:now,
+    timeline:[{time:now,title:'工单创建',desc:'由客服创建',who:S.user.name}]
+  };
+  S.data.tickets.unshift(t);
+  persist();
+  $('#mFillTicket').classList.remove('on');
+  renderTickets();
+  renderDashboard();
+  toast('工单创建成功');
+}
+
+function openDesigner(formId){
+  if(formId){
+    const form=S.data.forms.find(f=>f.id===formId);
+    if(!form)return;
+    S.designer={
+      formId:form.id,
+      name:form.name,
+      description:form.description||'',
+      fields:JSON.parse(JSON.stringify(form.fields)),
+      selectedFieldId:null
+    };
+    $('#designerTitle').textContent='编辑表单';
+  }else{
+    S.designer={formId:null,name:'',description:'',fields:[],selectedFieldId:null};
+    $('#designerTitle').textContent='新建表单';
+  }
+  $('#designerFormName').value=S.designer.name;
+  $('#designerFormDesc').value=S.designer.description;
+  renderCanvas();
+  renderPropPanel();
+  $('#mDesigner').classList.add('on');
+}
+
+function renderCanvas(){
+  const fields=S.designer.fields;
+  $('#fieldCount').textContent=fields.length+' 个字段';
+  const box=$('#canvasFields');
+  if(!fields.length){
+    box.innerHTML=`<div class="canvas-empty">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      <p>点击左侧组件添加到表单</p>
+    </div>`;
+    return;
+  }
+  const previewValues={};
+  fields.forEach(f=>{
+    if(f.defaultValue!==undefined)previewValues[f.id]=f.defaultValue;
+    else if(f.type==='switch')previewValues[f.id]=false;
+    else if(['radio','select'].includes(f.type)&&f.options?.length)previewValues[f.id]=f.options[0];
+  });
+  box.innerHTML=fields.map(f=>{
+    const visible=isFieldVisible(f,previewValues);
+    const sel=S.designer.selectedFieldId===f.id?' sel':'';
+    let preview='';
+    switch(f.type){
+      case 'text':case 'number':case 'date':case 'datetime':
+        preview=`<div class="fake-input">${esc(f.placeholder||'输入框')}</div>`;break;
+      case 'textarea':
+        preview=`<div class="fake-input" style="min-height:40px">${esc(f.placeholder||'多行文本')}</div>`;break;
+      case 'select':
+        preview=`<div class="fake-input">${esc(f.options?.[0]||'请选择…')} ▾</div>`;break;
+      case 'radio':case 'checkbox':
+        preview=`<div class="fake-radio">${(f.options||[]).slice(0,4).map(o=>`<span>${esc(o)}</span>`).join('')}</div>`;break;
+      case 'switch':
+        preview=`<div style="font-size:12px;color:var(--text-3)">◐ 开关（是/否）</div>`;break;
+      case 'user':
+        preview=`<div class="fake-input">选择成员 ▾</div>`;break;
+      case 'divider':
+        preview=`<div style="height:1px;background:var(--border);margin:4px 0"></div>`;break;
+      case 'title':
+        preview=`<div style="font-size:14px;font-weight:650">标题文本</div>`;break;
+    }
+    let condBadge='';
+    if(f.showWhen&&f.showWhen.fieldId){
+      const srcField=fields.find(x=>x.id===f.showWhen.fieldId);
+      const opMap={eq:'=',neq:'≠',contains:'包含',notEmpty:'不为空',gt:'>',lt:'<'};
+      condBadge=`<div class="field-cond-badge">🔗 当「${esc(srcField?.label||'未知')}」${opMap[f.showWhen.operator]||''}「${esc(String(f.showWhen.value))}」时显示</div>`;
+    }
+    const reqMark=f.required?'<span class="req">*</span>':'';
+    return `
+      <div class="field-card${sel}" data-fid="${f.id}" draggable="true">
+        <div class="field-card-actions">
+          <button class="field-act" data-up="${f.id}" title="上移">↑</button>
+          <button class="field-act" data-down="${f.id}" title="下移">↓</button>
+          <button class="field-act" data-copy="${f.id}" title="复制">⧉</button>
+          <button class="field-act del" data-del="${f.id}" title="删除">✕</button>
+        </div>
+        <div class="field-label">${esc(f.label)}${reqMark}<span class="type-chip">${FIELD_TYPES[f.type]?.label||f.type}</span>${!visible?' <span style="font-size:10.5px;color:var(--text-3);font-weight:400">(条件隐藏)</span>':''}</div>
+        <div class="field-preview">${preview}</div>
+        ${condBadge}
+      </div>`;
+  }).join('');
+
+  $$('.field-card',box).forEach(el=>{
+    el.onclick=(e)=>{
+      if(e.target.closest('.field-act'))return;
+      S.designer.selectedFieldId=el.dataset.fid;
+      renderCanvas();
+      renderPropPanel();
+    };
+  });
+  $$('[data-del]',box).forEach(b=>b.onclick=(e)=>{
+    e.stopPropagation();
+    const id=b.dataset.del;
+    S.designer.fields=S.designer.fields.filter(x=>x.id!==id);
+    S.designer.fields.forEach(f=>{if(f.showWhen&&f.showWhen.fieldId===id)delete f.showWhen;});
+    if(S.designer.selectedFieldId===id)S.designer.selectedFieldId=null;
+    renderCanvas();renderPropPanel();
+  });
+  $$('[data-up]',box).forEach(b=>b.onclick=(e)=>{
+    e.stopPropagation();
+    const id=b.dataset.up;
+    const i=S.designer.fields.findIndex(x=>x.id===id);
+    if(i>0){[S.designer.fields[i-1],S.designer.fields[i]]=[S.designer.fields[i],S.designer.fields[i-1]];renderCanvas();}
+  });
+  $$('[data-down]',box).forEach(b=>b.onclick=(e)=>{
+    e.stopPropagation();
+    const id=b.dataset.down;
+    const i=S.designer.fields.findIndex(x=>x.id===id);
+    if(i<S.designer.fields.length-1){[S.designer.fields[i+1],S.designer.fields[i]]=[S.designer.fields[i],S.designer.fields[i+1]];renderCanvas();}
+  });
+  $$('[data-copy]',box).forEach(b=>b.onclick=(e)=>{
+    e.stopPropagation();
+    const src=S.designer.fields.find(x=>x.id===b.dataset.copy);
+    if(!src)return;
+    const nf={...JSON.parse(JSON.stringify(src)),id:uid('f')};
+    const i=S.designer.fields.findIndex(x=>x.id===b.dataset.copy);
+    S.designer.fields.splice(i+1,0,nf);
+    S.designer.selectedFieldId=nf.id;
+    renderCanvas();renderPropPanel();
+  });
+}
+
+function renderPropPanel(){
+  const panel=$('#propPanel');
+  const fid=S.designer.selectedFieldId;
+  const f=S.designer.fields.find(x=>x.id===fid);
+  if(!f){
+    panel.innerHTML='<div class="cond-empty">点击画布中的字段以编辑属性</div>';
+    return;
+  }
+  const hasOptions=['select','radio','checkbox'].includes(f.type);
+  const needCond=!['divider','title'].includes(f.type);
+  const triggerFields=S.designer.fields.filter(x=>x.id!==f.id&&!['divider','title'].includes(x.type));
+  panel.innerHTML=`
+    <div class="prop-group">
+      <h5>基础属性</h5>
+      <div class="prop-row">
+        <label>字段标题</label>
+        <input id="pLabel" value="${esc(f.label||'')}" placeholder="如：订单号">
+      </div>
+      <div class="prop-row">
+        <label>占位提示</label>
+        <input id="pPlaceholder" value="${esc(f.placeholder||'')}" placeholder="输入框内的提示文字">
+      </div>
+      ${needCond?`<label class="prop-checkbox"><input type="checkbox" id="pRequired" ${f.required?'checked':''}>必填字段</label>`:''}
+    </div>
+    ${hasOptions?`
+      <div class="prop-group">
+        <h5>选项配置</h5>
+        <div class="option-list" id="optList">
+          ${(f.options||[]).map((o,i)=>`
+            <div class="option-item">
+              <input value="${esc(o)}" data-opt-i="${i}" placeholder="选项${i+1}">
+              <button class="rm" data-rm-opt="${i}">✕</button>
+            </div>`).join('')}
+        </div>
+        <button class="add-opt-btn" id="btnAddOpt">＋ 添加选项</button>
+      </div>
+    `:''}
+    ${needCond?`
+      <div class="prop-group">
+        <h5>条件显示</h5>
+        ${f.showWhen&&f.showWhen.fieldId?`
+          <div class="cond-block">
+            <div class="prop-row" style="margin-bottom:8px">
+              <label>触发字段</label>
+              <select id="cField">
+                ${triggerFields.map(t=>`<option value="${t.id}" ${f.showWhen.fieldId===t.id?'selected':''}>${esc(t.label)}</option>`).join('')}
+              </select>
+            </div>
+            <div class="prop-row" style="margin-bottom:8px">
+              <label>条件</label>
+              <select id="cOp">
+                <option value="eq" ${f.showWhen.operator==='eq'?'selected':''}>等于</option>
+                <option value="neq" ${f.showWhen.operator==='neq'?'selected':''}>不等于</option>
+                <option value="contains" ${f.showWhen.operator==='contains'?'selected':''}>包含</option>
+                <option value="notEmpty" ${f.showWhen.operator==='notEmpty'?'selected':''}>不为空</option>
+                <option value="gt" ${f.showWhen.operator==='gt'?'selected':''}>大于</option>
+                <option value="lt" ${f.showWhen.operator==='lt'?'selected':''}>小于</option>
+              </select>
+            </div>
+            <div class="prop-row" style="margin-bottom:8px">
+              <label>值</label>
+              <input id="cVal" value="${esc(String(f.showWhen.value??''))}" placeholder="如：是 / 退货">
+            </div>
+            <button class="btn btn-g btn-sm" id="btnRemoveCond" style="width:100%">移除条件</button>
+          </div>
+        `:`
+          <div class="cond-empty" style="padding:8px 0">
+            <button class="btn btn-g btn-sm" id="btnAddCond" style="width:100%">＋ 添加条件显示</button>
+          </div>
+        `}
+      </div>
+    `:''}
+  `;
+  $('#pLabel').oninput=e=>{f.label=e.target.value;renderCanvas();};
+  $('#pPlaceholder')?.addEventListener('input',e=>{f.placeholder=e.target.value;renderCanvas();});
+  $('#pRequired')?.addEventListener('change',e=>{f.required=e.target.checked;renderCanvas();});
+  $$('[data-opt-i]',panel).forEach(inp=>{
+    inp.oninput=()=>{
+      const i=+inp.dataset.optI;
+      if(!f.options)f.options=[];
+      f.options[i]=inp.value;
+      renderCanvas();
+    };
+  });
+  $$('[data-rm-opt]',panel).forEach(b=>{
+    b.onclick=()=>{f.options.splice(+b.dataset.rmOpt,1);renderPropPanel();renderCanvas();};
+  });
+  $('#btnAddOpt')?.addEventListener('click',()=>{
+    if(!f.options)f.options=[];
+    f.options.push('选项'+(f.options.length+1));
+    renderPropPanel();renderCanvas();
+  });
+  $('#btnAddCond')?.addEventListener('click',()=>{
+    if(!triggerFields.length){toast('需要先添加其他字段作为触发条件','warn');return;}
+    f.showWhen={fieldId:triggerFields[0].id,operator:'eq',value:''};
+    renderPropPanel();renderCanvas();
+  });
+  $('#cField')?.addEventListener('change',e=>{f.showWhen.fieldId=e.target.value;renderCanvas();});
+  $('#cOp')?.addEventListener('change',e=>{f.showWhen.operator=e.target.value;renderCanvas();});
+  $('#cVal')?.addEventListener('input',e=>{f.showWhen.value=e.target.value;renderCanvas();});
+  $('#btnRemoveCond')?.addEventListener('click',()=>{delete f.showWhen;renderPropPanel();renderCanvas();});
+}
+
+function saveDesigner(){
+  const name=$('#designerFormName').value.trim();
+  const desc=$('#designerFormDesc').value.trim();
+  if(!name){toast('请填写表单名称','err');return;}
+  if(!S.designer.fields.length){toast('请至少添加一个字段','err');return;}
+  if(S.designer.formId){
+    const form=S.data.forms.find(f=>f.id===S.designer.formId);
+    if(form){
+      form.name=name;
+      form.description=desc;
+      form.fields=S.designer.fields;
+      S.data.tickets.forEach(t=>{if(t.formId===form.id)t.formName=form.name;});
+    }
+    toast('表单已更新');
+  }else{
+    const form={
+      id:uid('form'),name,description:desc,
+      icon:'📋',color:pick(['#007aff','#ff9500','#34c759','#af52de','#ff3b30','#5e5ce6']),
+      fields:S.designer.fields
+    };
+    S.data.forms.push(form);
+    toast('表单已创建');
+  }
+  persist();
+  $('#mDesigner').classList.remove('on');
+  if(S.view==='forms')renderFormCards();
+}
+
+function bindApp(){
+  $$('.nav-item').forEach(el=>el.onclick=()=>switchView(el.dataset.view));
+  $('#btnLogout').onclick=()=>{if(!confirm('退出登录？'))return;Store.clearSession();location.reload();};
+  $('#btnNewTicket').onclick=openPickForm;
+  $('#btnNewForm').onclick=()=>openDesigner(null);
+  $('#formCards').onclick=e=>{
+    const card=e.target.closest('[data-form-id]');
+    if(card)openDesigner(card.dataset.formId);
+  };
+  $$('.comp-item').forEach(el=>{
+    el.onclick=()=>{
+      const type=el.dataset.comp;
+      const newField={id:uid('f'),type,label:FIELD_TYPES[type]?.label||'字段',required:false};
+      if(['select','radio','checkbox'].includes(type))newField.options=['选项1','选项2'];
+      if(type==='switch')newField.defaultValue=false;
+      if(type==='text')newField.placeholder='请输入';
+      if(type==='textarea')newField.placeholder='请输入详细内容';
+      S.designer.fields.push(newField);
+      S.designer.selectedFieldId=newField.id;
+      renderCanvas();
+      renderPropPanel();
+    };
+  });
+  $('#designerFormName').oninput=e=>{S.designer.name=e.target.value;};
+  $('#designerFormDesc').oninput=e=>{S.designer.description=e.target.value;};
+  $('#btnDesignerSave').onclick=saveDesigner;
+  $('#btnDesignerPreview').onclick=()=>{
+    const tempForm={id:'__preview',name:S.designer.name||'预览',description:S.designer.description||'',fields:S.designer.fields};
+    S.filling={formId:'__preview',values:{}};
+    tempForm.fields.forEach(f=>{
+      if(f.defaultValue!==undefined)S.filling.values[f.id]=f.defaultValue;
+      else if(f.type==='switch')S.filling.values[f.id]=false;
+    });
+    $('#fillTitle').textContent='预览表单';
+    $('#fillFormName').textContent=tempForm.name;
+    $('#fillFormDesc').textContent=tempForm.description;
+    renderFillFields(tempForm);
+    $('#mFillTicket').classList.add('on');
+    $('#btnSubmitFill').textContent='关闭预览';
+    $('#btnSubmitFill').onclick=()=>{
+      $('#mFillTicket').classList.remove('on');
+      $('#btnSubmitFill').textContent='创建工单';
+      $('#btnSubmitFill').onclick=submitFill;
+    };
+  };
+  $('#ticketRows').onclick=e=>{const row=e.target.closest('tr[data-id]');if(row)openTicket(row.dataset.id);};
+  $('#recentRows').onclick=e=>{const row=e.target.closest('tr[data-id]');if(row)openTicket(row.dataset.id);};
+  $('#statusTabs').onclick=e=>{
+    const t=e.target.closest('.login-tab');if(!t)return;
+    $$('.login-tab',$('#statusTabs')).forEach(x=>x.classList.toggle('on',x===t));
+    S.filters.status=t.dataset.status;renderTickets();
+  };
+  let st=null;
+  $('#filterSearch').oninput=e=>{
+    clearTimeout(st);
+    const v=e.target.value;
+    st=setTimeout(()=>{S.filters.q=v;renderTickets();},200);
+  };
+  $('#globalSearch').oninput=e=>{
+    const v=e.target.value;
+    if(S.view!=='tickets')switchView('tickets');
+    $('#filterSearch').value=v;
+    S.filters.q=v;renderTickets();
+  };
+  $('#dwClose').onclick=closeTicket;
+  $('#drawerMask').onclick=closeTicket;
+  $('#drawer').addEventListener('click',e=>{
+    const nx=e.target.closest('[data-next]');
+    if(nx)updateTicketStatus(S.currentTicketId,nx.dataset.next);
+  });
+  $('#btnSubmitFill').onclick=submitFill;
+  $$('[data-close]').forEach(el=>{
+    el.onclick=()=>{const id=el.dataset.close;if(id)$('#'+id).classList.remove('on');};
+  });
+  $('#accountRows').onclick=e=>{
+    const ap=e.target.closest('[data-approve]');
+    if(ap){const u=S.data.users.find(x=>x.id===ap.dataset.approve);if(u){u.status='active';persist();renderAccounts();toast('已通过');}return;}
+    const rj=e.target.closest('[data-reject]');
+    if(rj){if(confirm('确定拒绝？')){S.data.users=S.data.users.filter(x=>x.id!==rj.dataset.reject);persist();renderAccounts();toast('已拒绝','warn');}return;}
+    const tg=e.target.closest('[data-toggle]');
+    if(tg){const u=S.data.users.find(x=>x.id===tg.dataset.toggle);if(u){u.status=u.status==='active'?'disabled':'active';persist();renderAccounts();}return;}
+  };
+  $('#btnCreateAccount').onclick=()=>{
+    const name=prompt('姓名');if(!name)return;
+    const phone=prompt('手机号');if(!phone)return;
+    const pwd=prompt('初始密码','123456');if(!pwd)return;
+    const dept=prompt('部门','售后客服组')||'未分配';
+    if(S.data.users.find(u=>u.phone===phone)){toast('手机号已存在','err');return;}
+    S.data.users.push({id:uid('u'),phone,pwd,name,role:'agent',dept,status:'active',createdAt:Date.now()});
+    persist();renderAccounts();toast('账号已开通');
+  };
+  document.addEventListener('keydown',e=>{
+    if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('#globalSearch').focus();}
+    if(e.key==='Escape'){
+      if($('#mDesigner').classList.contains('on'))$('#mDesigner').classList.remove('on');
+      else if($('#mFillTicket').classList.contains('on'))$('#mFillTicket').classList.remove('on');
+      else if($('#mPickForm').classList.contains('on'))$('#mPickForm').classList.remove('on');
+      else if($('#drawer').classList.contains('on'))closeTicket();
+    }
+  });
+}
+
 function bindLogin(){
-  $$('.tab',$('#scLogin')).forEach(tab=>{tab.onclick=()=>{$$('.tab',$('#scLogin')).forEach(t=>t.classList.toggle('on',t===tab));$('#fLogin').classList.toggle('hide',tab.dataset.tab!=='login');$('#fReg').classList.toggle('hide',tab.dataset.tab!=='reg');};});
+  $$('.login-tab').forEach(tab=>{
+    tab.onclick=()=>{
+      $$('.login-tab').forEach(t=>t.classList.toggle('on',t===tab));
+      $('#paneLogin').classList.toggle('hide',tab.dataset.tab!=='login');
+      $('#paneReg').classList.toggle('hide',tab.dataset.tab!=='reg');
+    };
+  });
   $('#lgPwd').onkeydown=e=>{if(e.key==='Enter')$('#btnLogin').click();};
-  $('#btnLogin').onclick=async()=>{
+  $('#btnLogin').onclick=()=>{
     const phone=$('#lgPhone').value.trim(),pwd=$('#lgPwd').value.trim();
     if(!phone||!pwd){toast('请输入账号和密码','err');return;}
     const u=S.data.users.find(x=>x.phone===phone);
@@ -928,151 +1763,65 @@ function bindLogin(){
     if(u.status==='pending'){toast('账号审核中','warn');return;}
     if(u.status==='disabled'){toast('账号已禁用','err');return;}
     S.user=u;
-    if(Cloud.key&&Cloud.online){await loadCloud();renderAll();}
+    Store.setSession(u.id);
     enterApp();
   };
   $('#btnReg').onclick=()=>{
-    const name=$('#rgName').value.trim(),phone=$('#rgPhone').value.trim(),pwd=$('#rgPwd').value.trim(),dept=$('#rgDept').value.trim();
+    const name=$('#rgName').value.trim(),phone=$('#rgPhone').value.trim(),
+      pwd=$('#rgPwd').value.trim(),dept=$('#rgDept').value.trim();
     if(!name||!phone||!pwd){toast('请填写完整信息','err');return;}
     if(!/^1\d{10}$/.test(phone)){toast('手机号格式不正确','err');return;}
     if(pwd.length<6){toast('密码至少 6 位','err');return;}
     if(S.data.users.find(u=>u.phone===phone)){toast('该手机号已注册','err');return;}
     S.data.users.push({id:uid('u'),phone,pwd,name,role:'agent',dept:dept||'未分配',status:'pending',createdAt:Date.now()});
-    persist();toast('申请已提交，等待管理员审批','ok',4000);
+    persist();
+    toast('申请已提交，等待管理员审批','ok',4000);
     $('#rgName').value='';$('#rgPhone').value='';$('#rgPwd').value='';$('#rgDept').value='';
-    setTimeout(()=>{$$('.tab',$('#scLogin'))[0].click();$('#lgPhone').value=phone;},1200);
+    setTimeout(()=>{$$('.login-tab')[0].click();$('#lgPhone').value=phone;},1200);
   };
 }
 
-/* ============ 引导 ============ */
-function bindGuide(){
-  $('#btnConnect').onclick=async()=>{
-    const key=$('#setupKey').value.trim();
-    const base=$('#setupBase').value.trim()||'https://drive.aiinak.com/api/v1';
-    if(!key){toast('请填写 API Key','err');return;}
-    Cloud.cfg(key,base);
-    $('#guideMsg').className='msgbox';$('#guideMsg').classList.remove('hide');$('#guideMsg').textContent='正在测试连接…';
-    try{
-      await Cloud.test();
-      $('#guideMsg').className='msgbox ok';$('#guideMsg').textContent='连接成功！正在加载数据…';
-      await loadCloud();
-      if(!S.data.users.length){const s=seed();S.data.tickets=s.tickets;S.data.groups=s.groups;S.data.users=s.users;await persist();}
-      enterApp();
-    }catch(e){
-      $('#guideMsg').className='msgbox err';$('#guideMsg').textContent='连接失败：'+e.message+'（将使用本地存储）';
-      Cloud.clear();
-      setTimeout(()=>{enterApp();},1500);
-    }
-  };
-}
-
-/* ============ 进入应用 ============ */
 function enterApp(){
-  if(!S.user){$('#scLogin').classList.remove('hide');return;}
-  $('#scLogin').classList.add('hide');$('#scGuide').classList.add('hide');$('#app').classList.remove('hide');
-  const u=S.user;$('#meName').textContent=u.name;$('#meRole').textContent=(u.role==='admin'?'管理员':'客服')+' · '+(u.dept||'');
-  $('#meAv').textContent=initials(u.name);$('#meAv').style.background=avColor(u.name);
-  const isAdmin=u.role==='admin';$('#admLabel').style.display=isAdmin?'':'none';$('#navAcc').style.display=isAdmin?'':'none';
-  $('#cloudText').textContent=Cloud.online?'已同步':'本地存储';
+  if(!S.user){$('#scLogin').style.display='grid';return;}
+  $('#scLogin').style.display='none';
+  $('#app').classList.remove('hide');
+  const u=S.user;
+  $('#meName').textContent=u.name;
+  $('#meRole').textContent=(u.role==='admin'?'管理员':'客服')+' · '+(u.dept||'');
+  $('#meAv').textContent=initials(u.name);
+  $('#meAv').style.background=avColor(u.name);
+  const isAdmin=u.role==='admin';
+  $('#admLabel').style.display=isAdmin?'':'none';
+  $('#navAcc').style.display=isAdmin?'':'none';
   switchView('dashboard');
-  toast(`欢迎 ${u.name}`,'ok',2600);
+  toast(`欢迎 ${u.name}`,'ok',2400);
 }
 
-/* ============ 事件 ============ */
-function bindApp(){
-  $$('.ni').forEach(el=>el.onclick=()=>switchView(el.dataset.view));
-  $('#btnLogout').onclick=()=>{if(!confirm('退出登录？'))return;localStorage.removeItem('sd_user');location.reload();};
-  $('#cloudBadge').onclick=()=>{persist();toast('已触发同步');};
-  $('#btnNewTicket').onclick=()=>{const sel=$('#fType');if(!sel.options.length)TYPES.forEach(tp=>{const o=document.createElement('option');o.value=tp;o.textContent=tp;sel.appendChild(o);});['#fName','#fPhone','#fOrder','#fTitle','#fDesc'].forEach(s=>$(s).value='');$('#mTicket').classList.add('on');};
-  $$('[data-close]').forEach(el=>el.onclick=()=>{const id=el.dataset.close;if(id)$('#'+id).classList.remove('on');});
-  $('#btnSubmitTicket').onclick=()=>{
-    const name=$('#fName').value.trim(),phone=$('#fPhone').value.trim(),order=$('#fOrder').value.trim(),title=$('#fTitle').value.trim();
-    if(!name||!phone||!order||!title){toast('请填写完整信息','err');return;}
-    const type=$('#fType').value,priority=$('#fPriority').value;const now=Date.now();
-    S.data.tickets.unshift({id:uid('tk'),no:'TK'+codeDate(now)+'-'+String(S.data.tickets.length+1).padStart(3,'0'),title,type,priority,status:'pending',agent:'未分配',customer:{name,phone},source:'后台创建',orderNo:order,desc:$('#fDesc').value.trim()||TYPE_DESC[type],createdAt:now,updatedAt:now,plans:[],timeline:[{time:now,title:'工单创建',desc:'由客服创建',who:S.user.name}]});
-    persist();$('#mTicket').classList.remove('on');renderTickets();renderDashboard();toast('工单创建成功');
-  };
-  $('#ticketRows').onclick=e=>{const r=e.target.closest('tr[data-id]');if(r)openTicket(r.dataset.id);};
-  $('#recentRows').onclick=e=>{const r=e.target.closest('tr[data-id]');if(r)openTicket(r.dataset.id);};
-  $('#statusTabs').onclick=e=>{const t=e.target.closest('.tab');if(!t)return;$$('.tab',$('#statusTabs')).forEach(x=>x.classList.toggle('on',x===t));S.filters.status=t.dataset.status;renderTickets();};
-  let st=null;$('#filterSearch').oninput=e=>{clearTimeout(st);const v=e.target.value;st=setTimeout(()=>{S.filters.q=v;renderTickets();},200);};
-  $('#globalSearch').oninput=e=>{const v=e.target.value;if(S.view!=='tickets')switchView('tickets');$('#filterSearch').value=v;S.filters.q=v;renderTickets();};
-  $('#dwClose').onclick=closeTicket;$('#ov').onclick=closeTicket;
-  $('#drawer').addEventListener('click',e=>{const nx=e.target.closest('[data-next]');if(nx){updateTicketStatus(S.currentTicketId,nx.dataset.next);return;}const ac=e.target.closest('[data-act]');if(ac&&ac.dataset.act==='plan')openPlanModal();});
-  $('#btnSubmitPlan').onclick=()=>{
-    const title=$('#planTitle').value.trim(),body=$('#planBody').value.trim();
-    if(!title||!body){toast('请填写完整','err');return;}
-    const t=S.data.tickets.find(x=>x.id===S.currentTicketId);if(!t)return;t.plans=t.plans||[];
-    const now=Date.now();t.plans.push({id:uid('plan'),colorId:S.planColorId,title,body,time:now,who:S.user.name,version:'V'+(t.plans.length+1)});
-    t.timeline.push({time:now,title:'提交处理方案',desc:body,who:S.user.name});persist();$('#mPlan').classList.remove('on');renderDrawer(t);renderTickets();toast('方案已提交');
-  };
-  $('#btnNewGroup').onclick=()=>{
-    S.gTicketsSelected=new Set();$('#gName').value='';
-    $('#gTickets').innerHTML=S.data.tickets.slice(0,30).map(t=>`<label style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;cursor:pointer;font-size:12.5px"><input type="checkbox" data-gt="${t.id}" style="accent-color:#007aff"><span style="flex:1">${esc(t.title)}</span><span class="mt" style="font-size:11px">${t.no}</span></label>`).join('');
-    $$('[data-gt]').forEach(cb=>cb.onchange=()=>{if(cb.checked)S.gTicketsSelected.add(cb.dataset.gt);else S.gTicketsSelected.delete(cb.dataset.gt);});
-    $('#mGroup').classList.add('on');
-  };
-  $('#btnSubmitGroup').onclick=()=>{
-    const name=$('#gName').value.trim();if(!name){toast('请填写群聊名称','err');return;}
-    const now=Date.now();S.data.groups.push({id:uid('grp'),name,members:[S.user.id],ticketIds:[...S.gTicketsSelected],createdAt:now,messages:[{id:uid('msg'),type:'system',content:`群聊已创建，关联 ${S.gTicketsSelected.size} 个工单`,time:now,senderName:'系统'}]});
-    persist();$('#mGroup').classList.remove('on');switchView('chat');renderChatList();toast('群聊已创建');
-  };
-  $('#chatList').onclick=e=>{const i=e.target.closest('[data-gid]');if(i)openGroup(i.dataset.gid);};
-  $('#accountRows').onclick=e=>{
-    const ap=e.target.closest('[data-approve]');if(ap){const u=S.data.users.find(x=>x.id===ap.dataset.approve);if(u){u.status='active';persist();renderAccounts();toast('已通过');}return;}
-    const rj=e.target.closest('[data-reject]');if(rj){if(confirm('确定拒绝？')){S.data.users=S.data.users.filter(x=>x.id!==rj.dataset.reject);persist();renderAccounts();toast('已拒绝','warn');}return;}
-    const tg=e.target.closest('[data-toggle]');if(tg){const u=S.data.users.find(x=>x.id===tg.dataset.toggle);if(u){u.status=u.status==='active'?'disabled':'active';persist();renderAccounts();}return;}
-  };
-  $('#btnCreateAccount').onclick=()=>{
-    const name=prompt('姓名');if(!name)return;const phone=prompt('手机号');if(!phone)return;
-    const pwd=prompt('初始密码','123456');if(!pwd)return;const dept=prompt('部门','售后客服组')||'未分配';
-    if(S.data.users.find(u=>u.phone===phone)){toast('手机号已存在','err');return;}
-    S.data.users.push({id:uid('u'),phone,pwd,name,role:'agent',dept,status:'active',createdAt:Date.now()});
-    persist();renderAccounts();toast('账号已开通');
-  };
-  $('#swSound').onchange=e=>{S.data.settings.sound=e.target.checked;persist();};
-  $('#btnTestConn').onclick=async()=>{
-    const key=$('#setKey').value.trim(),base=$('#setBase').value.trim()||'https://drive.aiinak.com/api/v1';
-    if(!key){$('#setMsg').className='msgbox err';$('#setMsg').classList.remove('hide');$('#setMsg').textContent='请填写 API Key';return;}
-    Cloud.cfg(key,base);
-    try{await Cloud.test();$('#setMsg').className='msgbox ok';$('#setMsg').classList.remove('hide');$('#setMsg').textContent='连接成功';$('#setCloudStatus').textContent='已连接';await loadCloud();renderAll();}
-    catch(e){$('#setMsg').className='msgbox err';$('#setMsg').classList.remove('hide');$('#setMsg').textContent='连接失败：'+e.message;Cloud.clear();}
-  };
-  $('#btnSaveKey').onclick=async()=>{
-    const key=$('#setKey').value.trim(),base=$('#setBase').value.trim()||'https://drive.aiinak.com/api/v1';
-    if(!key){toast('请填写 API Key','err');return;}
-    Cloud.cfg(key,base);toast('已保存，将尝试同步');await persist();
-  };
-  $('#btnSyncNow').onclick=()=>{persist();toast('已触发同步');};
-  $('#btnShowKey').onclick=()=>{const inp=$('#setKey');inp.type=inp.type==='password'?'text':'password';};
-  document.addEventListener('keydown',e=>{
-    if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('#globalSearch').focus();}
-    if(e.key==='Escape'){if($('#mTicket').classList.contains('on'))$('#mTicket').classList.remove('on');else if($('#mGroup').classList.contains('on'))$('#mGroup').classList.remove('on');else if($('#mPlan').classList.contains('on'))$('#mPlan').classList.remove('on');else if($('#drawer').classList.contains('on'))closeTicket();}
-  });
-}
-
-function openPlanModal(){
-  $('#planColors').innerHTML=S.data.settings.planColors.map(c=>`<label style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;cursor:pointer;font-size:12.5px;border:2px solid ${S.planColorId===c.id?c.color:'transparent'};background:${c.color}18"><input type="radio" name="planColor" value="${c.id}" ${S.planColorId===c.id?'checked':''} style="accent-color:${c.color}"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${c.color}"></span>${esc(c.name)}</label>`).join('');
-  $$('input[name="planColor"]').forEach(r=>r.onchange=()=>{S.planColorId=r.value;openPlanModal();});
-  $('#planTitle').value='';$('#planBody').value='';$('#mPlan').classList.add('on');
-}
-
-/* ============ 启动 ============ */
-async function boot(){
-  const local=await Local.load();
-  if(local){S.data=local;}
-  else{const s=seed();S.data.tickets=s.tickets;S.data.groups=s.groups;S.data.users=s.users;await Local.save(S.data);}
-  if(!S.data.settings)S.data.settings={sound:true,planColors:[{id:'c1',color:'#007aff',name:'标准方案'},{id:'c2',color:'#ff9500',name:'升级方案'},{id:'c3',color:'#ff3b30',name:'紧急方案'},{id:'c4',color:'#34c759',name:'已解决'},{id:'c5',color:'#af52de',name:'补偿方案'}]};
-  bindLogin();bindGuide();bindApp();
-  // 已登录
-  const saved=localStorage.getItem('sd_user');
-  if(saved){
-    const u=S.data.users.find(x=>x.id===saved);
-    if(u&&u.status==='active'){S.user=u;if(Cloud.key){await loadCloud();}enterApp();}
+function boot(){
+  const saved=Store.load();
+  if(saved&&saved.forms&&saved.users){
+    S.data=saved;
+  }else{
+    const forms=seedForms();
+    S.data={
+      users:[{
+        id:'u_admin',phone:'13939538389',pwd:'hong980727',
+        name:'管理员',role:'admin',dept:'系统',status:'active',createdAt:Date.now()
+      }],
+      forms,
+      tickets:seedTickets(forms),
+      version:1
+    };
+    Store.save(S.data);
   }
-  // 有 Key 但未登录，显示登录页
+  bindLogin();
+  bindApp();
+  const sid=Store.getSession();
+  if(sid){
+    const u=S.data.users.find(x=>x.id===sid);
+    if(u&&u.status==='active'){S.user=u;enterApp();}
+  }
 }
-
 document.addEventListener('DOMContentLoaded',boot);
 </script>
 </body>
