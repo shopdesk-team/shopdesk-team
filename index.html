@@ -446,7 +446,7 @@ body.dark .msgs{background:rgba(28,28,30,.5)}
 .quote{display:flex;gap:6px;padding:5px 9px;border-radius:7px;background:rgba(120,120,128,.09);border-left:2.5px solid var(--blue);font-size:11.5px;color:var(--text-2);margin-bottom:5px;max-width:100%}
 .quote .qn{font-weight:620;color:var(--blue);font-size:10.5px}
 .msg.mine .quote{background:rgba(255,255,255,.2);border-left-color:#fff}
-./* @ 提及 - 白底蓝字 */
+  /* @ 提及 - 白底蓝字 */
 .mention{display:inline-block;color:#003d99;background:#dbeaff;padding:1px 6px;border-radius:5px;font-weight:700;border:1px solid rgba(0,122,255,.25)}
 .msg.mine .mention{color:#003d99;background:#ffffff;border:1px solid rgba(255,255,255,.5);font-weight:700}
 .mention-me{background:#ff9500!important;color:#fff!important;font-weight:700;border:1px solid #ff9500!important}
@@ -1483,10 +1483,10 @@ function buildActionsTop(t){
     +`<span style="flex:1"></span>
       <button class="btn btn-p btn-xs" data-act="add-plan">${ICON.plus}方案</button>
       <button class="btn btn-g btn-xs" data-act="reply">回复</button>
-      <button class="btn btn-g btn-xs" data-act="urge" style="color:var(--orange)"><button class="btn btn-g btn-xs" data-act="urge" style="color:var(--orange)">
+      <button class="btn btn-g btn-xs" data-act="urge" style="color:var(--orange)">
   <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
   催单
-</button></button>
+</button>
       <button class="btn btn-g btn-xs" data-act="send-group">发群</button>
       ${adm?`<button class="btn btn-g btn-xs" data-act="del" style="color:var(--red)">${ICON.trash}删除</button>`:''}`;
 }
@@ -1972,7 +1972,7 @@ function renderFormCards(){
 }
 
 /* ============ 账号管理 ============ */
-function renderAccounts(){function renderAccounts(){
+function renderAccounts(){
   if(!isAdmin())return;
   const shifts=S.data.shifts||SHIFTS;
   const positions=S.data.positions||POSITIONS;
@@ -2166,7 +2166,7 @@ function updateBadges(){
 }
 
 /* ============ 群聊 ============ */
-function openChatDrawer(){function openChatDrawer(){
+function openChatDrawer(){
   closeAllPanels('chatDrawer');
   S.chatOpen=true;
   $('#chatDrawer').classList.add('on');
@@ -2685,7 +2685,7 @@ function submitFill(){
 }
 
 /* ============ 通用模态 ============ */
-function showModal(title,body,buttons=[],wide=false){/* 关闭所有面板，只保留exceptId指定的那个 */
+/* 关闭所有面板，只保留exceptId指定的那个 */
 function closeAllPanels(exceptId){
   ['mModal','mDesigner','strongModal','shiftModal','urgeLock'].forEach(id=>{
     if(id!==exceptId){const el=$('#'+id);if(el&&el.classList.contains('on'))el.classList.remove('on');}
@@ -2715,6 +2715,7 @@ function showModal(title,body,buttons=[],wide=false){
     };
   });
 }
+
 function closeModal(id='mModal'){$('#'+id).classList.remove('on');}
 
 /* ============ 权限 ============ */
@@ -2805,7 +2806,8 @@ function enterApp(){if(window.Security&&S.user) window.Security.applyWatermark(S
   $('#admLabel').style.display=adm?'':'none';
   $('#navAcc').style.display=adm?'':'none';
   $('#navGroups').style.display=adm?'':'none';
-  $('#navCategories').style.display=adm?'':'none';
+  const navCat=document.getElementById('navCategories');
+if(navCat)navCat.style.display=adm?'':'none';
   $('#navForms').style.display=adm?'':'none';
   S.viewPref=S.data.settings?.viewPref||'right';
   $('#viewModeLabel').textContent={right:'右侧挤压',down:'向下挤压',card:'大卡片'}[S.viewPref]||'右侧挤压';
@@ -2827,7 +2829,11 @@ function bindApp(){
   $$('.nav-item').forEach(el=>{if(el.dataset.view)el.onclick=()=>switchView(el.dataset.view);});
   $('#btnTheme').onclick=toggleTheme;
   $('#btnChatToggle').onclick=()=>S.chatOpen?closeChatDrawer():openChatDrawer();
-  $('#btnSidePanel').onclick=$('#btnBell').onclick=(e)=>{
+  $('#btnSidePanel').onclick=()=>{
+  if($('#sidePanel').classList.contains('on')){$('#sidePanel').classList.remove('on');}
+  else{closeAllPanels('sidePanel');$('#sidePanel').classList.add('on');renderSidePanel();}
+};
+$('#btnBell').onclick=(e)=>{
   e.stopPropagation();
   const p=$('#notifPanel');
   if(p.classList.contains('hide')){closeAllPanels('notifPanel');p.classList.remove('hide');renderNotifPanel();}
@@ -2888,13 +2894,6 @@ function applyAvatarToGroupMessages(){
       $('#filterSearch').value=v;S.filters.q=v;renderTickets();
     };
     setTimeout(()=>document.addEventListener('click',function h(ev){if(!dd.contains(ev.target)&&ev.target.id!=='btnSearchToggle'){dd.remove();document.removeEventListener('click',h);}}),10);
-  };
-  // 通知
-  $('#btnBell').onclick=(e)=>{
-    e.stopPropagation();
-    const p=$('#notifPanel');
-    if(p.classList.contains('hide')){p.classList.remove('hide');renderNotifPanel();}
-    else p.classList.add('hide');
   };
   $('#notifClose').onclick=()=>$('#notifPanel').classList.add('hide');
   $('#notifSearch').oninput=()=>renderNotifPanel();
@@ -3183,7 +3182,8 @@ try{
   const lbl=$('#viewModeLabel');if(lbl)lbl.textContent={right:'右侧挤压',down:'向下挤压',card:'大卡片'}[S.viewPref]||'右侧挤压';
   bindLogin();bindApp();
   const sid=Store.getSession();
-  if(sid){const u=S.data.users.find(x=>x.id===sid);if(u&&u.status==='active'){S.user=u;u.online=true;persist();enterApp();}}initCategories();
+  initCategories();
+  if(sid){const u=S.data.users.find(x=>x.id===sid);if(u&&u.status==='active'){S.user=u;u.online=true;persist();enterApp();}}
 }
   /* ============ 分类设置模块 ============ */
 function initCategories(){
