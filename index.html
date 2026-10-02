@@ -648,6 +648,16 @@ body.dark .msgs{background:rgba(28,28,30,.5)}
         <div class="login-sub">智能表单 · 团队协作</div>
         <div class="fg"><label>账号</label><input class="inp" id="lgPhone" placeholder="手机号"></div>
         <div class="fg"><label>密码</label><input class="inp" id="lgPwd" type="password" placeholder="密码"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0 8px;font-size:12.5px">
+  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--text-2)">
+    <input type="checkbox" id="chkRemember" style="accent-color:var(--blue);width:15px;height:15px">
+    记住密码
+  </label>
+  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--text-2)">
+    <input type="checkbox" id="chkAutoLogin" style="accent-color:var(--blue);width:15px;height:15px">
+    自动登录
+  </label>
+</div>
         <button class="btn btn-p btn-blk" id="btnLogin" style="padding:11px;margin-top:6px">登 录</button>
         <div style="display:flex;justify-content:space-between;margin-top:14px;font-size:12.5px">
           <a id="goRegister" style="color:var(--blue);cursor:pointer">注册新账号</a>
@@ -2186,10 +2196,16 @@ function renderGroupSelector(){
 }
 function renderGroupSelItem(g){
   const un=S.unreadGroups[g.id]||0;
+  const avatarHtml=g.avatar?`<img src="${g.avatar}" style="width:100%;height:100%;object-fit:cover">`:initials(g.name);
+  const bg=g.avatar?'transparent':avColor(g.name);
   return `<div class="group-selector-item" data-sel-gid="${g.id}">
-    <div class="av" style="background:${avColor(g.name)}">${initials(g.name)}</div>
-    <div class="info"><div class="name">${g.pinned?ICON.pin+' ':''}${esc(g.name)}${g.muted?' <span style="font-size:10.5px;color:var(--text-3)">免打扰</span>':''}</div>
-      <div class="meta">${g.members.length} 位成员 · ${(g.ticketIds||[]).length} 工单</div></div>
+    <div class="av" style="background:${bg};overflow:hidden">${avatarHtml}</div>
+    <div class="info">
+      <div class="name">
+        ${g.pinned?ICON.pin+' ':''}${esc(g.name)}${g.muted?' <span style="font-size:10.5px;color:var(--text-3)">免打扰</span>':''}
+      </div>
+      <div class="meta">${g.members.length} 位成员 · ${(g.ticketIds||[]).length} 工单</div>
+    </div>
     ${un?`<span class="unread-mini">${un>99?'99+':un}</span>`:''}
   </div>`;
 }
@@ -2201,7 +2217,12 @@ function renderChatMain(){
   const tags=tickets.slice(-5).map(t=>`<span class="tk-tag" data-jump-tk="${t.id}">${t.no}</span>`).join('');
   $('#chatPanel').innerHTML=`
     <div class="chat-panel-head"><button class="icon-btn" id="btnBackGroups" title="返回" style="width:26px;height:26px">${ICON.arrowLeft}</button>
-      <h3>${esc(g.name)}</h3>
+      <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+  <div style="width:32px;height:32px;border-radius:10px;flex:0 0 32px;display:grid;place-items:center;color:#fff;font-size:13px;font-weight:650;overflow:hidden;background:${g.avatar?'transparent':avColor(g.name)}">
+    ${g.avatar?`<img src="${g.avatar}" style="width:100%;height:100%;object-fit:cover">`:initials(g.name)}
+  </div>
+  <h3 style="margin:0;font-size:13.5px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(g.name)}</h3>
+</div>
       <button class="icon-btn" id="btnGroupSettings" title="群设置" style="width:26px;height:26px">${ICON.settings}</button>
       <button class="icon-btn" id="btnCloseChat" style="width:26px;height:26px">${ICON.x}</button>
     </div>
@@ -2355,23 +2376,155 @@ function openNewGroupModal(){
 }
 function openGroupSettings(g){
   const isAdminGroup=g.admin===S.user.id||isAdmin();
-  showModal('群聊设置 · '+g.name,`
-    <div style="display:flex;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--border)"><div style="flex:1"><div style="font-weight:560">置顶群聊</div><div style="font-size:11.5px;color:var(--text-3);margin-top:2px">置顶后显示在列表最上方</div></div><div class="switch ${g.pinned?'on':''}" data-setting="pinned"></div></div>
-    <div style="display:flex;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--border)"><div style="flex:1"><div style="font-weight:560">消息免打扰</div><div style="font-size:11.5px;color:var(--text-3);margin-top:2px">开启后不响铃，被 @ 时仍会强提醒</div></div><div class="switch ${g.muted?'on':''}" data-setting="muted"></div></div>
-    <div style="padding:14px 0"><div style="font-size:12.5px;font-weight:600;margin-bottom:8px">群成员（${g.members.length}）</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px">${g.members.map(id=>{const u=S.data.users.find(x=>x.id===id);return u?`<span class="chip" style="padding:4px 9px">${esc(u.name)}${u.id===g.admin?' 群主':''}</span>`:'';}).join('')}</div>
-      ${isAdminGroup?`<button class="btn btn-p btn-sm" id="btnAddMemberToGroup" style="margin-top:10px;width:100%">添加成员</button>`:''}
+  const avatarHtml=g.avatar?`<img src="${g.avatar}" style="width:100%;height:100%;object-fit:cover">`:initials(g.name);
+  const shiftsList=S.data.shifts||SHIFTS;
+  showModal('群聊设置',`
+    <div style="display:flex;gap:16px;align-items:center;padding:16px;border-radius:12px;background:rgba(120,120,128,.06);margin-bottom:16px">
+      <div id="grAvatarPreview" style="width:72px;height:72px;border-radius:18px;flex:0 0 72px;display:grid;place-items:center;color:#fff;font-size:24px;font-weight:700;overflow:hidden;background:${avColor(g.name)};box-shadow:0 8px 20px -8px rgba(0,0,0,.3);cursor:pointer">
+        ${avatarHtml}
+      </div>
+      <div style="flex:1">
+        <div style="font-size:13.5px;font-weight:620;margin-bottom:4px">${esc(g.name)}</div>
+        <div style="font-size:11.5px;color:var(--text-3);margin-bottom:8px">${g.members.length} 位成员 · ${(g.ticketIds||[]).length} 个工单</div>
+        ${isAdminGroup?`<div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-p btn-sm" id="grAvatarUpload">
+            <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg>
+            上传群头像
+          </button>
+          <button class="btn btn-g btn-sm" id="grAvatarClear">清除</button>
+        </div>`:'<span style="font-size:11.5px;color:var(--text-3)">仅群主可修改</span>'}
+      </div>
     </div>
-    ${(g.banList||[]).length?`<div style="padding:14px 0"><div style="font-size:12.5px;font-weight:600;margin-bottom:8px">禁言名单（${g.banList.length}）</div>
+
+    ${isAdminGroup?`<div class="form-row"><label>群名称</label><input class="inp" id="grName" value="${esc(g.name)}"></div>`:''}
+
+    <div style="display:flex;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1">
+        <div style="font-weight:560">置顶群聊</div>
+        <div style="font-size:11.5px;color:var(--text-3);margin-top:2px">置顶后显示在列表最上方</div>
+      </div>
+      <div class="switch ${g.pinned?'on':''}" data-setting="pinned"></div>
+    </div>
+
+    <div style="display:flex;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1">
+        <div style="font-weight:560">消息免打扰</div>
+        <div style="font-size:11.5px;color:var(--text-3);margin-top:2px">开启后不响铃，被 @ 时仍会强提醒</div>
+      </div>
+      <div class="switch ${g.muted?'on':''}" data-setting="muted"></div>
+    </div>
+
+    <div style="padding:14px 0">
+      <div style="font-size:12.5px;font-weight:600;margin-bottom:8px">群成员（${g.members.length}）</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${g.members.map(id=>{
+          const u=S.data.users.find(x=>x.id===id);
+          if(!u)return '';
+          const av=u.avatar?`<img src="${u.avatar}" style="width:20px;height:20px;border-radius:50%;object-fit:cover">`:initials(u.name);
+          return `<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;background:rgba(120,120,128,.1);font-size:12px">
+            <span style="width:20px;height:20px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:9px;font-weight:650;overflow:hidden;background:${avColor(u.name)}">${av}</span>
+            ${esc(u.name)}${u.id===g.admin?' 👑':''}
+          </span>`;
+        }).join('')}
+      </div>
+      ${isAdminGroup?`<button class="btn btn-p btn-sm" id="btnAddMemberToGroup" style="margin-top:10px;width:100%">+ 添加成员</button>`:''}
+    </div>
+
+    ${(g.banList||[]).length?`<div style="padding:14px 0">
+      <div style="font-size:12.5px;font-weight:600;margin-bottom:8px">禁言名单（${g.banList.length}）</div>
       <div>${g.banList.map(id=>{const u=S.data.users.find(x=>x.id===id);return u?`<span class="chip" style="padding:4px 9px;color:var(--red)">${esc(u.name)}</span>`:'';}).join('')}</div>
     </div>`:''}
+
+    ${isAdminGroup?`<div style="padding:14px 0;border-top:1px solid var(--border)">
+      <button class="btn btn-d btn-sm" id="btnDissolveGroup" style="width:100%">解散群聊</button>
+    </div>`:''}
   `,[{label:'关闭',cls:'btn-g'}]);
-  $$('[data-setting]').forEach(el=>el.onclick=()=>{const k=el.dataset.setting;g[k]=!g[k];el.classList.toggle('on');persist();if(k==='pinned'&&S.chatOpen)renderGroupSelector();toast(g[k]?'已开启':'已关闭');});
+
+  // 群头像上传
+  $('#grAvatarUpload')?.addEventListener('click',()=>{
+    const inp=document.createElement('input');
+    inp.type='file';
+    inp.accept='image/*';
+    inp.onchange=()=>{
+      const f=inp.files[0];
+      if(!f)return;
+      if(f.size>2*1024*1024){toast('图片不能超过 2MB','err');return;}
+      const r=new FileReader();
+      r.onload=()=>{
+        g.avatar=r.result;
+        persist();
+        const preview=$('#grAvatarPreview');
+        preview.innerHTML=`<img src="${r.result}" style="width:100%;height:100%;object-fit:cover">`;
+        toast('群头像已更新');
+      };
+      r.readAsDataURL(f);
+    };
+    inp.click();
+  });
+
+  // 清除群头像
+  $('#grAvatarClear')?.addEventListener('click',()=>{
+    if(!confirm('确定清除群头像？'))return;
+    g.avatar=null;
+    persist();
+    const preview=$('#grAvatarPreview');
+    preview.innerHTML=initials(g.name);
+    preview.style.background=avColor(g.name);
+    toast('已清除');
+  });
+
+  // 群名称修改
+  $('#grName')?.addEventListener('change',()=>{
+    const newName=$('#grName').value.trim();
+    if(!newName){toast('群名称不能为空','err');return;}
+    g.name=newName;
+    persist();
+    toast('群名已更新');
+  });
+
+  // 开关
+  $$('[data-setting]').forEach(el=>{
+    el.onclick=()=>{
+      const k=el.dataset.setting;
+      g[k]=!g[k];
+      el.classList.toggle('on');
+      persist();
+      if(k==='pinned'&&S.chatOpen)renderGroupSelector();
+      toast(g[k]?'已开启':'已关闭');
+    };
+  });
+
+  // 添加成员
   $('#btnAddMemberToGroup')?.addEventListener('click',()=>{
-    showModal('添加成员',S.data.users.filter(u=>u.status==='active'&&!g.members.includes(u.id)).map(u=>`<label style="display:flex;gap:8px;align-items:center;padding:6px 10px;border-radius:8px;background:rgba(120,120,128,.05);cursor:pointer;margin-bottom:6px"><input type="checkbox" data-gm2="${u.id}">${esc(u.name)}</label>`).join('')||'<div style="padding:20px;text-align:center;color:var(--text-3)">所有成员已在群内</div>',[
-      {label:'取消',cls:'btn-g'},
-      {label:'添加',cls:'btn-p',onclick:()=>{const ids=$$('[data-gm2]:checked').map(x=>x.dataset.gm2);ids.forEach(id=>{if(!g.members.includes(id))g.members.push(id);});g.messages.push({id:uid('msg'),type:'system',content:`${ids.length} 位成员加入群聊`,time:Date.now(),senderName:'系统'});persist();renderChatMain();toast('已添加');return false;}}
-    ]);
+    showModal('添加成员',
+      S.data.users.filter(u=>u.status==='active'&&!g.members.includes(u.id)).map(u=>`
+        <label style="display:flex;gap:8px;align-items:center;padding:6px 10px;border-radius:8px;background:rgba(120,120,128,.05);cursor:pointer;margin-bottom:6px">
+          <input type="checkbox" data-gm2="${u.id}">
+          <span style="width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:10px;font-weight:650;overflow:hidden;background:${avColor(u.name)}">
+            ${u.avatar?`<img src="${u.avatar}" style="width:100%;height:100%;object-fit:cover">`:initials(u.name)}
+          </span>
+          ${esc(u.name)}
+        </label>`).join('')||'<div style="padding:20px;text-align:center;color:var(--text-3)">所有成员已在群内</div>',
+      [
+        {label:'取消',cls:'btn-g'},
+        {label:'添加',cls:'btn-p',onclick:()=>{
+          const ids=$$('[data-gm2]:checked').map(x=>x.dataset.gm2);
+          if(!ids.length){toast('请选择成员','err');return false;}
+          ids.forEach(id=>{if(!g.members.includes(id))g.members.push(id);});
+          g.messages.push({id:uid('msg'),type:'system',content:`${ids.length} 位成员加入群聊`,time:Date.now(),senderName:'系统'});
+          persist();renderChatMain();toast('已添加');return false;
+        }}
+      ]);
+  });
+
+  // 解散群聊
+  $('#btnDissolveGroup')?.addEventListener('click',()=>{
+    if(!confirm('确定解散此群聊？此操作不可恢复。'))return;
+    S.data.groups=S.data.groups.filter(x=>x.id!==g.id);
+    if(S.currentGroupId===g.id)S.currentGroupId=null;
+    persist();closeModal();
+    renderGroupSelector();
+    toast('群聊已解散','warn');
   });
 }
 function updateChatBadge(){let total=0;Object.values(S.unreadGroups).forEach(n=>total+=n);const el=$('#chatBadge');if(total>0){el.classList.remove('hide');el.textContent=total>99?'99+':total;}else el.classList.add('hide');}
@@ -2576,15 +2729,36 @@ function bindLogin(){
   $('#backToLogin1').onclick=$('#backToLogin2').onclick=()=>{flip.dataset.face='login';};
   $('#lgPwd').onkeydown=e=>{if(e.key==='Enter')$('#btnLogin').click();};
   $('#btnLogin').onclick=()=>{
-    const phone=$('#lgPhone').value.trim(),pwd=$('#lgPwd').value.trim();
-    if(!phone||!pwd){toast('请输入账号密码','err');return;}
-    const u=S.data.users.find(x=>x.phone===phone);
-    if(!u||u.pwd!==pwd){toast('账号或密码错误','err');return;}
-    if(u.status==='pending'){toast('账号审核中','warn');return;}
-    if(u.status==='disabled'){toast('账号已禁用','err');return;}
-    S.user=u;Store.setSession(u.id);u.online=true;persist();
-    if(u.showShiftOnLogin!==false){showShiftModal();}else enterApp();
-  };
+  const phone=$('#lgPhone').value.trim(),pwd=$('#lgPwd').value.trim();
+  if(!phone||!pwd){toast('请输入账号密码','err');return;}
+  const u=S.data.users.find(x=>x.phone===phone);
+  if(!u||u.pwd!==pwd){toast('账号或密码错误','err');return;}
+  if(u.status==='pending'){toast('账号审核中','warn');return;}
+  if(u.status==='disabled'){toast('账号已禁用','err');return;}
+
+  // ============ 记住密码/自动登录 ============
+  const remember=$('#chkRemember')?.checked;
+  const autoLogin=$('#chkAutoLogin')?.checked;
+
+  try{
+    if(remember||autoLogin){
+      // 简单 base64 编码存储（不是加密，仅防止肉眼查看）
+      const payload={
+        phone: phone,
+        pwd: btoa(encodeURIComponent(pwd)),
+        autoLogin: !!autoLogin,
+        time: Date.now()
+      };
+      localStorage.setItem('sd_login_saved', JSON.stringify(payload));
+    }else{
+      localStorage.removeItem('sd_login_saved');
+    }
+  }catch(e){}
+
+  // ============ 正常登录流程 ============
+  S.user=u;Store.setSession(u.id);u.online=true;persist();
+  if(u.showShiftOnLogin!==false){showShiftModal();}else enterApp();
+};
   $('#btnReg').onclick=()=>{
     const name=$('#rgName').value.trim(),phone=$('#rgPhone').value.trim(),pwd=$('#rgPwd').value.trim(),dept=$('#rgDept').value.trim();
     if(!name||!phone||!pwd){toast('请填完整','err');return;}
@@ -2683,6 +2857,16 @@ function bindApp(){
       const it=ev.target.closest('[data-user-act]');if(!it)return;
       const act=it.dataset.userAct;
       if(act==='profile'){editProfile();menu.remove();}
+        /* 用户改头像后，刷新群里所有该用户发过的消息头像 */
+function applyAvatarToGroupMessages(){
+  const cur=S.currentGroupId;
+  if(!cur)return;
+  const g=S.data.groups.find(x=>x.id===cur);
+  if(!g)return;
+  // 重新渲染当前群
+  const msgsBox=$('#msgs');
+  if(msgsBox)renderMsgs(g);
+}
       else if(act==='shift'){showShiftModal();menu.remove();}
       else if(act==='logout'){if(confirm('退出登录？')){S.user.online=false;persist();if(window.Security) window.Security.clearWatermark();Store.clearSession();location.reload();}}
     };
@@ -2767,20 +2951,103 @@ function bindApp(){
 }
 function editProfile(){
   const u=S.user;
+  const avatarHtml=u.avatar?`<img src="${u.avatar}" style="width:100%;height:100%;object-fit:cover">`:initials(u.name);
   showModal('个人资料',`
+    <div style="display:flex;gap:16px;align-items:center;padding:16px;border-radius:12px;background:rgba(120,120,128,.06);margin-bottom:16px">
+      <div id="pfAvatarPreview" style="width:80px;height:80px;border-radius:50%;flex:0 0 80px;display:grid;place-items:center;color:#fff;font-size:26px;font-weight:700;overflow:hidden;background:${avColor(u.name)};box-shadow:0 8px 20px -8px rgba(0,0,0,.3);cursor:pointer">
+        ${avatarHtml}
+      </div>
+      <div style="flex:1">
+        <div style="font-size:13.5px;font-weight:620;margin-bottom:4px">${esc(u.name)}</div>
+        <div style="font-size:11.5px;color:var(--text-3);margin-bottom:8px">点击左侧头像上传自定义图片</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-p btn-sm" id="pfAvatarUpload">
+            <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg>
+            上传头像
+          </button>
+          <button class="btn btn-g btn-sm" id="pfAvatarClear">清除</button>
+        </div>
+      </div>
+    </div>
     <div class="form-row"><label>姓名</label><input class="inp" id="pfName" value="${esc(u.name)}"></div>
-    <div class="form-grid"><div class="form-row"><label>职位</label><select class="inp" id="pfPosition"><option value="">选择</option>${POSITIONS.map(p=>`<option ${u.position===p?'selected':''}>${p}</option>`).join('')}</select></div><div class="form-row"><label>班次</label><select class="inp" id="pfShift"><option value="">选择</option>${SHIFTS.map(s=>`<option ${u.shift===s?'selected':''}>${s}</option>`).join('')}</select></div></div>
-    <div class="form-row" style="margin-bottom:0"><label>处理店铺</label><div style="display:flex;flex-wrap:wrap;gap:6px">${SHOPS.map(s=>`<label style="display:flex;gap:5px;align-items:center;padding:5px 10px;border-radius:99px;background:rgba(120,120,128,.1);font-size:12px;cursor:pointer"><input type="checkbox" data-pf-shop="${s}" ${u.shops?.includes(s)?'checked':''}>${s}</label>`).join('')}</div></div>
+    <div class="form-grid">
+      <div class="form-row"><label>职位</label>
+        <select class="inp" id="pfPosition">
+          <option value="">选择</option>
+          ${(S.data.positions||POSITIONS).map(p=>`<option ${u.position===p?'selected':''}>${esc(p)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-row"><label>班次</label>
+        <select class="inp" id="pfShift">
+          <option value="">选择</option>
+          ${(S.data.shifts||SHIFTS).map(s=>`<option ${u.shift===s?'selected':''}>${esc(s)}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="form-row"><label>手机号</label><input class="inp" id="pfPhone" value="${esc(u.phone)}"></div>
+    <div class="form-row" style="margin-bottom:0"><label>处理店铺</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${(S.data.shops||SHOPS).map(s=>`<label style="display:flex;gap:5px;align-items:center;padding:5px 10px;border-radius:99px;background:rgba(120,120,128,.1);font-size:12px;cursor:pointer;border:1.5px solid ${(u.shops||[]).includes(s)?'var(--blue)':'transparent'}">
+          <input type="checkbox" data-pf-shop="${esc(s)}" ${(u.shops||[]).includes(s)?'checked':''} style="accent-color:var(--blue)">
+          ${esc(s)}
+        </label>`).join('')}
+      </div>
+    </div>
+    <div id="pfAvatarMsg" style="display:none;margin-top:12px"></div>
   `,[
     {label:'取消',cls:'btn-g'},
     {label:'保存',cls:'btn-p',onclick:()=>{
-      u.name=$('#pfName').value.trim()||u.name;
+      const name=$('#pfName').value.trim();
+      if(!name){toast('姓名不能为空','err');return false;}
+      u.name=name;
       u.position=$('#pfPosition').value;
       u.shift=$('#pfShift').value;
+      u.phone=$('#pfPhone').value.trim()||u.phone;
       u.shops=$$('[data-pf-shop]:checked').map(x=>x.dataset.pfShop);
-      persist();updateUserUI();toast('已保存');return false;
+      persist();
+      updateUserUI();
+      applyAvatarToGroupMessages();
+      toast('已保存');
+      return false;
     }}
   ]);
+
+  // 上传头像
+  $('#pfAvatarUpload').onclick=()=>{
+    const inp=document.createElement('input');
+    inp.type='file';
+    inp.accept='image/*';
+    inp.onchange=()=>{
+      const f=inp.files[0];
+      if(!f)return;
+      if(f.size>2*1024*1024){toast('图片不能超过 2MB','err');return;}
+      const r=new FileReader();
+      r.onload=()=>{
+        u.avatar=r.result;
+        persist();
+        const preview=$('#pfAvatarPreview');
+        preview.innerHTML=`<img src="${r.result}" style="width:100%;height:100%;object-fit:cover">`;
+        updateUserUI();
+        applyAvatarToGroupMessages();
+        toast('头像已更新');
+      };
+      r.readAsDataURL(f);
+    };
+    inp.click();
+  };
+
+  // 清除头像
+  $('#pfAvatarClear').onclick=()=>{
+    if(!confirm('确定清除头像？'))return;
+    u.avatar=null;
+    persist();
+    const preview=$('#pfAvatarPreview');
+    preview.innerHTML=initials(u.name);
+    preview.style.background=avColor(u.name);
+    updateUserUI();
+    applyAvatarToGroupMessages();
+    toast('已清除');
+  };
 }
 function openAccBulkModal(){
   if(!S.selectedAccounts.size){toast('请先勾选账号','warn');return;}
@@ -2850,6 +3117,43 @@ function seedGroups(users){
 }
 function boot(){
   restoreTheme();
+  // ============ 自动填充/自动登录 ============
+try{
+  const saved=localStorage.getItem('sd_login_saved');
+  if(saved){
+    const data=JSON.parse(saved);
+    // 自动填充账号密码
+    const fillPhone=$('#lgPhone');
+    const fillPwd=$('#lgPwd');
+    if(fillPhone)fillPhone.value=data.phone||'';
+    if(fillPwd)fillPwd.value=data.pwd?decodeURIComponent(atob(data.pwd)):'';
+    // 勾选复选框
+    if($('#chkRemember'))$('#chkRemember').checked=true;
+    if(data.autoLogin&&$('#chkAutoLogin'))$('#chkAutoLogin').checked=true;
+
+    // 自动登录
+    if(data.autoLogin){
+      setTimeout(()=>{
+        // 查找用户并验证
+        const u=S.data.users.find(x=>x.phone===data.phone);
+        if(u&&u.status==='active'&&u.pwd===fillPwd.value){
+          S.user=u;Store.setSession(u.id);u.online=true;persist();
+          if(u.showShiftOnLogin!==false){showShiftModal();}else enterApp();
+          toast('自动登录成功 · 欢迎 '+u.name,'ok',2000);
+        }else if(u&&u.pwd!==fillPwd.value){
+          toast('密码已变更，请重新登录','warn');
+          localStorage.removeItem('sd_login_saved');
+          if($('#chkRemember'))$('#chkRemember').checked=false;
+          if($('#chkAutoLogin'))$('#chkAutoLogin').checked=false;
+        }else if(!u){
+          localStorage.removeItem('sd_login_saved');
+        }else if(u.status!=='active'){
+          toast('账号状态异常，请手动登录','warn');
+        }
+      },300);
+    }
+  }
+}catch(e){console.warn('自动登录失败',e);}
   try{const h=localStorage.getItem('its_hidden_cols');if(h)S.hiddenCols=JSON.parse(h);}catch(e){}
   const saved=Store.load();
   if(saved&&saved.forms&&saved.users){S.data=saved;}
