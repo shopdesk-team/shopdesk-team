@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="https://www.kdniao.com/file/KDNWidget.css">
 <script src="https://www.kdniao.com/file/KDNWidget.js"></script>
 <script>
+/* ============ 安全防护（无水印） ============ */
 (function(){
 'use strict';
 document.addEventListener('contextmenu',e=>{e.preventDefault();return false;},{capture:true});
@@ -22,10 +23,11 @@ st.textContent='*{-webkit-user-select:none!important;user-select:none!important;
 document.head.appendChild(st);
 document.addEventListener('dragstart',e=>e.preventDefault());
 document.addEventListener('copy',e=>{const t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'&&!e.target.isContentEditable){e.preventDefault();try{e.clipboardData.setData('text/plain','内部资料，禁止复制');}catch(x){}}});
+const __EMBED__=(window.top!==window.self);
 let devOpen=false;const WARN_ID='__sw__';
 function showDev(){if(devOpen)return;devOpen=true;const w=document.createElement('div');w.id=WARN_ID;w.style.cssText='position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.97);color:#fff;display:grid;place-items:center;text-align:center;font-family:-apple-system,sans-serif;padding:40px;';w.innerHTML='<div style="max-width:520px"><div style="font-size:26px;font-weight:700;margin-bottom:16px">检测到开发者工具</div><div style="font-size:15px;opacity:.75;line-height:1.9">本系统内容受版权及公司保密协议保护。<br>请关闭开发者工具后继续使用。</div></div>';document.documentElement.appendChild(w);}
 function hideDev(){if(!devOpen)return;devOpen=false;const e=document.getElementById(WARN_ID);if(e)e.remove();}
-if(window.top===window.self)setInterval(()=>{const w=window.outerWidth-window.innerWidth,h=window.outerHeight-window.innerHeight;(w>160||h>160)?showDev():hideDev();},1200);
+if(!__EMBED__)setInterval(()=>{const w=window.outerWidth-window.innerWidth,h=window.outerHeight-window.innerHeight;(w>160||h>160)?showDev():hideDev();},1200);
 window.Security={applyWatermark(){},showWatermark(){},hideWatermark(){},boostWatermark(){},clearWatermark(){}};
 })();
 </script>
@@ -187,6 +189,9 @@ body.dark .msgs{background:rgba(28,28,30,.5)}
 .mention{display:inline-block;padding:1px 6px;border-radius:5px;font-weight:600;background:#fef3c7;color:#92400e;border:1px solid #fde68a}
 .msg.mine .mention{background:rgba(254,243,199,.85);color:#78350f}
 .mention-me{background:#fbbf24!important;color:#7c2d12!important;border:1px solid #f59e0b!important;font-weight:700}
+.quote{padding:6px 10px;border-radius:8px;background:#f1f5f9;border-left:3px solid #3b82f6;font-size:11.5px;color:#334155;margin-bottom:6px;max-width:100%}
+.quote .qn{font-weight:620;color:#1d4ed8;font-size:10.5px;margin-bottom:2px}
+.msg.mine .quote{background:rgba(255,255,255,.18);border-left-color:#93c5fd;color:#fff}
 .bubble img{max-width:200px;max-height:200px;border-radius:8px;display:block;cursor:pointer}
 .chat-input-area{border-top:1px solid var(--border);padding:8px 12px 12px;background:var(--card);position:relative}
 .ctools{display:flex;gap:4px;margin-bottom:6px;align-items:center;flex-wrap:wrap}
@@ -218,8 +223,6 @@ body.dark .msgs{background:rgba(28,28,30,.5)}
 .call-btn.end{background:#ef4444}
 .call-btn.end:hover{background:#dc2626}
 .call-btn.muted{background:rgba(239,68,68,.35)}
-.call-resize{position:absolute;right:0;bottom:0;width:16px;height:16px;cursor:nwse-resize;background:linear-gradient(135deg,transparent 50%,rgba(255,255,255,.25) 50%);border-bottom-right-radius:16px}
-.call-resize::after{content:"";position:absolute;right:3px;bottom:3px;width:6px;height:6px;border-right:2px solid rgba(255,255,255,.5);border-bottom:2px solid rgba(255,255,255,.5)}
 .side-panel{position:fixed;top:0;right:0;height:100vh;width:380px;background:var(--card);z-index:150;border-left:1px solid var(--border);box-shadow:-30px 0 60px -30px rgba(0,0,0,.4);transform:translateX(102%);transition:transform .3s;display:flex;flex-direction:column}
 .side-panel.on{transform:none}
 .sp-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
@@ -292,7 +295,7 @@ body.dark .msgs{background:rgba(28,28,30,.5)}
 </head>
 <body>
 
-<!-- 登录页 -->
+<!-- 登录 -->
 <div class="sc-login" id="scLogin">
   <div class="flip-scene">
     <div class="flip-card" id="flipCard" data-face="login">
@@ -363,9 +366,11 @@ body.dark .msgs{background:rgba(28,28,30,.5)}
       <div class="spacer"></div>
       <button class="btn btn-p btn-sm" id="btnNewTicketTop" style="padding:6px 14px"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>新建工单</button>
       <div class="online-badge"><i></i><span id="onlineText">1 人在线</span></div>
+      <button class="icon-btn" id="btnSearchToggle"><svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg></button>
       <button class="icon-btn" id="btnTheme"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
       <button class="icon-btn" id="btnBell"><svg class="ico" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot-badge hide" id="bellBadge">0</span></button>
-      <button class="icon-btn" id="btnChatToggle"><svg class="ico" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg></button>
+      <button class="icon-btn" id="btnChatToggle"><svg class="ico" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg><span class="dot-badge hide" id="chatBadge">0</span></button>
+      <button class="icon-btn" id="btnSidePanel"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></button>
       <div class="user-chip" id="userChip"><div class="avatar" id="topAv">—</div><div style="min-width:0"><div class="uname" id="topName">—</div><div class="urole" id="topRole">—</div></div></div>
     </header>
 
@@ -419,7 +424,9 @@ body.dark .msgs{background:rgba(28,28,30,.5)}
         <section class="view hide" id="v-logistics">
           <div class="card">
             <div class="card-head"><h3>物流查询</h3><div class="spacer"></div><span class="muted" style="font-size:11.5px">支持 2000+ 快递</span></div>
-            <div style="padding:18px"><div id="kdniao-track-container" style="width:100%;min-height:520px;background:var(--bg);border-radius:10px;overflow:hidden"></div></div>
+            <div style="padding:18px">
+              <div id="kdniao-track-container" style="width:100%;min-height:520px;background:var(--bg);border-radius:10px;overflow:hidden"></div>
+            </div>
           </div>
         </section>
 
@@ -457,7 +464,9 @@ body.dark .msgs{background:rgba(28,28,30,.5)}
           </div><div style="padding:16px" id="groupList"></div></div>
         </section>
 
-        <section class="view hide" id="v-settings"><div class="settings-grid" id="settingsGrid"></div></section>
+        <section class="view hide" id="v-settings">
+          <div class="settings-grid" id="settingsGrid"></div>
+        </section>
       </div>
 
       <div class="chat-drawer" id="chatDrawer"><div class="chat-panel" id="chatPanel"></div></div>
@@ -465,15 +474,19 @@ body.dark .msgs{background:rgba(28,28,30,.5)}
 
     <div class="ticket-panel-right" id="tkRightPanel">
       <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start">
-        <div style="flex:1;min-width:0"><h2 id="rpTitle" style="font-size:15.5px;font-weight:650;margin-bottom:2px">—</h2><div style="font-size:11.5px;color:var(--text-3);font-family:monospace" id="rpNo">—</div></div>
-        <button class="close-x" id="rpClose" style="width:28px;height:28px;border-radius:7px;display:grid;place-items:center;color:var(--text-3)"><svg class="ico" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+        <div style="flex:1;min-width:0"><h2 id="rpTitle" style="font-size:15.5px;font-weight:650;margin-bottom:2px">—</h2><div style="font-size:11.5px;color:var(--text-3);font-family:ui-monospace,Menlo,monospace" id="rpNo">—</div></div>
+        <button class="close-x" id="rpClose" style="width:28px;height:28px;border-radius:7px;display:grid;place-items:center;color:var(--text-3)">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
       </div>
       <div id="rpBody" style="flex:1;overflow-y:auto;padding:16px 20px"></div>
       <div class="inline-reply" id="rpReplyArea">
         <div id="rpInlinePreview"></div>
         <textarea id="rpInlineInput" placeholder="输入回复内容…（Enter 发送，Shift+Enter 换行）"></textarea>
         <div style="display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap">
-          <button class="btn btn-g btn-sm" id="rpInlineAttach" style="padding:8px 12px">附件</button>
+          <button class="btn btn-g btn-sm" id="rpInlineAttach" style="padding:8px 12px" title="附件">
+            <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66L9.64 16.2a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>附件
+          </button>
           <input type="file" id="rpInlineFiles" accept="image/*,video/*,application/pdf,.doc,.docx,.xls,.xlsx,.zip" multiple style="display:none">
           <div style="flex:1"></div>
           <div id="rpQuickActions" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"></div>
@@ -518,8 +531,11 @@ body.dark .msgs{background:rgba(28,28,30,.5)}
 <div id="toasts"></div>
 
 <script>
-/* ============ 配置 ============ */
-const API_URL = location.protocol.startsWith('http') ? location.origin : 'http://localhost:3000';
+/* ================================================================
+   配置
+   ================================================================ */
+// 如果后端和前端在同一服务器部署，用相对路径即可；否则改成后端地址
+const API_URL = location.origin.startsWith('http') ? location.origin : 'http://localhost:3000';
 
 /* ============ 工具 ============ */
 const $=(s,r=document)=>r.querySelector(s);
@@ -542,6 +558,7 @@ const ICON={
   plus:'<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
   at:'<svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/></svg>',
   image:'<svg class="ico ico-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>',
+  video:'<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="m23 7-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>',
   phone:'<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
   cam:'<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="m23 7-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>',
   box:'<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>',
@@ -549,7 +566,9 @@ const ICON={
   bell:'<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>',
   user:'<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
   settings:'<svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg>',
+  arrowLeft:'<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>',
   trash:'<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+  chat:'<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg>',
   warning:'<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>',
   check:'<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>',
   upload:'<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg>',
@@ -557,7 +576,8 @@ const ICON={
   file:'<svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>'
 };
 
-const Store={KEY:'its_v13',SESSION:'its_v13_session',
+/* ============ 存储 ============ */
+const Store={KEY:'its_v12',SESSION:'its_v12_session',
   load(){try{const d=localStorage.getItem(this.KEY);return d?JSON.parse(d):null;}catch(e){return null;}},
   save(d){try{localStorage.setItem(this.KEY,JSON.stringify(d));}catch(e){}},
   getSession(){return localStorage.getItem(this.SESSION);},
@@ -565,23 +585,31 @@ const Store={KEY:'its_v13',SESSION:'its_v13_session',
   clearSession(){localStorage.removeItem(this.SESSION);}
 };
 
+/* ============ 权限 ============ */
 const PERMISSIONS=[
   {id:'ticket.view',name:'查看工单'},{id:'ticket.create',name:'创建工单'},{id:'ticket.edit',name:'编辑工单'},{id:'ticket.delete',name:'删除工单'},
   {id:'chat.use',name:'使用群聊'},{id:'chat.call',name:'发起通话'},
   {id:'account.manage',name:'账号管理'},{id:'form.manage',name:'表单管理'},{id:'settings.manage',name:'系统设置'},{id:'admin.all',name:'超级管理员'}
 ];
 
+/* ============ 状态 ============ */
 const S={
   user:null,data:null,view:'dashboard',ticketTab:'pending',ticketFormFilter:null,
   filters:{status:'all',q:'',custom:[],adv:{}},hiddenCols:[],sorts:{},
   selectedTickets:new Set(),selectedAccounts:new Set(),
-  batchMode:false,currentTicketId:null,currentGroupId:null,unreadGroups:{},quoteMsg:null,
+  batchMode:false,
+  currentTicketId:null,currentGroupId:null,unreadGroups:{},
+  quoteMsg:null,
   designer:{formId:null,name:'',description:'',fields:[],statusIds:[],selectedFieldId:null},
-  filling:{formId:null,values:{}},sidePanel:{tab:'todo'},chatOpen:false,
-  viewPref:'right',saveTimer:null,settingsTab:'display',ntFormId:null,
-  dataVersion:0,onlineUsers:[]
+  filling:{formId:null,values:{}},
+  sidePanel:{tab:'todo'},chatOpen:false,
+  viewPref:'right',saveTimer:null,settingsTab:'display',
+  ntFormId:null,
+  dataVersion:0,
+  onlineUsers:[]
 };
 
+/* ============ 常量 ============ */
 const DEFAULT_STATUSES=[
   {id:'pending',label:'待处理',cls:'st-pending',color:'#ff9500'},
   {id:'processing',label:'处理中',cls:'st-processing',color:'#007aff'},
@@ -590,124 +618,296 @@ const DEFAULT_STATUSES=[
   {id:'closed',label:'已关闭',cls:'st-closed',color:'#8e8e93'}
 ];
 const PRIORITY={urgent:{label:'紧急',cls:'pr-urgent'},high:{label:'高',cls:'pr-high'},medium:{label:'中',cls:'pr-medium'},low:{label:'低',cls:'pr-low'}};
-const FIELD_TYPES={text:{label:'单行文本'},textarea:{label:'多行文本'},number:{label:'数字'},select:{label:'下拉选择'},radio:{label:'单选'},checkbox:{label:'多选'},switch:{label:'开关'},date:{label:'日期'},datetime:{label:'日期时间'},user:{label:'成员选择'},subform:{label:'子表单'},address:{label:'收寄信息'},formula:{label:'公式计算'},divider:{label:'分割线'},title:{label:'标题'},attachment:{label:'附件上传'},image:{label:'图片上传'},video:{label:'视频上传'}};
+const FIELD_TYPES={
+  text:{label:'单行文本'},textarea:{label:'多行文本'},number:{label:'数字'},
+  select:{label:'下拉选择'},radio:{label:'单选'},checkbox:{label:'多选'},
+  switch:{label:'开关'},date:{label:'日期'},datetime:{label:'日期时间'},
+  user:{label:'成员选择'},subform:{label:'子表单'},address:{label:'收寄信息'},
+  formula:{label:'公式计算'},divider:{label:'分割线'},title:{label:'标题'},
+  attachment:{label:'附件上传'},image:{label:'图片上传'},video:{label:'视频上传'}
+};
 const SHIFTS=['早班 09:00-18:00','晚班 14:00-22:00','中班 12:00-20:00','夜班 22:00-06:00','全天班 09:00-22:00','休息'];
 const SHOPS=['淘宝','天猫','京东','拼多多','抖音小店','唯品会','官网商城'];
 const POSITIONS=['售前','售后','客服','技术','运营','物流','财务'];
 
 /* ================================================================
-   实时同步
+   实时同步系统
    ================================================================ */
-let isSyncing=false,lastVersion=0,heartbeatTimer=null,syncTimer=null;
+let isSyncing=false;
+let lastVersion=0;
+let heartbeatTimer=null;
+let syncTimer=null;
 
 async function apiFetch(path,options){
-  try{const res=await fetch(API_URL+path,options);if(!res.ok)throw new Error('HTTP '+res.status);return await res.json();}catch(e){console.warn('[API]',path,e.message);return null;}
+  try{
+    const res=await fetch(API_URL+path,options);
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    return await res.json();
+  }catch(e){
+    console.warn('[API]',path,e.message);
+    return null;
+  }
 }
+
+// 上传数据（合并到 persist）
 async function uploadData(){
-  const r=await apiFetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(S.data)});
+  const r=await apiFetch('/api/data',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(S.data)
+  });
   if(r&&r.version){lastVersion=r.version;S.dataVersion=r.version;}
 }
+
+// 心跳
 async function sendHeartbeat(){
   if(!S.user)return;
-  const r=await apiFetch('/api/heartbeat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:S.user.id,name:S.user.name})});
+  const r=await apiFetch('/api/heartbeat',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({userId:S.user.id,name:S.user.name})
+  });
   if(r&&r.online){
     S.onlineUsers=r.online;
-    (S.data.users||[]).forEach(u=>{u.online=r.online.includes(u.id);});
-    const el=$('#onlineText');if(el)el.textContent=(S.onlineUsers.length||1)+' 人在线';
+    // 更新用户在线状态
+    (S.data.users||[]).forEach(u=>{ u.online = r.online.includes(u.id); });
+    // 更新 UI
+    const online=S.onlineUsers.length||1;
+    const el=$('#onlineText');
+    if(el)el.textContent=online+' 人在线';
+    // 若在人员班次页，刷新
     if(S.view==='staff')renderStaff();
+    // 若在概览页，刷新徽章
     if(S.view==='dashboard')updateBadges();
   }
 }
+
+// 拉取数据
 async function pullData(){
   const r=await apiFetch('/api/data');
   if(!r||!r.data)return false;
   if(r.version===lastVersion)return false;
-  lastVersion=r.version;S.dataVersion=r.version;
+  // 服务器有更新
+  lastVersion=r.version;
+  S.dataVersion=r.version;
   if(r.data&&r.data.users){
-    const me=r.data.users.find(u=>u.id===S.user.id);if(me)me.online=true;
-    S.data=r.data;Store.save(S.data);
-    try{switchView(S.view);}catch(e){}
-    if(S.chatOpen&&S.currentGroupId){const g=S.data.groups.find(x=>x.id===S.currentGroupId);if(g)renderMsgs(g);}
-    updateBellBadge();return true;
+    // 保留当前登录状态
+    const me=r.data.users.find(u=>u.id===S.user.id);
+    if(me){me.online=true;}
+    S.data=r.data;
+    Store.save(S.data);
+    // 刷新当前视图
+    try{ switchView(S.view); }catch(e){}
+    // 若群聊打开，刷新消息
+    if(S.chatOpen&&S.currentGroupId){
+      const g=S.data.groups.find(x=>x.id===S.currentGroupId);
+      if(g)renderMsgs(g);
+    }
+    // 通知面板刷新
+    updateBellBadge();
+    return true;
   }
   return false;
 }
+
+// 启动同步循环
 function startRealtimeSync(){
   if(heartbeatTimer)clearInterval(heartbeatTimer);
   if(syncTimer)clearInterval(syncTimer);
-  heartbeatTimer=setInterval(sendHeartbeat,8000);sendHeartbeat();
-  syncTimer=setInterval(async()=>{
-    if(isSyncing||!S.user)return;isSyncing=true;
-    try{await pullData();await checkIncomingCall();}catch(e){}
+  // 心跳 8 秒
+  heartbeatTimer=setInterval(sendHeartbeat,8000);
+  sendHeartbeat();
+  // 拉数据 3 秒
+  syncTimer=setInterval(async ()=>{
+    if(isSyncing||!S.user)return;
+    isSyncing=true;
+    try{
+      await pullData();
+      await checkIncomingCall();
+    }catch(e){}
     isSyncing=false;
   },3000);
 }
-function stopRealtimeSync(){if(heartbeatTimer)clearInterval(heartbeatTimer);if(syncTimer)clearInterval(syncTimer);heartbeatTimer=null;syncTimer=null;}
+
+function stopRealtimeSync(){
+  if(heartbeatTimer)clearInterval(heartbeatTimer);
+  if(syncTimer)clearInterval(syncTimer);
+  heartbeatTimer=null;
+  syncTimer=null;
+}
 
 /* ================================================================
    通话信令
    ================================================================ */
-let currentCallWidget=null,incomingCallPopup=null,isInCall=false;
+let currentCallWidget=null;
+let incomingCallPopup=null;
+let isInCall=false;
 
 async function startCall(g,type){
   if(!hasPerm('chat.call')&&!isAdmin()){toast('无通话权限','warn');return;}
   if(isInCall){toast('已在通话中','warn');return;}
-  const r=await apiFetch('/api/call/invite',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from:S.user.id,fromName:S.user.name,groupId:g.id,groupName:g.name,type})});
-  if(!r){toast('服务器未连接','err');return;}
-  isInCall=true;openCallWidget(g,type,false);
+  // 通知服务器
+  const r=await apiFetch('/api/call/invite',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      from:S.user.id,fromName:S.user.name,
+      groupId:g.id,groupName:g.name,type
+    })
+  });
+  if(!r){toast('服务器未连接，无法发起通话','err');return;}
+  isInCall=true;
+  openCallWidget(g,type,false);
 }
+
 async function checkIncomingCall(){
   if(!S.user||isInCall||incomingCallPopup)return;
   const call=await apiFetch('/api/call/status');
-  if(!call||!call.from||call.from===S.user.id||call.accepted||call.rejected)return;
-  if(Date.now()-call.time>30000)return;
-  const g=S.data.groups.find(x=>x.id===call.groupId);if(!g)return;
+  if(!call||!call.from)return;
+  if(call.from===S.user.id)return; // 自己的通话
+  if(call.accepted||call.rejected)return;
+  if(Date.now()-call.time>30000)return; // 过期
+  const g=S.data.groups.find(x=>x.id===call.groupId);
+  if(!g)return;
   showIncomingCall(call,g);
 }
+
 function showIncomingCall(call,g){
   if(incomingCallPopup)return;
-  const popup=document.createElement('div');incomingCallPopup=popup;
+  const popup=document.createElement('div');
+  incomingCallPopup=popup;
   popup.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2500;background:linear-gradient(135deg,#1e293b,#0f172a);color:#fff;border-radius:20px;padding:26px;width:340px;text-align:center;box-shadow:0 40px 80px rgba(0,0,0,.5)';
-  popup.innerHTML=`<div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:grid;place-items:center;font-size:26px;font-weight:700;margin:0 auto 14px;animation:callPulse 1.5s infinite">${initials(call.fromName)}</div><div style="font-size:15px;font-weight:650;margin-bottom:4px">${esc(call.fromName)} 邀请你</div><div style="font-size:12.5px;opacity:.8;margin-bottom:20px">${call.type==='video'?'视频通话':'语音通话'} · ${esc(g.name)}</div><div style="display:flex;gap:12px;justify-content:center"><button id="callReject" style="flex:1;padding:11px;border-radius:10px;background:rgba(239,68,68,.9);color:#fff;font-weight:600;cursor:pointer;border:none">拒绝</button><button id="callAccept" style="flex:1;padding:11px;border-radius:10px;background:rgba(52,199,89,.9);color:#fff;font-weight:600;cursor:pointer;border:none">接听</button></div>`;
+  popup.innerHTML=`
+    <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:grid;place-items:center;font-size:26px;font-weight:700;margin:0 auto 14px;animation:callPulse 1.5s infinite">${initials(call.fromName)}</div>
+    <div style="font-size:15px;font-weight:650;margin-bottom:4px">${esc(call.fromName)} 邀请你</div>
+    <div style="font-size:12.5px;opacity:.8;margin-bottom:20px">${call.type==='video'?'视频通话':'语音通话'} · ${esc(g.name)}</div>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <button id="callReject" style="flex:1;padding:11px;border-radius:10px;background:rgba(239,68,68,.9);color:#fff;font-weight:600;cursor:pointer;border:none">拒绝</button>
+      <button id="callAccept" style="flex:1;padding:11px;border-radius:10px;background:rgba(52,199,89,.9);color:#fff;font-weight:600;cursor:pointer;border:none">接听</button>
+    </div>`;
   document.body.appendChild(popup);
-  try{beep(880,0.15,0,'sine',0.3);beep(1046,0.2,0.2,'sine',0.3);}catch(e){}
-  popup.querySelector('#callReject').onclick=async()=>{popup.remove();incomingCallPopup=null;await apiFetch('/api/call/reject',{method:'POST'});toast('已拒绝');};
+  // 播放提示音
+  try{ beep(880,0.15,0,'sine',0.3); beep(1046,0.2,0.2,'sine',0.3);}catch(e){}
+  
+  popup.querySelector('#callReject').onclick=async()=>{
+    popup.remove();incomingCallPopup=null;
+    await apiFetch('/api/call/reject',{method:'POST'});
+    toast('已拒绝');
+  };
   popup.querySelector('#callAccept').onclick=async()=>{
     popup.remove();incomingCallPopup=null;
     await apiFetch('/api/call/accept',{method:'POST'});
-    isInCall=true;openCallWidget(g,call.type,true);
-    g.messages=g.messages||[];g.messages.push({id:uid('msg'),type:'system',content:`${S.user.name} 接听了通话`,time:Date.now(),senderName:'系统'});persist();
+    isInCall=true;
+    openCallWidget(g,call.type,true);
+    // 加入群消息记录
+    g.messages=g.messages||[];
+    g.messages.push({id:uid('msg'),type:'system',content:`${S.user.name} 接听了通话`,time:Date.now(),senderName:'系统'});
+    persist();
   };
-  setTimeout(()=>{if(incomingCallPopup===popup){popup.remove();incomingCallPopup=null;}},30000);
+  // 30秒自动消失
+  setTimeout(()=>{ if(incomingCallPopup===popup){ popup.remove(); incomingCallPopup=null; } },30000);
 }
+
 function openCallWidget(g,type,isIncoming){
   if(currentCallWidget)currentCallWidget.remove();
   const isVideo=type==='video';
-  const widget=document.createElement('div');widget.className='call-widget';widget.style.right='24px';widget.style.bottom='24px';
-  widget.innerHTML=`<div class="call-header" id="callHeader"><div class="t-icon">${isVideo?ICON.cam:ICON.phone}</div><div class="t-title">${esc(g.name)}</div><div class="t-btn" id="callMin"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></div><div class="t-btn" id="callClose"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></div></div><div class="call-body"><div class="call-avatar">${initials(g.name)}</div><div class="call-name">${isVideo?'视频通话中':'语音通话中'}</div><div class="call-sub">${g.members.length} 位成员</div><div class="call-timer" id="callTimer">00:00</div><div class="call-resize" id="callResize"></div></div><div class="call-actions"><div class="call-btn" id="btnMute">${ICON.phone}</div><div class="call-btn end" id="btnEnd"><svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" transform="rotate(135 12 12)"/></svg></div></div>`;
-  document.body.appendChild(widget);currentCallWidget=widget;
-  const startTime=Date.now();const timerEl=widget.querySelector('#callTimer');
+  const widget=document.createElement('div');
+  widget.className='call-widget';
+  widget.style.right='24px';widget.style.bottom='24px';
+  widget.innerHTML=`
+    <div class="call-header" id="callHeader">
+      <div class="t-icon">${isVideo?ICON.cam:ICON.phone}</div>
+      <div class="t-title">${esc(g.name)}</div>
+      <div class="t-btn" id="callMin" title="最小化"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></div>
+      <div class="t-btn" id="callClose" title="关闭"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></div>
+    </div>
+    <div class="call-body">
+      <div class="call-avatar">${initials(g.name)}</div>
+      <div class="call-name">${isVideo?'视频通话中':'语音通话中'}</div>
+      <div class="call-sub">${g.members.length} 位成员</div>
+      <div class="call-timer" id="callTimer">00:00</div>
+      <div class="call-resize" id="callResize"></div>
+    </div>
+    <div class="call-actions">
+      <div class="call-btn" id="btnMute" title="静音">${ICON.phone}</div>
+      <div class="call-btn end" id="btnEnd" title="挂断"><svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" transform="rotate(135 12 12)"/></svg></div>
+    </div>`;
+  document.body.appendChild(widget);
+  currentCallWidget=widget;
+  
+  const startTime=Date.now();
+  const timerEl=widget.querySelector('#callTimer');
   const timer=setInterval(()=>{const d=Math.floor((Date.now()-startTime)/1000);timerEl.textContent=`${pad(Math.floor(d/60))}:${pad(d%60)}`;},1000);
+  
+  // 拖动
   const header=widget.querySelector('#callHeader');
   let drag=false,sx=0,sy=0,l=0,t=0;
-  header.addEventListener('mousedown',e=>{if(e.target.closest('.t-btn'))return;drag=true;const r=widget.getBoundingClientRect();widget.style.left=r.left+'px';widget.style.top=r.top+'px';widget.style.right='auto';widget.style.bottom='auto';sx=e.clientX;sy=e.clientY;l=r.left;t=r.top;});
-  const onMove=e=>{if(!drag)return;const w=widget.offsetWidth,h=widget.offsetHeight;widget.style.left=Math.max(0,Math.min(innerWidth-w,l+(e.clientX-sx)))+'px';widget.style.top=Math.max(0,Math.min(innerHeight-h,t+(e.clientY-sy)))+'px';};
+  header.addEventListener('mousedown',e=>{
+    if(e.target.closest('.t-btn'))return;
+    drag=true;
+    const r=widget.getBoundingClientRect();
+    widget.style.left=r.left+'px';widget.style.top=r.top+'px';
+    widget.style.right='auto';widget.style.bottom='auto';
+    sx=e.clientX;sy=e.clientY;l=r.left;t=r.top;
+  });
+  const onMove=e=>{
+    if(!drag)return;
+    const w=widget.offsetWidth,h=widget.offsetHeight;
+    widget.style.left=Math.max(0,Math.min(innerWidth-w,l+(e.clientX-sx)))+'px';
+    widget.style.top=Math.max(0,Math.min(innerHeight-h,t+(e.clientY-sy)))+'px';
+  };
   const onUp=()=>{drag=false;};
-  document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
+  document.addEventListener('mousemove',onMove);
+  document.addEventListener('mouseup',onUp);
+  
+  // 调整大小
   const handle=widget.querySelector('#callResize');
   let rz=false,rsx=0,rsy=0,rw=0,rh=0;
-  handle.addEventListener('mousedown',e=>{rz=true;rsx=e.clientX;rsy=e.clientY;rw=widget.offsetWidth;rh=widget.offsetHeight;e.preventDefault();e.stopPropagation();});
-  const onRz=e=>{if(!rz)return;const nw=Math.max(220,Math.min(innerWidth-40,rw+(e.clientX-rsx)));const nh=Math.max(180,Math.min(innerHeight-40,rh+(e.clientY-rsy)));widget.style.width=nw+'px';widget.style.height=nh+'px';};
+  handle.addEventListener('mousedown',e=>{
+    rz=true;rsx=e.clientX;rsy=e.clientY;
+    rw=widget.offsetWidth;rh=widget.offsetHeight;
+    e.preventDefault();e.stopPropagation();
+  });
+  const onRz=e=>{
+    if(!rz)return;
+    const nw=Math.max(220,Math.min(innerWidth-40,rw+(e.clientX-rsx)));
+    const nh=Math.max(180,Math.min(innerHeight-40,rh+(e.clientY-rsy)));
+    widget.style.width=nw+'px';widget.style.height=nh+'px';
+  };
   const onRzEnd=()=>{rz=false;};
-  document.addEventListener('mousemove',onRz);document.addEventListener('mouseup',onRzEnd);
+  document.addEventListener('mousemove',onRz);
+  document.addEventListener('mouseup',onRzEnd);
+  
   widget.querySelector('#callMin').onclick=()=>widget.classList.toggle('minimized');
-  let muted=false;widget.querySelector('#btnMute').onclick=e=>{muted=!muted;e.currentTarget.classList.toggle('muted',muted);toast(muted?'已静音':'已取消静音');};
-  const endCall=async()=>{clearInterval(timer);document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);document.removeEventListener('mousemove',onRz);document.removeEventListener('mouseup',onRzEnd);widget.remove();currentCallWidget=null;isInCall=false;await apiFetch('/api/call/end',{method:'POST'});const dur=Math.floor((Date.now()-startTime)/1000);const sysMsg=`${isVideo?'视频':'语音'}通话结束 · ${Math.floor(dur/60)}分${dur%60}秒`;g.messages=g.messages||[];g.messages.push({id:uid('msg'),type:'system',content:sysMsg,time:Date.now(),senderName:'系统'});persist();if(S.chatOpen&&S.currentGroupId===g.id)renderMsgs(g);toast(sysMsg);};
-  widget.querySelector('#btnEnd').onclick=endCall;widget.querySelector('#btnClose').onclick=endCall;
+  let muted=false;
+  widget.querySelector('#btnMute').onclick=e=>{muted=!muted;e.currentTarget.classList.toggle('muted',muted);toast(muted?'已静音':'已取消静音');};
+  
+  const endCall=async()=>{
+    clearInterval(timer);
+    document.removeEventListener('mousemove',onMove);
+    document.removeEventListener('mouseup',onUp);
+    document.removeEventListener('mousemove',onRz);
+    document.removeEventListener('mouseup',onRzEnd);
+    widget.remove();currentCallWidget=null;isInCall=false;
+    await apiFetch('/api/call/end',{method:'POST'});
+    const dur=Math.floor((Date.now()-startTime)/1000);
+    const sysMsg=`${isVideo?'视频':'语音'}通话结束 · ${Math.floor(dur/60)}分${dur%60}秒`;
+    g.messages=g.messages||[];
+    g.messages.push({id:uid('msg'),type:'system',content:sysMsg,time:Date.now(),senderName:'系统'});
+    persist();
+    if(S.chatOpen&&S.currentGroupId===g.id)renderMsgs(g);
+    toast(sysMsg);
+  };
+  widget.querySelector('#btnEnd').onclick=endCall;
+  widget.querySelector('#callClose').onclick=endCall;
+  
+  // 播放拨号音
   if(!isIncoming){try{beep(523,0.2,0,'sine',0.3);beep(659,0.25,0.2,'sine',0.3);}catch(e){}}
 }
 
-/* ============ 通知 ============ */
+/* ================================================================
+   通知系统
+   ================================================================ */
 function addNotification(title,text,iconSvg,type,relatedId){
   if(!S.data.notifications)S.data.notifications=[];
   S.data.notifications.unshift({id:uid('ntf'),title,text,icon:iconSvg||ICON.bell,type,relatedId,time:Date.now(),read:false});
@@ -716,15 +916,23 @@ function addNotification(title,text,iconSvg,type,relatedId){
 }
 function updateBellBadge(){
   const unread=(S.data.notifications||[]).filter(n=>!n.read).length;
-  const el=$('#bellBadge');if(!el)return;
-  if(unread>0){el.classList.remove('hide');el.textContent=unread>99?'99+':unread;}else el.classList.add('hide');
+  const el=$('#bellBadge');
+  if(el){if(unread>0){el.classList.remove('hide');el.textContent=unread>99?'99+':unread;}else el.classList.add('hide');}
 }
 function renderNotifPanel(){
   const q=($('#notifSearch')?.value||'').toLowerCase();
   const list=(S.data.notifications||[]).filter(n=>!q||(n.title+n.text).toLowerCase().includes(q));
-  $('#notifList').innerHTML=list.length?list.map(n=>`<div class="notif-item ${n.read?'':'unread'}" data-ntf="${n.id}"><div class="notif-icon">${n.icon||ICON.bell}</div><div class="notif-body"><div class="notif-title">${esc(n.title)}</div><div class="notif-text">${esc(n.text)}</div><div class="notif-time">${fmtTime(n.time)}</div></div></div>`).join(''):'<div style="padding:40px;text-align:center;color:var(--text-3)">暂无通知</div>';
-  $$('[data-ntf]').forEach(el=>el.onclick=()=>{const n=S.data.notifications.find(x=>x.id===el.dataset.ntf);if(!n)return;n.read=true;persist();updateBellBadge();renderNotifPanel();});
+  $('#notifList').innerHTML=list.length?list.map(n=>`<div class="notif-item ${n.read?'':'unread'}" data-ntf="${n.id}">
+    <div class="notif-icon">${n.icon||ICON.bell}</div>
+    <div class="notif-body"><div class="notif-title">${esc(n.title)}</div><div class="notif-text">${esc(n.text)}</div><div class="notif-time">${fmtTime(n.time)}</div></div>
+  </div>`).join(''):'<div style="padding:40px;text-align:center;color:var(--text-3)">暂无通知</div>';
+  $$('[data-ntf]').forEach(el=>el.onclick=()=>{
+    const n=S.data.notifications.find(x=>x.id===el.dataset.ntf);if(!n)return;
+    n.read=true;persist();updateBellBadge();renderNotifPanel();
+  });
 }
+
+/* ============ 声音 ============ */
 let ac=null;
 function ensureAudio(){try{if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();return ac;}catch(e){return null;}}
 function beep(f,d,delay=0,t='sine',v=0.14){const ctx=ensureAudio();if(!ctx)return;const ts=ctx.currentTime+delay;const o=ctx.createOscillator(),g=ctx.createGain();o.type=t;o.frequency.setValueAtTime(f,ts);g.gain.setValueAtTime(0,ts);g.gain.linearRampToValueAtTime(v,ts+0.01);g.gain.exponentialRampToValueAtTime(0.0001,ts+d);o.connect(g).connect(ctx.destination);o.start(ts);o.stop(ts+d+0.02);}
@@ -735,7 +943,12 @@ function toggleTheme(e){const r=e.currentTarget.getBoundingClientRect();const x=
 function restoreTheme(){try{if(localStorage.getItem('its_dark')==='1')document.body.classList.add('dark');}catch(e){}}
 
 /* ============ 视图 ============ */
-const VIEW_META={dashboard:['数据概览','今日工单处理情况'],tickets:['工单管理','按表单分类查看'],staff:['人员班次','按班次查看人员'],logistics:['物流查询','支持2000+快递'],forms:['表单设置','自定义表单模板'],categories:['分类设置','拖拽排序'],accounts:['账号管理','用户审批与权限'],groups:['权限组','按角色分配权限'],settings:['系统设置','管理所有系统内容']};
+const VIEW_META={
+  dashboard:['数据概览','今日工单处理情况'],tickets:['工单管理','按表单分类查看'],
+  staff:['人员班次','按班次查看人员'],logistics:['物流查询','支持2000+快递'],
+  forms:['表单设置','自定义表单模板'],categories:['分类设置','拖拽排序'],
+  accounts:['账号管理','用户审批与权限'],groups:['权限组','按角色分配权限'],settings:['系统设置','管理所有系统内容']
+};
 function switchView(view){
   S.view=view;
   $$('.nav-item').forEach(el=>el.classList.toggle('on',el.dataset.view===view));
@@ -812,16 +1025,26 @@ function renderTickets(){
 }
 function renderFormFlatTabs(){
   const forms=S.data.forms;const allPending=S.data.tickets.filter(t=>getStatusKind(t)==='st-pending').length;
-  $('#formFlatTabs').innerHTML=`<div class="form-flat-tab ${!S.ticketFormFilter?'on':''}" data-fftab=""><span class="dot" style="background:var(--blue)"></span>全部表单<span class="cnt">${allPending}</span></div>${forms.map(f=>{const cnt=S.data.tickets.filter(t=>t.formId===f.id&&getStatusKind(t)==='st-pending').length;return `<div class="form-flat-tab ${S.ticketFormFilter===f.id?'on':''}" data-fftab="${f.id}"><span class="dot" style="background:${f.color}"></span>${esc(f.name)}<span class="cnt">${cnt}</span></div>`;}).join('')}`;
+  $('#formFlatTabs').innerHTML=`
+    <div class="form-flat-tab ${!S.ticketFormFilter?'on':''}" data-fftab=""><span class="dot" style="background:var(--blue)"></span>全部表单<span class="cnt">${allPending}</span></div>
+    ${forms.map(f=>{const cnt=S.data.tickets.filter(t=>t.formId===f.id&&getStatusKind(t)==='st-pending').length;return `<div class="form-flat-tab ${S.ticketFormFilter===f.id?'on':''}" data-fftab="${f.id}"><span class="dot" style="background:${f.color}"></span>${esc(f.name)}<span class="cnt">${cnt}</span></div>`;}).join('')}`;
   $$('[data-fftab]').forEach(el=>el.onclick=()=>{S.ticketFormFilter=el.dataset.fftab||null;S.ticketTab='pending';renderTickets();});
 }
 function renderTicketTabs(){
   const me=S.user.name;
   const statusesInScope=S.ticketFormFilter?getFormStatuses(S.ticketFormFilter):(S.data.statuses||DEFAULT_STATUSES);
   const clsSet=new Set(statusesInScope.map(s=>s.cls||'st-closed'));
-  const categories=[{key:'all',label:'全部',cls:null},{key:'pending',label:'待处理',cls:'st-pending'},{key:'processing',label:'处理中',cls:'st-processing'},{key:'resolved',label:'已完成',cls:'st-resolved'},{key:'closed',label:'已关闭',cls:'st-closed'},{key:'mine',label:'与我有关',cls:null}].filter(c=>!c.cls||clsSet.has(c.cls));
+  const categories=[
+    {key:'all',label:'全部',cls:null},{key:'pending',label:'待处理',cls:'st-pending'},
+    {key:'processing',label:'处理中',cls:'st-processing'},{key:'resolved',label:'已完成',cls:'st-resolved'},
+    {key:'closed',label:'已关闭',cls:'st-closed'},{key:'mine',label:'与我有关',cls:null}
+  ].filter(c=>!c.cls||clsSet.has(c.cls));
   const base=S.data.tickets.filter(t=>!S.ticketFormFilter||t.formId===S.ticketFormFilter);
-  const countFor=c=>{if(c.key==='all')return base.length;if(c.key==='mine')return base.filter(t=>t.timeline?.some(x=>x.who===me)).length;return base.filter(t=>getStatusKind(t)===c.cls).length;};
+  const countFor=c=>{
+    if(c.key==='all')return base.length;
+    if(c.key==='mine')return base.filter(t=>t.timeline?.some(x=>x.who===me)).length;
+    return base.filter(t=>getStatusKind(t)===c.cls).length;
+  };
   $('#ticketTabs').innerHTML=categories.map(c=>`<div class="ticket-tab ${S.ticketTab===c.key?'on':''}" data-tab="${c.key}">${c.label} <span class="cnt">${countFor(c)}</span></div>`).join('');
   $$('#ticketTabs .ticket-tab').forEach(el=>el.onclick=()=>{S.ticketTab=el.dataset.tab;renderTickets();});
 }
@@ -843,11 +1066,15 @@ function renderCell(t,c){
   return esc(str).slice(0,40);
 }
 function visibleTickets(){
-  const f=S.filters,q=f.q.trim().toLowerCase(),adv=f.adv||{};const me=S.user.name;
+  const f=S.filters,q=f.q.trim().toLowerCase(),adv=f.adv||{};
+  const me=S.user.name;
   let nos=[];if(adv.nos)nos=adv.nos.split(/[,，\s]+/).map(s=>s.trim().toUpperCase()).filter(Boolean);
   let list=S.data.tickets.filter(t=>{
     if(S.ticketFormFilter&&t.formId!==S.ticketFormFilter)return false;
-    if(S.ticketTab!=='all'&&S.ticketTab!=='mine'){const wantCls={pending:'st-pending',processing:'st-processing',resolved:'st-resolved',closed:'st-closed'}[S.ticketTab];if(wantCls&&getStatusKind(t)!==wantCls)return false;}
+    if(S.ticketTab!=='all'&&S.ticketTab!=='mine'){
+      const wantCls={pending:'st-pending',processing:'st-processing',resolved:'st-resolved',closed:'st-closed'}[S.ticketTab];
+      if(wantCls&&getStatusKind(t)!==wantCls)return false;
+    }
     if(S.ticketTab==='mine'&&!t.timeline?.some(x=>x.who===me))return false;
     if(adv.creator&&t.creator!==adv.creator)return false;
     if(adv.agent&&t.agent!==adv.agent)return false;
@@ -861,8 +1088,17 @@ function visibleTickets(){
     return true;
   });
   const sortKeys=Object.keys(S.sorts||{});
-  if(sortKeys.length){list=list.slice().sort((a,b)=>{for(const k of sortKeys){const dir=S.sorts[k];let va=a[k]!==undefined?a[k]:a.values[k],vb=b[k]!==undefined?b[k]:b.values[k];va=va===undefined||va===null?'':String(va);vb=vb===undefined||vb===null?'':String(vb);const cmp=va.localeCompare(vb,'zh');if(cmp!==0)return dir==='asc'?cmp:-cmp;}return 0;});}
-  else list=list.slice().sort((a,b)=>b.createdAt-a.createdAt);
+  if(sortKeys.length){
+    list=list.slice().sort((a,b)=>{
+      for(const k of sortKeys){
+        const dir=S.sorts[k];
+        let va=a[k]!==undefined?a[k]:a.values[k],vb=b[k]!==undefined?b[k]:b.values[k];
+        va=va===undefined||va===null?'':String(va);vb=vb===undefined||vb===null?'':String(vb);
+        const cmp=va.localeCompare(vb,'zh');if(cmp!==0)return dir==='asc'?cmp:-cmp;
+      }
+      return 0;
+    });
+  }else list=list.slice().sort((a,b)=>b.createdAt-a.createdAt);
   return list;
 }
 function renderBulkBar(){
@@ -875,7 +1111,8 @@ function renderBulkBar(){
     bar.querySelector('#batchExport').onclick=()=>exportWithFilterDialog();
   }else{
     bar.style.background='var(--blue-l)';
-    const n=S.selectedTickets.size;const list=visibleTickets();const allSel=n>0&&n===list.length;
+    const n=S.selectedTickets.size;const list=visibleTickets();
+    const allSel=n>0&&n===list.length;
     bar.innerHTML=`<button class="btn btn-g btn-xs" id="batchExit">退出批量</button><label style="display:flex;gap:6px;align-items:center;cursor:pointer;font-size:12.5px;padding:0 6px"><input type="checkbox" id="batchSelectAll" ${allSel?'checked':''}>全选本页(${list.length})</label><div style="width:1px;height:16px;background:var(--border-2)"></div><button class="btn btn-g btn-xs" id="bulkChangeStatus" ${n?'':'disabled style="opacity:.5"'}>修改状态</button><button class="btn btn-g btn-xs" id="bulkChangeAgent" ${n?'':'disabled style="opacity:.5"'}>分配执行人</button><button class="btn btn-g btn-xs" id="bulkChangePriority" ${n?'':'disabled style="opacity:.5"'}>修改优先级</button><button class="btn btn-g btn-xs" id="bulkAppendNote" ${n?'':'disabled style="opacity:.5"'}>追加备注</button><button class="btn btn-g btn-xs" id="bulkExport" ${n?'':'disabled style="opacity:.5"'}>导出选中</button><button class="btn btn-g btn-xs" id="bulkDelete" style="color:var(--red);${n?'':'opacity:.5'}" ${n?'':'disabled'}>删除</button><div style="flex:1"></div><span style="font-size:12px;color:var(--text-2)">已选 <b id="bulkSelectedCount" style="color:var(--blue);font-size:14px">${n}</b> 条</span>`;
     bar.querySelector('#batchExit').onclick=()=>{S.batchMode=false;S.selectedTickets.clear();renderTickets();};
     bar.querySelector('#batchSelectAll').onchange=e=>{if(e.target.checked)list.forEach(t=>S.selectedTickets.add(t.id));else S.selectedTickets.clear();renderTickets();};
@@ -918,7 +1155,7 @@ function bindBulkActions(){
   $('#bulkDelete')?.addEventListener('click',()=>{if(!ids().length)return;if(!confirm(`确定删除所选 ${ids().length} 条工单？`))return;S.data.tickets=S.data.tickets.filter(t=>!S.selectedTickets.has(t.id));S.selectedTickets.clear();persist();renderTickets();renderDashboard();toast('已删除','warn');});
 }
 
-/* ============ 列菜单 ============ */
+/* ============ 列菜单/筛选 ============ */
 function showColMenu(target,colId){
   closeAllPopups();
   const col=getAllColumns().find(c=>c.id===colId);if(!col)return;
@@ -946,18 +1183,34 @@ function showAdvancedFilter(){
   const creators=[...new Set(S.data.tickets.map(t=>t.creator).filter(Boolean))];
   const agents=[...new Set(S.data.tickets.map(t=>t.agent).filter(Boolean))];
   const cur=S.filters.adv||{};
-  showModal('高级筛选',`<div class="form-row"><label>关键词</label><input class="inp" id="afQ" value="${esc(S.filters.q||'')}"></div><div class="form-grid"><div class="form-row"><label>创建人</label><select class="inp" id="afCreator"><option value="">全部</option>${creators.map(c=>`<option ${cur.creator===c?'selected':''}>${esc(c)}</option>`).join('')}</select></div><div class="form-row"><label>执行人</label><select class="inp" id="afAgent"><option value="">全部</option>${agents.map(a=>`<option ${cur.agent===a?'selected':''}>${esc(a)}</option>`).join('')}</select></div></div><div class="form-grid"><div class="form-row"><label>状态</label><select class="inp" id="afStatus"><option value="">全部</option>${(S.data.statuses||DEFAULT_STATUSES).map(s=>`<option value="${s.id}" ${cur.status===s.id?'selected':''}>${esc(s.label)}</option>`).join('')}</select></div><div class="form-row"><label>优先级</label><select class="inp" id="afPriority"><option value="">全部</option>${Object.entries(PRIORITY).map(([k,v])=>`<option value="${k}" ${cur.priority===k?'selected':''}>${v.label}</option>`).join('')}</select></div></div><div class="form-grid"><div class="form-row"><label>创建时间-起</label><input type="date" class="inp" id="afStart" value="${cur.start||''}"></div><div class="form-row"><label>创建时间-止</label><input type="date" class="inp" id="afEnd" value="${cur.end||''}"></div></div><div class="form-row"><label>表单类型</label><select class="inp" id="afForm"><option value="">全部</option>${S.data.forms.map(f=>`<option value="${f.id}" ${S.ticketFormFilter===f.id?'selected':''}>${esc(f.name)}</option>`).join('')}</select></div><div class="form-row"><label>任意字段包含</label><input class="inp" id="afAny" value="${esc(cur.any||'')}"></div>`,[
+  showModal('高级筛选',`
+    <div class="form-row"><label>关键词</label><input class="inp" id="afQ" value="${esc(S.filters.q||'')}"></div>
+    <div class="form-grid"><div class="form-row"><label>创建人</label><select class="inp" id="afCreator"><option value="">全部</option>${creators.map(c=>`<option ${cur.creator===c?'selected':''}>${esc(c)}</option>`).join('')}</select></div><div class="form-row"><label>执行人</label><select class="inp" id="afAgent"><option value="">全部</option>${agents.map(a=>`<option ${cur.agent===a?'selected':''}>${esc(a)}</option>`).join('')}</select></div></div>
+    <div class="form-grid"><div class="form-row"><label>状态</label><select class="inp" id="afStatus"><option value="">全部</option>${(S.data.statuses||DEFAULT_STATUSES).map(s=>`<option value="${s.id}" ${cur.status===s.id?'selected':''}>${esc(s.label)}</option>`).join('')}</select></div><div class="form-row"><label>优先级</label><select class="inp" id="afPriority"><option value="">全部</option>${Object.entries(PRIORITY).map(([k,v])=>`<option value="${k}" ${cur.priority===k?'selected':''}>${v.label}</option>`).join('')}</select></div></div>
+    <div class="form-grid"><div class="form-row"><label>创建时间-起</label><input type="date" class="inp" id="afStart" value="${cur.start||''}"></div><div class="form-row"><label>创建时间-止</label><input type="date" class="inp" id="afEnd" value="${cur.end||''}"></div></div>
+    <div class="form-row"><label>表单类型</label><select class="inp" id="afForm"><option value="">全部</option>${S.data.forms.map(f=>`<option value="${f.id}" ${S.ticketFormFilter===f.id?'selected':''}>${esc(f.name)}</option>`).join('')}</select></div>
+    <div class="form-row"><label>任意字段包含</label><input class="inp" id="afAny" value="${esc(cur.any||'')}"></div>
+  `,[
     {label:'清空',cls:'btn-g',onclick:()=>{S.filters.adv={};S.filters.q='';renderTickets();return false;}},
     {label:'应用',cls:'btn-p',onclick:()=>{S.filters.q=$('#afQ').value.trim();S.filters.adv={creator:$('#afCreator').value,agent:$('#afAgent').value,status:$('#afStatus').value,priority:$('#afPriority').value,start:$('#afStart').value,end:$('#afEnd').value,any:$('#afAny').value.trim()};S.ticketFormFilter=$('#afForm').value||null;renderTickets();toast('已应用');return false;}}
   ]);
 }
 
-/* ============ Excel 导入导出 ============ */
+/* ============ Excel 导出/导入 ============ */
 function exportWithFilterDialog(presetTickets,presetLabel){
   const forms=S.data.forms;
   const creators=[...new Set(S.data.tickets.map(t=>t.creator).filter(Boolean))];
   const agents=[...new Set(S.data.tickets.map(t=>t.agent).filter(Boolean))];
-  showModal('导出数据',`<div style="font-size:12.5px;color:var(--text-2);margin-bottom:10px">${presetTickets?`<b>${presetLabel}</b> · 直接点"下一步"`:'选择筛选条件（留空为全部）'}</div>${!presetTickets?`<div class="form-row"><label>表单类型</label><select class="inp" id="expForm"><option value="">全部</option>${forms.map(f=>`<option value="${f.id}">${esc(f.name)}</option>`).join('')}</select></div><div class="form-grid"><div class="form-row"><label>状态</label><select class="inp" id="expStatus"><option value="">全部</option>${(S.data.statuses||DEFAULT_STATUSES).map(s=>`<option value="${s.id}">${esc(s.label)}</option>`).join('')}</select></div><div class="form-row"><label>优先级</label><select class="inp" id="expPriority"><option value="">全部</option>${Object.entries(PRIORITY).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join('')}</select></div></div><div class="form-grid"><div class="form-row"><label>创建人</label><select class="inp" id="expCreator"><option value="">全部</option>${creators.map(c=>`<option>${esc(c)}</option>`).join('')}</select></div><div class="form-row"><label>执行人</label><select class="inp" id="expAgent"><option value="">全部</option>${agents.map(a=>`<option>${esc(a)}</option>`).join('')}</select></div></div><div class="form-grid"><div class="form-row"><label>创建时间-起</label><input type="date" class="inp" id="expStart"></div><div class="form-row"><label>创建时间-止</label><input type="date" class="inp" id="expEnd"></div></div><div class="form-row"><label>关键词</label><input class="inp" id="expKeyword" placeholder="工单号/客户/订单号"></div>`:''}`,[
+  showModal('导出数据',`
+    <div style="font-size:12.5px;color:var(--text-2);margin-bottom:10px">${presetTickets?`<b>${presetLabel}</b> · 直接点"下一步"`:'选择筛选条件（留空为全部）'}</div>
+    ${!presetTickets?`
+      <div class="form-row"><label>表单类型</label><select class="inp" id="expForm"><option value="">全部</option>${forms.map(f=>`<option value="${f.id}">${esc(f.name)}</option>`).join('')}</select></div>
+      <div class="form-grid"><div class="form-row"><label>状态</label><select class="inp" id="expStatus"><option value="">全部</option>${(S.data.statuses||DEFAULT_STATUSES).map(s=>`<option value="${s.id}">${esc(s.label)}</option>`).join('')}</select></div><div class="form-row"><label>优先级</label><select class="inp" id="expPriority"><option value="">全部</option>${Object.entries(PRIORITY).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join('')}</select></div></div>
+      <div class="form-grid"><div class="form-row"><label>创建人</label><select class="inp" id="expCreator"><option value="">全部</option>${creators.map(c=>`<option>${esc(c)}</option>`).join('')}</select></div><div class="form-row"><label>执行人</label><select class="inp" id="expAgent"><option value="">全部</option>${agents.map(a=>`<option>${esc(a)}</option>`).join('')}</select></div></div>
+      <div class="form-grid"><div class="form-row"><label>创建时间-起</label><input type="date" class="inp" id="expStart"></div><div class="form-row"><label>创建时间-止</label><input type="date" class="inp" id="expEnd"></div></div>
+      <div class="form-row"><label>关键词</label><input class="inp" id="expKeyword" placeholder="工单号/客户/订单号"></div>
+    `:''}
+  `,[
     {label:'取消',cls:'btn-g'},
     {label:'下一步',cls:'btn-p',onclick:()=>{
       let tickets;
@@ -965,10 +1218,13 @@ function exportWithFilterDialog(presetTickets,presetLabel){
       else{
         const fForm=$('#expForm').value,fStatus=$('#expStatus').value,fPriority=$('#expPriority').value;
         const fCreator=$('#expCreator').value,fAgent=$('#expAgent').value;
-        const fStart=$('#expStart').value,fEnd=$('#expEnd').value;const kw=$('#expKeyword').value.trim().toLowerCase();
+        const fStart=$('#expStart').value,fEnd=$('#expEnd').value;
+        const kw=$('#expKeyword').value.trim().toLowerCase();
         tickets=S.data.tickets.filter(t=>{
-          if(fForm&&t.formId!==fForm)return false;if(fStatus&&t.status!==fStatus)return false;
-          if(fPriority&&t.priority!==fPriority)return false;if(fCreator&&t.creator!==fCreator)return false;
+          if(fForm&&t.formId!==fForm)return false;
+          if(fStatus&&t.status!==fStatus)return false;
+          if(fPriority&&t.priority!==fPriority)return false;
+          if(fCreator&&t.creator!==fCreator)return false;
           if(fAgent&&t.agent!==fAgent)return false;
           if(fStart){const st=new Date(fStart).getTime();if(t.createdAt<st)return false;}
           if(fEnd){const et=new Date(fEnd).getTime()+86400e3;if(t.createdAt>et)return false;}
@@ -989,9 +1245,19 @@ function exportTicketsToXlsx(tickets){
   forms.forEach(f=>f.fields.forEach(fd=>{
     if(['divider','title'].includes(fd.type))return;
     if(seen.has(fd.id+':'+fd.label))return;
-    seen.add(fd.id+':'+fd.label);allFields.push({key:f.id+':'+fd.id,label:fd.label,formId:f.id,fieldId:fd.id});
+    seen.add(fd.id+':'+fd.label);
+    allFields.push({key:f.id+':'+fd.id,label:fd.label,formId:f.id,fieldId:fd.id});
   }));
-  showModal('选择导出列',`<div style="display:flex;gap:8px;margin-bottom:10px;font-size:12px"><button class="row-btn" id="xlsAll">全选</button><button class="row-btn" id="xlsNone">全不选</button><span style="color:var(--text-3);align-self:center">共 ${allFields.length} 列 · ${tickets.length} 条</span></div><div style="max-height:320px;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:8px;border:1px solid var(--border);border-radius:8px">${allFields.map(x=>`<label style="display:flex;gap:6px;align-items:center;padding:5px 8px;font-size:12px;border-radius:6px;cursor:pointer;background:rgba(120,120,128,.04)"><input type="checkbox" data-xls-col="${x.key}" checked>${esc(x.label)}</label>`).join('')}</div>`,[
+  showModal('选择导出列',`
+    <div style="display:flex;gap:8px;margin-bottom:10px;font-size:12px">
+      <button class="row-btn" id="xlsAll">全选</button>
+      <button class="row-btn" id="xlsNone">全不选</button>
+      <span style="color:var(--text-3);align-self:center">共 ${allFields.length} 列 · ${tickets.length} 条</span>
+    </div>
+    <div style="max-height:320px;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:8px;border:1px solid var(--border);border-radius:8px">
+      ${allFields.map(x=>`<label style="display:flex;gap:6px;align-items:center;padding:5px 8px;font-size:12px;border-radius:6px;cursor:pointer;background:rgba(120,120,128,.04)"><input type="checkbox" data-xls-col="${x.key}" checked>${esc(x.label)}</label>`).join('')}
+    </div>
+  `,[
     {label:'取消',cls:'btn-g'},
     {label:'导出',cls:'btn-p',onclick:()=>{
       const picked=$$('[data-xls-col]:checked').map(cb=>cb.dataset.xlsCol);
@@ -1001,10 +1267,19 @@ function exportTicketsToXlsx(tickets){
       const rows=[headers];
       tickets.forEach(t=>{
         const row=[t.no,t.formName,getStatus(t).label,PRIORITY[t.priority]?.label||'',t.agent||'',t.creator||'',fullTime(t.createdAt),fullTime(t.updatedAt||t.createdAt)];
-        picked.forEach(k=>{const f=allFields.find(x=>x.key===k);let v='';if(f){const val=t.values[f.fieldId];if(Array.isArray(val))v=val.map(x=>typeof x==='object'?(x.name||''):x).join('; ');else if(val===true)v='是';else if(val===false)v='否';else if(val!==undefined&&val!==null)v=String(val);}row.push(v);});
+        picked.forEach(k=>{
+          const f=allFields.find(x=>x.key===k);let v='';
+          if(f){const val=t.values[f.fieldId];
+            if(Array.isArray(val))v=val.map(x=>typeof x==='object'?(x.name||''):x).join('; ');
+            else if(val===true)v='是';else if(val===false)v='否';
+            else if(val!==undefined&&val!==null)v=String(val);
+          }
+          row.push(v);
+        });
         rows.push(row);
       });
-      const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=headers.map(()=>({wch:16}));
+      const ws=XLSX.utils.aoa_to_sheet(rows);
+      ws['!cols']=headers.map(()=>({wch:16}));
       const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'工单列表');
       XLSX.writeFile(wb,'工单导出-'+new Date().toISOString().slice(0,10)+'.xlsx');
       toast(`已导出 ${tickets.length} 条`);return false;
@@ -1015,12 +1290,26 @@ function exportTicketsToXlsx(tickets){
 function startBatchImport(){
   const forms=S.data.forms;
   if(!forms.length){toast('请先创建表单','warn');return;}
-  showModal('导入数据 · 选择表单',`<div style="font-size:12.5px;color:var(--text-2);margin-bottom:12px">选择目标表单：</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${forms.map(f=>`<div data-pick="${f.id}" style="padding:14px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;display:flex;gap:10px;align-items:center"><div style="width:36px;height:36px;border-radius:9px;background:${f.color};color:#fff;display:grid;place-items:center;font-size:14px;font-weight:650">${initials(f.name)}</div><div style="flex:1"><div style="font-size:12.5px;font-weight:620">${esc(f.name)}</div><div style="font-size:11px;color:var(--text-3);margin-top:2px">${f.fields.length} 个字段</div></div></div>`).join('')}</div>`,[{label:'取消',cls:'btn-g'}]);
+  showModal('导入数据 · 选择表单',`
+    <div style="font-size:12.5px;color:var(--text-2);margin-bottom:12px">选择目标表单：</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${forms.map(f=>`<div data-pick="${f.id}" style="padding:14px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;display:flex;gap:10px;align-items:center">
+        <div style="width:36px;height:36px;border-radius:9px;background:${f.color};color:#fff;display:grid;place-items:center;font-size:14px;font-weight:650">${initials(f.name)}</div>
+        <div style="flex:1"><div style="font-size:12.5px;font-weight:620">${esc(f.name)}</div><div style="font-size:11px;color:var(--text-3);margin-top:2px">${f.fields.length} 个字段</div></div>
+      </div>`).join('')}
+    </div>
+  `,[{label:'取消',cls:'btn-g'}]);
   $$('[data-pick]').forEach(el=>el.onclick=()=>{closeModal();setTimeout(()=>importStep2(el.dataset.pick),100);});
 }
 function importStep2(formId){
   const form=S.data.forms.find(x=>x.id===formId);if(!form)return;
-  showModal(`导入 · ${form.name}`,`<div style="padding:14px;border-radius:10px;background:var(--blue-l);margin-bottom:16px;font-size:12.5px;color:var(--blue-d);line-height:1.7">下载模板填写数据，或直接上传已有的 Excel 文件。</div><div style="display:flex;flex-direction:column;gap:10px"><button class="btn btn-g btn-blk" id="downloadTemplate" style="padding:12px;justify-content:flex-start">${ICON.download}<span style="margin-left:10px;flex:1;text-align:left"><div style="font-weight:600">下载导入模板</div><div style="font-size:11px;color:var(--text-3)">.xlsx 格式</div></span></button><button class="btn btn-p btn-blk" id="uploadData" style="padding:12px;justify-content:flex-start">${ICON.upload}<span style="margin-left:10px;flex:1;text-align:left"><div style="font-weight:600">上传 Excel 文件</div><div style="font-size:11px;color:rgba(255,255,255,.7)">.xlsx / .xls</div></span></button></div>`,[{label:'取消',cls:'btn-g'}]);
+  showModal(`导入 · ${form.name}`,`
+    <div style="padding:14px;border-radius:10px;background:var(--blue-l);margin-bottom:16px;font-size:12.5px;color:var(--blue-d);line-height:1.7">下载模板填写数据，或直接上传已有的 Excel 文件。</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-g btn-blk" id="downloadTemplate" style="padding:12px;justify-content:flex-start">${ICON.download}<span style="margin-left:10px;flex:1;text-align:left"><div style="font-weight:600">下载导入模板</div><div style="font-size:11px;color:var(--text-3)">.xlsx 格式</div></span></button>
+      <button class="btn btn-p btn-blk" id="uploadData" style="padding:12px;justify-content:flex-start">${ICON.upload}<span style="margin-left:10px;flex:1;text-align:left"><div style="font-weight:600">上传 Excel 文件</div><div style="font-size:11px;color:rgba(255,255,255,.7)">.xlsx / .xls</div></span></button>
+    </div>
+  `,[{label:'取消',cls:'btn-g'}]);
   $('#downloadTemplate').onclick=()=>downloadImportTemplate(form);
   $('#uploadData').onclick=()=>{closeModal();setTimeout(()=>uploadImportFile(form),100);};
 }
@@ -1028,7 +1317,12 @@ function downloadImportTemplate(form){
   if(!window.XLSX){toast('SheetJS 未加载','err');return;}
   const fields=form.fields.filter(f=>!['divider','title','formula'].includes(f.type));
   const headers=fields.map(f=>f.label);
-  const ws=XLSX.utils.aoa_to_sheet([headers,fields.map(f=>{if(f.type==='number')return 0;if(f.type==='switch')return '是';if(f.type==='date')return '2025-01-01';if(['radio','select','checkbox'].includes(f.type))return (f.options||[])[0]||'';return '';})]);
+  const ws=XLSX.utils.aoa_to_sheet([headers,fields.map(f=>{
+    if(f.type==='number')return 0;if(f.type==='switch')return '是';
+    if(f.type==='date')return '2025-01-01';
+    if(['radio','select','checkbox'].includes(f.type))return (f.options||[])[0]||'';
+    return '';
+  })]);
   ws['!cols']=headers.map(h=>({wch:Math.max(12,h.length*2)}));
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,form.name.slice(0,30));
   XLSX.writeFile(wb,form.name+'-导入模板.xlsx');toast('模板已下载');
@@ -1038,27 +1332,44 @@ function uploadImportFile(form){
   inp.onchange=async()=>{
     const f=inp.files[0];if(!f)return;
     try{
-      const buf=await f.arrayBuffer();const wb=XLSX.read(buf,{type:'array'});
-      const ws=wb.Sheets[wb.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+      const buf=await f.arrayBuffer();
+      const wb=XLSX.read(buf,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
       if(!rows.length){toast('文件中没有数据','err');return;}
-      const headers=Object.keys(rows[0]);const fields=form.fields.filter(x=>!['divider','title'].includes(x.type));
+      const headers=Object.keys(rows[0]);
+      const fields=form.fields.filter(x=>!['divider','title'].includes(x.type));
       showImportMapper(form,rows,headers,fields);
     }catch(e){toast('解析失败：'+e.message,'err');}
   };
   inp.click();
 }
 function showImportMapper(form,rows,headers,fields){
-  showModal('导入映射 · '+form.name,`<div style="font-size:12.5px;color:var(--text-2);margin-bottom:10px">共 ${rows.length} 行，请将 Excel 列映射到表单字段：</div><div style="max-height:340px;overflow-y:auto">${headers.map((h,i)=>`<div style="display:grid;grid-template-columns:1fr 24px 1fr;gap:8px;align-items:center;margin-bottom:8px"><div style="padding:8px 12px;background:rgba(120,120,128,.08);border-radius:8px;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(h)}</div><div style="text-align:center;color:var(--text-3)">→</div><select class="inp" data-map-col="${i}" style="padding:7px 10px;font-size:12.5px"><option value="">忽略</option>${fields.map(fd=>`<option value="${fd.id}" ${fd.label===h?'selected':''}>${esc(fd.label)}</option>`).join('')}</select></div>`).join('')}</div><label style="display:flex;gap:8px;align-items:center;padding:10px 12px;background:rgba(120,120,128,.05);border-radius:8px;margin-top:12px;cursor:pointer;font-size:12.5px"><input type="checkbox" id="saveAsTemplate" style="width:15px;height:15px;accent-color:var(--blue)">保存为「${esc(form.name)}」的导入模板</label>`,[
+  showModal('导入映射 · '+form.name,`
+    <div style="font-size:12.5px;color:var(--text-2);margin-bottom:10px">共 ${rows.length} 行，请将 Excel 列映射到表单字段：</div>
+    <div style="max-height:340px;overflow-y:auto">
+      ${headers.map((h,i)=>`<div style="display:grid;grid-template-columns:1fr 24px 1fr;gap:8px;align-items:center;margin-bottom:8px">
+        <div style="padding:8px 12px;background:rgba(120,120,128,.08);border-radius:8px;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(h)}</div>
+        <div style="text-align:center;color:var(--text-3)">→</div>
+        <select class="inp" data-map-col="${i}" style="padding:7px 10px;font-size:12.5px"><option value="">忽略</option>${fields.map(fd=>`<option value="${fd.id}" ${fd.label===h?'selected':''}>${esc(fd.label)}</option>`).join('')}</select>
+      </div>`).join('')}
+    </div>
+    <label style="display:flex;gap:8px;align-items:center;padding:10px 12px;background:rgba(120,120,128,.05);border-radius:8px;margin-top:12px;cursor:pointer;font-size:12.5px">
+      <input type="checkbox" id="saveAsTemplate" style="width:15px;height:15px;accent-color:var(--blue)">保存为「${esc(form.name)}」的导入模板
+    </label>
+  `,[
     {label:'取消',cls:'btn-g'},
     {label:`导入 ${rows.length} 条`,cls:'btn-p',onclick:()=>{
       const maps={};
       $$('[data-map-col]').forEach(sel=>{const v=sel.value;if(!v)return;maps[headers[+sel.dataset.mapCol]]=v;});
       if(!Object.keys(maps).length){toast('请至少映射一列','err');return false;}
       if($('#saveAsTemplate')?.checked){form.importTemplate={name:'自定义模板',headers:maps,time:Date.now()};persist();toast('模板已保存');}
-      const firstStatus=getFormStatuses(form.id)[0];const defaultStatus=firstStatus?firstStatus.id:'pending';
+      const firstStatus=getFormStatuses(form.id)[0];
+      const defaultStatus=firstStatus?firstStatus.id:'pending';
       let ok=0;const now=Date.now();
       rows.forEach(r=>{
-        const values={};Object.entries(maps).forEach(([h,fid])=>{values[fid]=String(r[h]||'').trim();});
+        const values={};
+        Object.entries(maps).forEach(([h,fid])=>{values[fid]=String(r[h]||'').trim();});
         S.data.tickets.unshift({id:uid('tk'),no:'TK'+String(Math.floor(20250000+S.data.tickets.length+ok+1)),formId:form.id,formName:form.name,formColor:form.color,values,status:defaultStatus,priority:'medium',agent:'未分配',creator:S.user.name,createdAt:now,updatedAt:now,plans:[],urgeCount:0,timeline:[{time:now,title:'Excel导入',desc:'由 '+S.user.name+' 导入',who:S.user.name}]});
         ok++;
       });
@@ -1068,7 +1379,7 @@ function showImportMapper(form,rows,headers,fields){
 }
 function importTicketsFromXlsx(formId){if(!window.XLSX){toast('SheetJS 未加载','err');return;}const form=S.data.forms.find(x=>x.id===formId);if(!form){toast('请指定表单','err');return;}importStep2(formId);}
 
-/* ============ 物流 ============ */
+/* ============ 物流查询 ============ */
 let kdniaoInited=false;
 function renderLogisticsView(){
   if(!window.KDNWidget){setTimeout(()=>{if(window.KDNWidget)renderLogisticsView();},600);return;}
@@ -1118,7 +1429,11 @@ function editShiftForUser(userId,dateStr){
   const u=S.data.users.find(x=>x.id===userId);if(!u)return;
   const info=getUserShift(userId,dateStr);
   const shiftsList=S.data.shifts||SHIFTS;const shopsList=S.data.shops||SHOPS;
-  showModal(`编辑 ${u.name} · ${dateStr} 班次`,`<div class="form-row"><label>状态</label><select class="inp" id="editShiftStatus"><option value="working" ${info.status==='working'?'selected':''}>上班</option><option value="rest" ${info.status==='rest'?'selected':''}>休息</option><option value="off" ${info.status==='off'?'selected':''}>请假</option></select></div><div class="form-row" id="editShiftRow" ${info.status!=='working'?'style="display:none"':''}><label>班次</label><select class="inp" id="editShiftTime">${shiftsList.map(s=>`<option ${info.shift===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div><div class="form-row" id="editShopRow" ${info.status!=='working'?'style="display:none"':''}><label>处理店铺</label><div style="display:flex;flex-wrap:wrap;gap:6px">${shopsList.map(s=>`<label style="display:flex;gap:5px;align-items:center;padding:6px 12px;border-radius:99px;background:${(info.shops||[]).includes(s)?'var(--blue-l)':'rgba(120,120,128,.08)'};font-size:12.5px;cursor:pointer"><input type="checkbox" data-edit-shop="${esc(s)}" ${(info.shops||[]).includes(s)?'checked':''}>${esc(s)}</label>`).join('')}</div></div>`,[
+  showModal(`编辑 ${u.name} · ${dateStr} 班次`,`
+    <div class="form-row"><label>状态</label><select class="inp" id="editShiftStatus"><option value="working" ${info.status==='working'?'selected':''}>上班</option><option value="rest" ${info.status==='rest'?'selected':''}>休息</option><option value="off" ${info.status==='off'?'selected':''}>请假</option></select></div>
+    <div class="form-row" id="editShiftRow" ${info.status!=='working'?'style="display:none"':''}><label>班次</label><select class="inp" id="editShiftTime">${shiftsList.map(s=>`<option ${info.shift===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>
+    <div class="form-row" id="editShopRow" ${info.status!=='working'?'style="display:none"':''}><label>处理店铺</label><div style="display:flex;flex-wrap:wrap;gap:6px">${shopsList.map(s=>`<label style="display:flex;gap:5px;align-items:center;padding:6px 12px;border-radius:99px;background:${(info.shops||[]).includes(s)?'var(--blue-l)':'rgba(120,120,128,.08)'};font-size:12.5px;cursor:pointer"><input type="checkbox" data-edit-shop="${esc(s)}" ${(info.shops||[]).includes(s)?'checked':''}>${esc(s)}</label>`).join('')}</div></div>
+  `,[
     {label:'取消',cls:'btn-g'},
     {label:'保存',cls:'btn-p',onclick:()=>{const status=$('#editShiftStatus').value;const shift=status==='working'?$('#editShiftTime').value:'休息';const shops=status==='working'?$$('[data-edit-shop]:checked').map(x=>x.dataset.editShop):[];setUserShift(userId,dateStr,{shift,shops,status});renderStaff();toast('已保存');return false;}}
   ]);
@@ -1131,7 +1446,21 @@ function renderFormCards(){
     const enabledStatuses=getFormStatuses(f.id);
     const statusChips=enabledStatuses.slice(0,4).map(s=>`<span class="bdg ${s.cls}" style="font-size:10px;padding:1px 7px;${getStatusStyle(s)}">${esc(s.label)}</span>`).join('');
     const moreStatus=enabledStatuses.length>4?`<span style="font-size:10px;color:var(--text-3)">+${enabledStatuses.length-4}</span>`:'';
-    return`<div class="card" style="padding:14px;cursor:pointer" data-form-id="${f.id}"><div style="display:flex;gap:11px;margin-bottom:10px"><div style="width:40px;height:40px;border-radius:10px;background:${f.color};color:#fff;display:grid;place-items:center;font-size:18px">${initials(f.name)}</div><div style="flex:1;min-width:0"><div style="font-weight:620;font-size:13.5px">${esc(f.name)}</div><div style="font-size:11.5px;color:var(--text-3);margin-top:2px">${esc(f.description||'')}</div></div></div><div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">${statusChips}${moreStatus||(!enabledStatuses.length?'<span style="font-size:11px;color:var(--text-3)">未配置状态</span>':'')}</div><div style="display:flex;gap:6px;padding-top:10px;border-top:1px solid var(--border);font-size:11.5px;color:var(--text-3);flex-wrap:wrap;align-items:center"><span>字段 <b>${f.fields.length}</b></span><span>工单 <b>${S.data.tickets.filter(t=>t.formId===f.id).length}</b></span><div style="flex:1"></div><button class="row-btn" data-exp-form="${f.id}" style="font-size:11px;padding:3px 7px">导出</button><button class="row-btn" data-imp-form="${f.id}" style="font-size:11px;padding:3px 7px">导入</button><button class="row-btn del" data-del-form="${f.id}" style="font-size:11px;padding:3px 7px">删除</button></div></div>`;
+    return`<div class="card" style="padding:14px;cursor:pointer" data-form-id="${f.id}">
+      <div style="display:flex;gap:11px;margin-bottom:10px">
+        <div style="width:40px;height:40px;border-radius:10px;background:${f.color};color:#fff;display:grid;place-items:center;font-size:18px">${initials(f.name)}</div>
+        <div style="flex:1;min-width:0"><div style="font-weight:620;font-size:13.5px">${esc(f.name)}</div><div style="font-size:11.5px;color:var(--text-3);margin-top:2px">${esc(f.description||'')}</div></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">${statusChips}${moreStatus||(!enabledStatuses.length?'<span style="font-size:11px;color:var(--text-3)">未配置状态</span>':'')}</div>
+      <div style="display:flex;gap:6px;padding-top:10px;border-top:1px solid var(--border);font-size:11.5px;color:var(--text-3);flex-wrap:wrap;align-items:center">
+        <span>字段 <b>${f.fields.length}</b></span>
+        <span>工单 <b>${S.data.tickets.filter(t=>t.formId===f.id).length}</b></span>
+        <div style="flex:1"></div>
+        <button class="row-btn" data-exp-form="${f.id}" style="font-size:11px;padding:3px 7px">导出</button>
+        <button class="row-btn" data-imp-form="${f.id}" style="font-size:11px;padding:3px 7px">导入</button>
+        <button class="row-btn del" data-del-form="${f.id}" style="font-size:11px;padding:3px 7px">删除</button>
+      </div>
+    </div>`;
   }).join('');
   $$('[data-form-id]').forEach(el=>el.onclick=e=>{if(e.target.closest('button'))return;openDesigner(el.dataset.formId);});
   $$('[data-del-form]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(!confirm('确定删除表单？'))return;S.data.forms=S.data.forms.filter(x=>x.id!==b.dataset.delForm);persist();renderFormCards();toast('已删除','warn');});
@@ -1149,7 +1478,13 @@ function renderCategories(){
     const usedBy=S.data.forms.filter(f=>!f.statusIds||!f.statusIds.length||f.statusIds.includes(s.id));
     const usedText=usedBy.length===S.data.forms.length?`全 ${usedBy.length} 个表单`:(usedBy.length?`${usedBy.length} 个表单`:'未使用');
     const color=s.color||'#007aff';
-    return`<div class="cat-item" draggable="true" data-drag-cat="statuses" data-drag-idx="${i}">${dragIcon}<input type="color" value="${color}" data-cat-color="statuses:${i}" style="width:22px;height:22px;border:none;border-radius:50%;padding:0;cursor:pointer;background:transparent"><input class="cat-input" data-cat-edit="statuses:${i}" value="${esc(s.label)}"><span class="chip" style="font-size:10px;white-space:nowrap;cursor:pointer" data-status-usage="${i}">${usedText}</span>${S.data.statuses.length>1?`<button class="row-btn del" data-cat-del="statuses:${i}">✕</button>`:''}</div>`;
+    return`<div class="cat-item" draggable="true" data-drag-cat="statuses" data-drag-idx="${i}">
+      ${dragIcon}
+      <input type="color" value="${color}" data-cat-color="statuses:${i}" style="width:22px;height:22px;border:none;border-radius:50%;padding:0;cursor:pointer;background:transparent">
+      <input class="cat-input" data-cat-edit="statuses:${i}" value="${esc(s.label)}">
+      <span class="chip" style="font-size:10px;white-space:nowrap;cursor:pointer" data-status-usage="${i}">${usedText}</span>
+      ${S.data.statuses.length>1?`<button class="row-btn del" data-cat-del="statuses:${i}">✕</button>`:''}
+    </div>`;
   }).join('');
   $('#catShifts').innerHTML=S.data.shifts.map((s,i)=>`<div class="cat-item" draggable="true" data-drag-cat="shifts" data-drag-idx="${i}">${dragIcon}<input class="cat-input" data-cat-edit="shifts:${i}" value="${esc(s)}"><button class="row-btn del" data-cat-del="shifts:${i}">✕</button></div>`).join('');
   $('#catPositions').innerHTML=S.data.positions.map((p,i)=>`<div class="cat-item" draggable="true" data-drag-cat="positions" data-drag-idx="${i}">${dragIcon}<input class="cat-input" data-cat-edit="positions:${i}" value="${esc(p)}"><button class="row-btn del" data-cat-del="positions:${i}">✕</button></div>`).join('');
@@ -1176,11 +1511,21 @@ function renderCategories(){
   $$('[data-cat-del]').forEach(btn=>btn.onclick=()=>{const [t,i]=btn.dataset.catDel.split(':');if(!confirm('确定删除？'))return;S.data[t].splice(+i,1);persist();renderCategories();toast('已删除','warn');});
   $$('[data-cat-add]').forEach(btn=>btn.onclick=()=>{const type=btn.dataset.catAdd;const name=prompt('输入名称：');if(!name)return;if(type==='statuses')S.data.statuses.push({id:'st_'+Date.now().toString(36),label:name,cls:'st-closed',color:'#8e8e93'});else S.data[type].push(name);persist();renderCategories();toast('已添加');});
   $$('[data-status-usage]').forEach(chip=>chip.onclick=e=>{
-    e.stopPropagation();const idx=+chip.dataset.statusUsage;const s=S.data.statuses[idx];if(!s)return;
+    e.stopPropagation();
+    const idx=+chip.dataset.statusUsage;
+    const s=S.data.statuses[idx];if(!s)return;
     const usedBy=S.data.forms.filter(f=>!f.statusIds||!f.statusIds.length||f.statusIds.includes(s.id));
     const notUsed=S.data.forms.filter(f=>f.statusIds&&f.statusIds.length&&!f.statusIds.includes(s.id));
-    showModal(`「${s.label}」使用情况`,`<div style="font-size:12.5px;color:var(--text-2);margin-bottom:14px">状态 <span class="bdg ${s.cls}" style="${getStatusStyle(s)}">${esc(s.label)}</span> 使用情况：</div><div style="margin-bottom:14px"><div style="font-size:12.5px;font-weight:620;margin-bottom:8px">已启用（${usedBy.length} 个表单）</div>${usedBy.length?usedBy.map(f=>`<div style="display:flex;gap:8px;align-items:center;padding:7px 11px;border-radius:8px;background:rgba(52,199,89,.06);border:1px solid rgba(52,199,89,.25);margin-bottom:5px"><span style="width:8px;height:8px;border-radius:50%;background:${f.color}"></span><span style="flex:1;font-size:12.5px">${esc(f.name)}</span><span style="font-size:11px;color:var(--text-3)">${f.statusIds?.length?'已配置':'默认全部'}</span></div>`).join(''):'<div style="padding:12px;text-align:center;color:var(--text-3);font-size:12px">无</div>'}</div>${notUsed.length?`<div><div style="font-size:12.5px;font-weight:620;margin-bottom:8px">未启用（${notUsed.length} 个表单）</div>${notUsed.map(f=>`<div style="display:flex;gap:8px;align-items:center;padding:7px 11px;border-radius:8px;background:rgba(255,59,48,.05);border:1px solid rgba(255,59,48,.2);margin-bottom:5px"><span style="width:8px;height:8px;border-radius:50%;background:${f.color}"></span><span style="flex:1;font-size:12.5px">${esc(f.name)}</span><button class="row-btn" data-add-status="${f.id}" style="font-size:11px;padding:2px 8px">启用</button></div>`).join('')}</div>`:''}`,[{label:'关闭',cls:'btn-g'}],true);
-    setTimeout(()=>{$$('[data-add-status]').forEach(btn=>btn.onclick=()=>{const fid=btn.dataset.addStatus;const form=S.data.forms.find(x=>x.id===fid);if(!form)return;if(!form.statusIds)form.statusIds=[];if(!form.statusIds.includes(s.id))form.statusIds.push(s.id);persist();closeModal();renderCategories();toast('已启用');});},50);
+    showModal(`「${s.label}」使用情况`,`
+      <div style="font-size:12.5px;color:var(--text-2);margin-bottom:14px">状态 <span class="bdg ${s.cls}" style="${getStatusStyle(s)}">${esc(s.label)}</span> 使用情况：</div>
+      <div style="margin-bottom:14px"><div style="font-size:12.5px;font-weight:620;margin-bottom:8px">已启用（${usedBy.length} 个表单）</div>
+        ${usedBy.length?usedBy.map(f=>`<div style="display:flex;gap:8px;align-items:center;padding:7px 11px;border-radius:8px;background:rgba(52,199,89,.06);border:1px solid rgba(52,199,89,.25);margin-bottom:5px"><span style="width:8px;height:8px;border-radius:50%;background:${f.color}"></span><span style="flex:1;font-size:12.5px">${esc(f.name)}</span><span style="font-size:11px;color:var(--text-3)">${f.statusIds?.length?'已配置':'默认全部'}</span></div>`).join(''):'<div style="padding:12px;text-align:center;color:var(--text-3);font-size:12px">无</div>'}
+      </div>
+      ${notUsed.length?`<div><div style="font-size:12.5px;font-weight:620;margin-bottom:8px">未启用（${notUsed.length} 个表单）</div>${notUsed.map(f=>`<div style="display:flex;gap:8px;align-items:center;padding:7px 11px;border-radius:8px;background:rgba(255,59,48,.05);border:1px solid rgba(255,59,48,.2);margin-bottom:5px"><span style="width:8px;height:8px;border-radius:50%;background:${f.color}"></span><span style="flex:1;font-size:12.5px">${esc(f.name)}</span><button class="row-btn" data-add-status="${f.id}" style="font-size:11px;padding:2px 8px">启用</button></div>`).join('')}</div>`:''}
+    `,[{label:'关闭',cls:'btn-g'}],true);
+    setTimeout(()=>{
+      $$('[data-add-status]').forEach(btn=>btn.onclick=()=>{const fid=btn.dataset.addStatus;const form=S.data.forms.find(x=>x.id===fid);if(!form)return;if(!form.statusIds)form.statusIds=[];if(!form.statusIds.includes(s.id))form.statusIds.push(s.id);persist();closeModal();renderCategories();toast('已启用');});
+    },50);
   });
 }
 
@@ -1204,7 +1549,11 @@ function renderAccounts(){
       <td><select class="inp" data-inline-shift="${u.id}" style="padding:3px 6px;font-size:11.5px"><option value="">未设置</option>${shifts.map(s=>`<option ${u.shift===s?'selected':''}>${esc(s)}</option>`).join('')}</select></td>
       <td><span class="chip">${esc(shopText)}</span></td>
       <td><select class="inp" data-inline-status="${u.id}" style="padding:3px 6px;font-size:11.5px"><option value="active" ${u.status==='active'?'selected':''}>已启用</option><option value="pending" ${u.status==='pending'?'selected':''}>待审批</option><option value="disabled" ${u.status==='disabled'?'selected':''}>已禁用</option></select></td>
-      <td>${u.status==='pending'?`<button class="row-btn" data-approve="${u.id}" style="background:#e3f8ea;color:#1a7f37">通过</button>`:''}<button class="row-btn" data-edit-acc="${u.id}" style="margin-left:4px">编辑</button>${!isMe?`<button class="row-btn del" data-del-acc="${u.id}" style="margin-left:4px">✕</button>`:''}</td>
+      <td>
+        ${u.status==='pending'?`<button class="row-btn" data-approve="${u.id}" style="background:#e3f8ea;color:#1a7f37">通过</button>`:''}
+        <button class="row-btn" data-edit-acc="${u.id}" style="margin-left:4px">编辑</button>
+        ${!isMe?`<button class="row-btn del" data-del-acc="${u.id}" style="margin-left:4px">✕</button>`:''}
+      </td>
     </tr>`;
   }).join('');
   updateBadges();
@@ -1219,7 +1568,22 @@ function bindInlineEdits(){
 function openAccountEdit(id){
   const u=id?S.data.users.find(x=>x.id===id):null;
   const positions=S.data.positions||POSITIONS,shifts=S.data.shifts||SHIFTS,shops=S.data.shops||SHOPS;
-  showModal(u?'编辑账号 · '+u.name:'新建账号',`<div class="form-row"><label>姓名</label><input class="inp" id="acName" value="${esc(u?.name||'')}"></div><div class="form-grid"><div class="form-row"><label>手机号</label><input class="inp" id="acPhone" value="${esc(u?.phone||'')}"></div><div class="form-row"><label>密码 ${u?'（留空不改）':''}</label><input class="inp" id="acPwd" placeholder="${u?'留空不改':'默认123456'}"></div></div><div class="form-grid-3"><div class="form-row"><label>角色</label><select class="inp" id="acRole"><option value="agent" ${u?.role==='agent'?'selected':''}>客服</option><option value="admin" ${u?.role==='admin'?'selected':''}>管理员</option><option value="viewer" ${u?.role==='viewer'?'selected':''}>只读</option></select></div><div class="form-row"><label>职位</label><select class="inp" id="acPosition"><option value="">选择</option>${positions.map(p=>`<option ${u?.position===p?'selected':''}>${esc(p)}</option>`).join('')}</select></div><div class="form-row"><label>部门</label><input class="inp" id="acDept" value="${esc(u?.dept||'')}"></div></div><div class="form-row"><label>默认班次</label><select class="inp" id="acShift"><option value="">选择</option>${shifts.map(s=>`<option ${u?.shift===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div><div class="form-row"><label>处理店铺</label><div style="display:flex;flex-wrap:wrap;gap:6px">${shops.map(s=>`<label style="display:flex;gap:5px;align-items:center;padding:5px 10px;border-radius:99px;background:${(u?.shops||[]).includes(s)?'var(--blue-l)':'rgba(120,120,128,.1)'};font-size:12px;cursor:pointer"><input type="checkbox" data-ac-shop="${esc(s)}" ${(u?.shops||[]).includes(s)?'checked':''}>${esc(s)}</label>`).join('')}</div></div><div class="form-row"><label>权限</label><div class="perm-grid">${PERMISSIONS.map(p=>`<label class="perm-item ${u?.permissions?.includes(p.id)?'on':''}"><input type="checkbox" data-ac-perm="${p.id}" ${u?.permissions?.includes(p.id)?'checked':''}>${p.name}</label>`).join('')}</div></div><div class="form-row"><label>状态</label><select class="inp" id="acStatus"><option value="active" ${u?.status==='active'?'selected':''}>已启用</option><option value="disabled" ${u?.status==='disabled'?'selected':''}>已禁用</option><option value="pending" ${u?.status==='pending'?'selected':''}>待审批</option></select></div>`,[
+  showModal(u?'编辑账号 · '+u.name:'新建账号',`
+    <div class="form-row"><label>姓名</label><input class="inp" id="acName" value="${esc(u?.name||'')}"></div>
+    <div class="form-grid">
+      <div class="form-row"><label>手机号</label><input class="inp" id="acPhone" value="${esc(u?.phone||'')}"></div>
+      <div class="form-row"><label>密码 ${u?'（留空不改）':''}</label><input class="inp" id="acPwd" placeholder="${u?'留空不改':'默认123456'}"></div>
+    </div>
+    <div class="form-grid-3">
+      <div class="form-row"><label>角色</label><select class="inp" id="acRole"><option value="agent" ${u?.role==='agent'?'selected':''}>客服</option><option value="admin" ${u?.role==='admin'?'selected':''}>管理员</option><option value="viewer" ${u?.role==='viewer'?'selected':''}>只读</option></select></div>
+      <div class="form-row"><label>职位</label><select class="inp" id="acPosition"><option value="">选择</option>${positions.map(p=>`<option ${u?.position===p?'selected':''}>${esc(p)}</option>`).join('')}</select></div>
+      <div class="form-row"><label>部门</label><input class="inp" id="acDept" value="${esc(u?.dept||'')}"></div>
+    </div>
+    <div class="form-row"><label>默认班次</label><select class="inp" id="acShift"><option value="">选择</option>${shifts.map(s=>`<option ${u?.shift===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>
+    <div class="form-row"><label>处理店铺</label><div style="display:flex;flex-wrap:wrap;gap:6px">${shops.map(s=>`<label style="display:flex;gap:5px;align-items:center;padding:5px 10px;border-radius:99px;background:${(u?.shops||[]).includes(s)?'var(--blue-l)':'rgba(120,120,128,.1)'};font-size:12px;cursor:pointer"><input type="checkbox" data-ac-shop="${esc(s)}" ${(u?.shops||[]).includes(s)?'checked':''}>${esc(s)}</label>`).join('')}</div></div>
+    <div class="form-row"><label>权限</label><div class="perm-grid">${PERMISSIONS.map(p=>`<label class="perm-item ${u?.permissions?.includes(p.id)?'on':''}"><input type="checkbox" data-ac-perm="${p.id}" ${u?.permissions?.includes(p.id)?'checked':''}>${p.name}</label>`).join('')}</div></div>
+    <div class="form-row"><label>状态</label><select class="inp" id="acStatus"><option value="active" ${u?.status==='active'?'selected':''}>已启用</option><option value="disabled" ${u?.status==='disabled'?'selected':''}>已禁用</option><option value="pending" ${u?.status==='pending'?'selected':''}>待审批</option></select></div>
+  `,[
     {label:'取消',cls:'btn-g'},
     {label:'保存',cls:'btn-p',onclick:()=>{
       const name=$('#acName').value.trim(),phone=$('#acPhone').value.trim(),pwd=$('#acPwd').value.trim();
@@ -1251,7 +1615,11 @@ function renderGroups(){
 }
 function openEditGroup(id){
   const g=id?S.data.permissionGroups.find(x=>x.id===id):null;
-  showModal(g?'编辑权限组':'新建权限组',`<div class="form-row"><label>名称</label><input class="inp" id="gName" value="${esc(g?.name||'')}"></div><div class="form-row"><label>权限</label><div class="perm-grid">${PERMISSIONS.map(p=>`<label class="perm-item ${g?.permissions?.includes(p.id)?'on':''}"><input type="checkbox" data-perm="${p.id}" ${g?.permissions?.includes(p.id)?'checked':''}>${p.name}</label>`).join('')}</div></div><div class="form-row"><label>成员</label><div style="display:flex;flex-wrap:wrap;gap:6px;max-height:150px;overflow-y:auto">${S.data.users.map(u=>`<label style="display:flex;gap:5px;align-items:center;padding:5px 10px;border-radius:99px;background:rgba(120,120,128,.1);font-size:12px;cursor:pointer"><input type="checkbox" data-gm="${u.id}" ${g?.members?.includes(u.id)?'checked':''}>${esc(u.name)}</label>`).join('')}</div></div>`,[
+  showModal(g?'编辑权限组':'新建权限组',`
+    <div class="form-row"><label>名称</label><input class="inp" id="gName" value="${esc(g?.name||'')}"></div>
+    <div class="form-row"><label>权限</label><div class="perm-grid">${PERMISSIONS.map(p=>`<label class="perm-item ${g?.permissions?.includes(p.id)?'on':''}"><input type="checkbox" data-perm="${p.id}" ${g?.permissions?.includes(p.id)?'checked':''}>${p.name}</label>`).join('')}</div></div>
+    <div class="form-row"><label>成员</label><div style="display:flex;flex-wrap:wrap;gap:6px;max-height:150px;overflow-y:auto">${S.data.users.map(u=>`<label style="display:flex;gap:5px;align-items:center;padding:5px 10px;border-radius:99px;background:rgba(120,120,128,.1);font-size:12px;cursor:pointer"><input type="checkbox" data-gm="${u.id}" ${g?.members?.includes(u.id)?'checked':''}>${esc(u.name)}</label>`).join('')}</div></div>
+  `,[
     {label:'取消',cls:'btn-g'},
     {label:'保存',cls:'btn-p',onclick:()=>{const name=$('#gName').value.trim();if(!name){toast('请填写名称','err');return false;}const perms=$$('[data-perm]:checked').map(x=>x.dataset.perm);const members=$$('[data-gm]:checked').map(x=>x.dataset.gm);if(g)Object.assign(g,{name,permissions:perms,members});else{S.data.permissionGroups=S.data.permissionGroups||[];S.data.permissionGroups.push({id:uid('grp'),name,permissions:perms,members});}persist();renderGroups();toast('已保存');return false;}}
   ]);
@@ -1275,7 +1643,11 @@ function updateBadges(){
 function renderSettings(){
   if(!isAdmin())return;
   if(!S.data.settings)S.data.settings={};
-  const tabs=[{id:'display',label:'显示偏好',icon:ICON.settings},{id:'data',label:'数据管理',icon:ICON.box},{id:'danger',label:'危险操作',icon:ICON.warning}];
+  const tabs=[
+    {id:'display',label:'显示偏好',icon:ICON.settings},
+    {id:'data',label:'数据管理',icon:ICON.box},
+    {id:'danger',label:'危险操作',icon:ICON.warning}
+  ];
   if(!S.settingsTab)S.settingsTab='display';
   $('#settingsGrid').innerHTML=`<div class="card" style="grid-column:1/-1;overflow:hidden"><div style="display:flex;gap:4px;padding:8px 12px 0;border-bottom:1px solid var(--border);background:rgba(120,120,128,.03);flex-wrap:wrap">${tabs.map(t=>`<button class="sp-tab ${S.settingsTab===t.id?'on':''}" data-stab="${t.id}" style="flex:none;display:inline-flex;align-items:center;gap:6px;padding:8px 16px;font-size:12.5px">${t.icon}${t.label}</button>`).join('')}</div><div style="padding:18px" id="settingsBody"></div></div>`;
   $$('[data-stab]').forEach(b=>b.onclick=()=>{S.settingsTab=b.dataset.stab;renderSettings();});
@@ -1284,15 +1656,38 @@ function renderSettings(){
 function renderSettingsBody(){
   const S2=S.data.settings;const body=$('#settingsBody');const tab=S.settingsTab;
   if(tab==='display'){
-    body.innerHTML=`<div class="form-row"><label>系统名称</label><input class="inp" id="setSysName" value="${esc(S2.sysName||'内部协同工单系统')}"></div><div class="form-row"><label>服务器地址</label><input class="inp" id="setApiUrl" value="${esc(API_URL)}"></div><div class="form-grid"><div class="form-row"><label>工单详情打开方式</label><select class="inp" id="setViewPref"><option value="right" ${S2.viewPref==='right'?'selected':''}>右侧挤压</option></select></div><div class="form-row"><label>默认列表视图</label><select class="inp" id="setDefaultTab"><option value="pending" ${S2.defaultTab==='pending'?'selected':''}>待处理</option><option value="all" ${S2.defaultTab==='all'?'selected':''}>全部</option></select></div></div><button class="btn btn-p btn-sm" id="btnSaveDisplay" style="margin-top:8px">保存显示设置</button>`;
-    $('#btnSaveDisplay').onclick=()=>{S2.sysName=$('#setSysName').value;S2.viewPref=$('#setViewPref').value;S.viewPref=S2.viewPref;S2.defaultTab=$('#setDefaultTab').value;persist();toast('已保存');};
+    body.innerHTML=`
+      <div class="form-row"><label>系统名称</label><input class="inp" id="setSysName" value="${esc(S2.sysName||'内部协同工单系统')}"></div>
+      <div class="form-row"><label>服务器地址</label><input class="inp" id="setApiUrl" value="${esc(API_URL)}" placeholder="http://localhost:3000"></div>
+      <div class="form-grid">
+        <div class="form-row"><label>工单详情打开方式</label><select class="inp" id="setViewPref"><option value="right" ${S2.viewPref==='right'?'selected':''}>右侧挤压</option></select></div>
+        <div class="form-row"><label>默认列表视图</label><select class="inp" id="setDefaultTab"><option value="pending" ${S2.defaultTab==='pending'?'selected':''}>待处理</option><option value="all" ${S2.defaultTab==='all'?'selected':''}>全部</option></select></div>
+      </div>
+      <button class="btn btn-p btn-sm" id="btnSaveDisplay" style="margin-top:8px">保存显示设置</button>`;
+    $('#btnSaveDisplay').onclick=()=>{S2.sysName=$('#setSysName').value;S2.viewPref=$('#setViewPref').value;S.viewPref=S2.viewPref;S2.defaultTab=$('#setDefaultTab').value;const newApi=$('#setApiUrl').value.trim();if(newApi){try{localStorage.setItem('its_api_url',newApi);}catch(e){}}persist();toast('已保存，刷新页面后生效');};
   } else if(tab==='data'){
-    body.innerHTML=`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px"><button class="btn btn-g btn-sm" id="setExport">${ICON.download} 导出全部数据</button><button class="btn btn-g btn-sm" id="setImport">${ICON.upload} 导入数据</button><button class="btn btn-g btn-sm" id="setUploadServer">↑ 上传到服务器</button></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">${[{k:'工单',v:S.data.tickets.length},{k:'用户',v:S.data.users.length},{k:'表单',v:S.data.forms.length},{k:'群聊',v:S.data.groups.length}].map(x=>`<div style="padding:14px;border-radius:10px;background:rgba(120,120,128,.05);border:1px solid var(--border);text-align:center"><div style="font-size:20px;font-weight:700">${x.v}</div><div style="font-size:11px;color:var(--text-3)">${x.k}</div></div>`).join('')}</div><div style="margin-top:14px;font-size:12px;color:var(--text-3);line-height:1.7">服务器版本号：<b style="color:var(--blue)">${S.dataVersion||'未连接'}</b></div>`;
+    body.innerHTML=`
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+        <button class="btn btn-g btn-sm" id="setExport">${ICON.download} 导出全部数据</button>
+        <button class="btn btn-g btn-sm" id="setImport">${ICON.upload} 导入数据</button>
+        <button class="btn btn-g btn-sm" id="setUploadServer">↑ 上传到服务器</button>
+        <button class="btn btn-g btn-sm" id="setPullServer">↓ 从服务器拉取</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        ${[{k:'工单',v:S.data.tickets.length},{k:'用户',v:S.data.users.length},{k:'表单',v:S.data.forms.length},{k:'群聊',v:S.data.groups.length}].map(x=>`<div style="padding:14px;border-radius:10px;background:rgba(120,120,128,.05);border:1px solid var(--border);text-align:center"><div style="font-size:20px;font-weight:700">${x.v}</div><div style="font-size:11px;color:var(--text-3)">${x.k}</div></div>`).join('')}
+      </div>
+      <div style="margin-top:14px;font-size:12px;color:var(--text-3);line-height:1.7">当前服务器版本号：<b style="color:var(--blue)">${S.dataVersion||'未连接'}</b></div>`;
     $('#setExport').onclick=()=>{const blob=new Blob([JSON.stringify(S.data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ticket-backup-'+Date.now()+'.json';a.click();toast('已导出');};
     $('#setImport').onclick=()=>{const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=()=>{const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.forms||!d.users){toast('格式错误','err');return;}S.data=d;persist();location.reload();}catch(e){toast('解析失败','err');}};r.readAsText(f);};inp.click();};
-    $('#setUploadServer').onclick=async()=>{await uploadData();toast('已上传');};
+    $('#setUploadServer').onclick=async()=>{await uploadData();toast('已上传到服务器');};
+    $('#setPullServer').onclick=async()=>{const r=await apiFetch('/api/data');if(r&&r.data){S.data=r.data;persist();toast('已拉取');setTimeout(()=>location.reload(),600);}else{toast('服务器无数据','warn');}};
   } else if(tab==='danger'){
-    body.innerHTML=`<div style="padding:12px 14px;border-radius:10px;background:rgba(255,59,48,.08);border:1px solid rgba(255,59,48,.3);margin-bottom:16px;display:flex;gap:10px"><span style="color:var(--red);flex:0 0 auto">${ICON.warning}</span><div style="flex:1;font-size:12.5px;color:var(--red);line-height:1.7"><b>危险操作</b> · 清除后数据将无法恢复，请谨慎选择。</div></div><button class="btn btn-d" id="setClearData">${ICON.trash} 清空数据（选择要清除的内容）</button>`;
+    body.innerHTML=`
+      <div style="padding:12px 14px;border-radius:10px;background:rgba(255,59,48,.08);border:1px solid rgba(255,59,48,.3);margin-bottom:16px;display:flex;gap:10px">
+        <span style="color:var(--red);flex:0 0 auto">${ICON.warning}</span>
+        <div style="flex:1;font-size:12.5px;color:var(--red);line-height:1.7"><b>危险操作</b> · 清除后数据将无法恢复，请谨慎选择。</div>
+      </div>
+      <button class="btn btn-d" id="setClearData">${ICON.trash} 清空数据（选择要清除的内容）</button>`;
     $('#setClearData').onclick=()=>openClearDataDialog();
   }
 }
@@ -1305,21 +1700,45 @@ function getClearableCategories(){
     {key:'notifications',name:'通知记录',desc:'通知中心的所有历史消息',count:(S.data.notifications||[]).length},
     {key:'logistics',name:'物流查询记录',desc:'物流查询历史',count:(S.data.logistics||[]).length},
     {key:'side',name:'待办/日程/便签',desc:'工作台侧边栏的条目',count:(S.data.side||[]).length},
+    {key:'urges',name:'催办记录',desc:'所有催办历史',count:(S.data.urges||[]).length},
     {key:'permissionGroups',name:'权限组',desc:'所有权限组配置',count:(S.data.permissionGroups||[]).length,danger:true},
     {key:'shiftSchedule',name:'排班记录',desc:'所有日期的排班安排',count:Object.keys(S.data.shiftSchedule||{}).length},
     {key:'statuses',name:'任务状态',desc:'自定义状态（将重置）',count:(S.data.statuses||[]).length},
     {key:'shifts',name:'班次',desc:'自定义班次（将重置）',count:(S.data.shifts||[]).length},
     {key:'positions',name:'职位',desc:'自定义职位（将重置）',count:(S.data.positions||[]).length},
-    {key:'shops',name:'处理店铺',desc:'自定义店铺（将重置）',count:(S.data.shops||[]).length}
+    {key:'shops',name:'处理店铺',desc:'自定义店铺（将重置）',count:(S.data.shops||[]).length},
+    {key:'settings',name:'系统设置',desc:'显示偏好等',count:1,danger:true}
   ];
 }
 function openClearDataDialog(){
-  const cats=getClearableCategories();const total=cats.reduce((s,c)=>s+c.count,0);
-  showModal('清空数据',`<div style="padding:12px 14px;border-radius:10px;background:rgba(255,59,48,.08);border:1px solid rgba(255,59,48,.3);margin-bottom:16px;display:flex;gap:10px"><span style="color:var(--red)">${ICON.warning}</span><div style="flex:1;font-size:12.5px;color:var(--red);line-height:1.7"><b>危险操作</b> · 清除后无法恢复，建议先备份。</div></div><div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap"><button class="row-btn" id="cdSelectAll">全选</button><button class="row-btn" id="cdSelectNone">全不选</button><button class="row-btn" id="cdSelectDanger" style="color:var(--red)">仅危险项</button><div style="flex:1"></div><span style="font-size:11.5px;color:var(--text-3)">共 ${cats.length} 类 · 约 ${total} 条</span></div><div style="max-height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:6px">${cats.map(c=>`<label style="display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:9px;background:rgba(120,120,128,.04);border:1px solid var(--border);cursor:pointer" data-cd-item="${c.key}"><input type="checkbox" data-cd-check="${c.key}" style="width:16px;height:16px;accent-color:${c.danger?'var(--red)':'var(--blue)'};cursor:pointer"><div style="flex:1;min-width:0"><div style="display:flex;gap:6px;align-items:center"><span style="font-size:12.5px;font-weight:620">${esc(c.name)}</span>${c.danger?`<span style="font-size:10px;color:var(--red);background:rgba(255,59,48,.12);padding:1px 6px;border-radius:4px;font-weight:600">危险</span>`:''}</div><div style="font-size:11px;color:var(--text-3);margin-top:2px">${esc(c.desc)}</div></div><span class="chip" style="flex:0 0 auto;font-size:11px">${c.count} 条</span></label>`).join('')}</div>`,[
+  const cats=getClearableCategories();
+  const total=cats.reduce((s,c)=>s+c.count,0);
+  showModal('清空数据',`
+    <div style="padding:12px 14px;border-radius:10px;background:rgba(255,59,48,.08);border:1px solid rgba(255,59,48,.3);margin-bottom:16px;display:flex;gap:10px">
+      <span style="color:var(--red)">${ICON.warning}</span>
+      <div style="flex:1;font-size:12.5px;color:var(--red);line-height:1.7"><b>危险操作</b> · 清除后无法恢复，建议先备份。</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+      <button class="row-btn" id="cdSelectAll">全选</button>
+      <button class="row-btn" id="cdSelectNone">全不选</button>
+      <button class="row-btn" id="cdSelectDanger" style="color:var(--red)">仅危险项</button>
+      <div style="flex:1"></div>
+      <span style="font-size:11.5px;color:var(--text-3)">共 ${cats.length} 类 · 约 ${total} 条</span>
+    </div>
+    <div style="max-height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:6px">
+      ${cats.map(c=>`<label style="display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:9px;background:rgba(120,120,128,.04);border:1px solid var(--border);cursor:pointer" data-cd-item="${c.key}">
+        <input type="checkbox" data-cd-check="${c.key}" style="width:16px;height:16px;accent-color:${c.danger?'var(--red)':'var(--blue)'};cursor:pointer">
+        <div style="flex:1;min-width:0"><div style="display:flex;gap:6px;align-items:center"><span style="font-size:12.5px;font-weight:620">${esc(c.name)}</span>${c.danger?`<span style="font-size:10px;color:var(--red);background:rgba(255,59,48,.12);padding:1px 6px;border-radius:4px;font-weight:600">危险</span>`:''}</div><div style="font-size:11px;color:var(--text-3);margin-top:2px">${esc(c.desc)}</div></div>
+        <span class="chip" style="flex:0 0 auto;font-size:11px;color:${c.count?'var(--blue-d)':'var(--text-3)'}">${c.count} 条</span>
+      </label>`).join('')}
+    </div>
+    <div id="cdSummary" style="margin-top:12px;padding:10px 12px;border-radius:9px;background:var(--blue-l);font-size:12px;color:var(--blue-d);display:none"></div>
+  `,[
     {label:'取消',cls:'btn-g'},
     {label:'下一步',cls:'btn-d',onclick:()=>{const checked=$$('[data-cd-check]:checked').map(cb=>cb.dataset.cdCheck);if(!checked.length){toast('请至少选择一项','warn');return false;}closeModal();setTimeout(()=>confirmClearData(checked),120);return false;}}
   ],true);
-  $$('[data-cd-check]').forEach(cb=>cb.onchange=()=>{const item=cb.closest('[data-cd-item]');item.style.background=cb.checked?'rgba(255,59,48,.05)':'rgba(120,120,128,.04)';item.style.borderColor=cb.checked?'rgba(255,59,48,.35)':'var(--border)';});
+  const updateSummary=()=>{const checked=$$('[data-cd-check]:checked');const sum=$$('[data-cd-check]').reduce((s,cb)=>{if(!cb.checked)return s;const cat=cats.find(x=>x.key===cb.dataset.cdCheck);return s+(cat?cat.count:0);},0);const sumBox=$('#cdSummary');if(checked.length){sumBox.style.display='block';sumBox.innerHTML=`已选 <b>${checked.length}</b> 类 · 约 <b>${sum}</b> 条数据将被清除`;}else sumBox.style.display='none';};
+  $$('[data-cd-check]').forEach(cb=>cb.onchange=()=>{const item=cb.closest('[data-cd-item]');item.style.background=cb.checked?'rgba(255,59,48,.05)':'rgba(120,120,128,.04)';item.style.borderColor=cb.checked?'rgba(255,59,48,.35)':'var(--border)';updateSummary();});
   $('#cdSelectAll').onclick=()=>{$$('[data-cd-check]').forEach(cb=>{cb.checked=true;cb.onchange();});};
   $('#cdSelectNone').onclick=()=>{$$('[data-cd-check]').forEach(cb=>{cb.checked=false;cb.onchange();});};
   $('#cdSelectDanger').onclick=()=>{$$('[data-cd-check]').forEach(cb=>{const cat=cats.find(x=>x.key===cb.dataset.cdCheck);cb.checked=!!cat?.danger;cb.onchange();});};
@@ -1327,7 +1746,25 @@ function openClearDataDialog(){
 function confirmClearData(keys){
   const cats=getClearableCategories().filter(c=>keys.includes(c.key));
   const total=cats.reduce((s,c)=>s+c.count,0);
-  showModal('确认清除数据',`<div style="text-align:center;margin-bottom:16px"><div style="width:64px;height:64px;border-radius:18px;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(135deg,#ff3b30,#ff9500);color:#fff">${ICON.warning}</div><div style="font-size:17px;font-weight:700;margin-bottom:6px">即将清除 ${cats.length} 类数据</div><div style="font-size:12.5px;color:var(--text-2);line-height:1.7">约 <b style="color:var(--red);font-size:15px">${total}</b> 条数据将被永久删除</div></div><div style="padding:12px;border-radius:10px;background:rgba(255,59,48,.05);border:1px solid rgba(255,59,48,.2);max-height:180px;overflow-y:auto;margin-bottom:16px">${cats.map(c=>`<div style="display:flex;gap:8px;align-items:center;padding:6px 8px;font-size:12.5px"><span style="width:6px;height:6px;border-radius:50%;background:var(--red)"></span><span style="flex:1">${esc(c.name)}</span><span style="color:var(--text-3);font-size:11.5px">${c.count} 条</span></div>`).join('')}</div><label style="display:flex;gap:8px;align-items:center;padding:10px 12px;border-radius:9px;background:rgba(120,120,128,.05);cursor:pointer;font-size:12.5px;margin-bottom:10px"><input type="checkbox" id="cdConfirm1" style="width:15px;height:15px;accent-color:var(--red);cursor:pointer">我已了解风险，确认清除以上数据</label><div style="padding:10px 12px;border-radius:9px;background:rgba(120,120,128,.05)"><div style="font-size:12px;color:var(--text-2);margin-bottom:6px">请输入 <b style="color:var(--red);font-family:monospace">确认清除</b> 以完成验证：</div><input class="inp" id="cdConfirmText" placeholder="输入：确认清除" autocomplete="off" style="font-family:monospace;text-align:center;letter-spacing:2px"></div>`,[
+  showModal('确认清除数据',`
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="width:64px;height:64px;border-radius:18px;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(135deg,#ff3b30,#ff9500);color:#fff">
+        <svg class="ico ico-lg" viewBox="0 0 24 24" stroke="#fff"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+      </div>
+      <div style="font-size:17px;font-weight:700;margin-bottom:6px">即将清除 ${cats.length} 类数据</div>
+      <div style="font-size:12.5px;color:var(--text-2);line-height:1.7">约 <b style="color:var(--red);font-size:15px">${total}</b> 条数据将被永久删除</div>
+    </div>
+    <div style="padding:12px;border-radius:10px;background:rgba(255,59,48,.05);border:1px solid rgba(255,59,48,.2);max-height:180px;overflow-y:auto;margin-bottom:16px">
+      ${cats.map(c=>`<div style="display:flex;gap:8px;align-items:center;padding:6px 8px;font-size:12.5px"><span style="width:6px;height:6px;border-radius:50%;background:var(--red)"></span><span style="flex:1">${esc(c.name)}</span><span style="color:var(--text-3);font-size:11.5px">${c.count} 条</span></div>`).join('')}
+    </div>
+    <label style="display:flex;gap:8px;align-items:center;padding:10px 12px;border-radius:9px;background:rgba(120,120,128,.05);cursor:pointer;font-size:12.5px;margin-bottom:10px">
+      <input type="checkbox" id="cdConfirm1" style="width:15px;height:15px;accent-color:var(--red);cursor:pointer">我已了解风险，确认清除以上数据
+    </label>
+    <div style="padding:10px 12px;border-radius:9px;background:rgba(120,120,128,.05)">
+      <div style="font-size:12px;color:var(--text-2);margin-bottom:6px">请输入 <b style="color:var(--red);font-family:monospace">确认清除</b> 以完成验证：</div>
+      <input class="inp" id="cdConfirmText" placeholder="输入：确认清除" autocomplete="off" style="font-family:monospace;text-align:center;letter-spacing:2px">
+    </div>
+  `,[
     {label:'取消',cls:'btn-g'},
     {label:'确认清除',cls:'btn-d',onclick:()=>{if(!$('#cdConfirm1').checked){toast('请先勾选确认项','warn');return false;}if($('#cdConfirmText').value.trim()!=='确认清除'){toast('请输入"确认清除"','err');return false;}executeClearData(keys);return false;}}
   ],true);
@@ -1336,16 +1773,28 @@ function executeClearData(keys){
   const before={tickets:S.data.tickets.length,groups:S.data.groups.length,users:S.data.users.length,forms:S.data.forms.length};
   const clearMap={
     tickets:()=>{S.data.tickets=[];},groups:()=>{S.data.groups=[];S.currentGroupId=null;},
-    users:()=>{const me=S.user;S.data.users=[me];},forms:()=>{S.data.forms=seedForms();},
-    notifications:()=>{S.data.notifications=[];updateBellBadge();},logistics:()=>{S.data.logistics=[];},
-    side:()=>{S.data.side=[];},permissionGroups:()=>{S.data.permissionGroups=[];},
-    shiftSchedule:()=>{S.data.shiftSchedule={};},statuses:()=>{S.data.statuses=JSON.parse(JSON.stringify(DEFAULT_STATUSES));},
-    shifts:()=>{S.data.shifts=SHIFTS.slice();},positions:()=>{S.data.positions=POSITIONS.slice();},shops:()=>{S.data.shops=SHOPS.slice();}
+    users:()=>{const me=S.user;S.data.users=[me];},
+    forms:()=>{S.data.forms=seedForms();},notifications:()=>{S.data.notifications=[];updateBellBadge();},
+    logistics:()=>{S.data.logistics=[];},side:()=>{S.data.side=[];},urges:()=>{S.data.urges=[];},
+    permissionGroups:()=>{S.data.permissionGroups=[];},shiftSchedule:()=>{S.data.shiftSchedule={};},
+    statuses:()=>{S.data.statuses=JSON.parse(JSON.stringify(DEFAULT_STATUSES));},
+    shifts:()=>{S.data.shifts=SHIFTS.slice();},positions:()=>{S.data.positions=POSITIONS.slice();},
+    shops:()=>{S.data.shops=SHOPS.slice();},
+    settings:()=>{S.data.settings={sysName:'内部协同工单系统',viewPref:'right',defaultTab:'pending'};}
   };
   keys.forEach(k=>{if(clearMap[k])try{clearMap[k]();}catch(e){}});
   persist();closeModal();
   try{switchView(S.view||'dashboard');updateBellBadge();}catch(e){}
-  showModal('清除完成',`<div style="text-align:center;padding:12px 0"><div style="width:64px;height:64px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;background:rgba(52,199,89,.15);color:var(--green)"><svg class="ico ico-lg" viewBox="0 0 24 24" stroke="currentColor"><path d="M20 6 9 17l-5-5"/></svg></div><div style="font-size:16px;font-weight:650;margin-bottom:6px">已成功清除 ${keys.length} 类数据</div><div style="font-size:11.5px;color:var(--text-3);background:rgba(120,120,128,.05);padding:10px;border-radius:8px;line-height:1.8;text-align:left">清除前：${before.tickets} 工单 / ${before.groups} 群聊 / ${before.users} 用户 / ${before.forms} 表单<br>清除后：${S.data.tickets.length} 工单 / ${S.data.groups.length} 群聊 / ${S.data.users.length} 用户 / ${S.data.forms.length} 表单</div></div>`,[{label:'关闭',cls:'btn-p'}]);
+  const summary=keys.map(k=>{const cat=getClearableCategories().find(x=>x.key===k);return cat?cat.name:'';}).filter(Boolean).join('、');
+  addNotification('数据已清除',`清除项：${summary}`,ICON.trash,'system');
+  showModal('清除完成',`
+    <div style="text-align:center;padding:12px 0">
+      <div style="width:64px;height:64px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;background:rgba(52,199,89,.15);color:var(--green)"><svg class="ico ico-lg" viewBox="0 0 24 24" stroke="currentColor"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <div style="font-size:16px;font-weight:650;margin-bottom:6px">已成功清除 ${keys.length} 类数据</div>
+      <div style="font-size:12.5px;color:var(--text-3);line-height:1.7;margin-bottom:14px">${esc(summary)}</div>
+      <div style="font-size:11.5px;color:var(--text-3);background:rgba(120,120,128,.05);padding:10px;border-radius:8px;line-height:1.8;text-align:left">清除前：${before.tickets} 工单 / ${before.groups} 群聊 / ${before.users} 用户 / ${before.forms} 表单<br>清除后：${S.data.tickets.length} 工单 / ${S.data.groups.length} 群聊 / ${S.data.users.length} 用户 / ${S.data.forms.length} 表单</div>
+    </div>
+  `,[{label:'关闭',cls:'btn-p'}]);
 }
 
 /* ============ 通用模态 ============ */
@@ -1355,6 +1804,7 @@ function closeAllPanels(exceptId){
   if(exceptId!=='sidePanel')$('#sidePanel')?.classList.remove('on');
   if(exceptId!=='notifPanel')$('#notifPanel')?.classList.add('hide');
   if(exceptId!=='userMenu')$('#userMenu')?.remove();
+  if(exceptId!=='searchDropdown')$('#searchDropdown')?.remove();
   closeAllPopups();
 }
 function showModal(title,body,buttons=[],wide=false){
@@ -1366,6 +1816,8 @@ function showModal(title,body,buttons=[],wide=false){
   $$('[data-btn]').forEach(el=>{el.onclick=()=>{const b=buttons[+el.dataset.btn];if(b.onclick){const r=b.onclick();if(r!==false&&r!==undefined)closeModal();}else closeModal();};});
 }
 function closeModal(id='mModal'){const el=$('#'+id);if(el)el.classList.remove('on');}
+
+/* ============ 权限 ============ */
 function hasPerm(perm){if(!S.user)return false;if(S.user.permissions?.includes('admin.all')||S.user.role==='admin')return true;if(S.user.permissions?.includes(perm))return true;return false;}
 function isAdmin(){return S.user&&(S.user.role==='admin'||S.user.permissions?.includes('admin.all'));}
 
@@ -1376,7 +1828,7 @@ function bindLogin(){
   $('#goForgot').onclick=()=>{flip.dataset.face='forgot';$('#regPane').classList.add('hide');$('#forgotPane').classList.remove('hide');};
   $('#backToLogin1').onclick=$('#backToLogin2').onclick=()=>{flip.dataset.face='login';};
   $('#lgPwd').onkeydown=e=>{if(e.key==='Enter')$('#btnLogin').click();};
-  $('#btnLogin').onclick=()=>{
+  $('#btnLogin').onclick=async()=>{
     const phone=$('#lgPhone').value.trim(),pwd=$('#lgPwd').value.trim();
     if(!phone||!pwd){toast('请输入账号密码','err');return;}
     const u=S.data.users.find(x=>x.phone===phone);
@@ -1384,7 +1836,10 @@ function bindLogin(){
     if(u.status==='pending'){toast('账号审核中','warn');return;}
     if(u.status==='disabled'){toast('账号已禁用','err');return;}
     const remember=$('#chkRemember')?.checked,autoLogin=$('#chkAutoLogin')?.checked;
-    try{if(remember||autoLogin)localStorage.setItem('sd_login_saved',JSON.stringify({phone,pwd:btoa(encodeURIComponent(pwd)),autoLogin:!!autoLogin,time:Date.now()}));else localStorage.removeItem('sd_login_saved');}catch(e){}
+    try{
+      if(remember||autoLogin)localStorage.setItem('sd_login_saved',JSON.stringify({phone,pwd:btoa(encodeURIComponent(pwd)),autoLogin:!!autoLogin,time:Date.now()}));
+      else localStorage.removeItem('sd_login_saved');
+    }catch(e){}
     S.user=u;Store.setSession(u.id);u.online=true;persist();
     if(u.showShiftOnLogin!==false){showShiftModal();}else enterApp();
   };
@@ -1417,6 +1872,8 @@ function showShiftModal(){
   $('#shiftModal').classList.add('on');
   $('#btnShiftConfirm').onclick=()=>{const sel=$$('[data-shift]').find(x=>x.dataset.sel==='1');if(sel)u.shift=sel.dataset.shift;u.shops=$$('[data-shop-c]:checked').map(x=>x.dataset.shopC);persist();$('#shiftModal').classList.remove('on');enterApp();};
 }
+
+/* ============ 进入应用 ============ */
 function enterApp(){
   if(!S.user){$('#scLogin').style.display='grid';return;}
   $('#scLogin').style.display='none';$('#app').classList.remove('hide');
@@ -1428,6 +1885,7 @@ function enterApp(){
   switchView('dashboard');
   updateBellBadge();
   toast(`欢迎 ${S.user.name}`,'ok',2000);
+  // 启动实时同步
   startRealtimeSync();
 }
 
@@ -1436,6 +1894,7 @@ function bindApp(){
   $$('.nav-item').forEach(el=>{if(el.dataset.view)el.onclick=()=>switchView(el.dataset.view);});
   $('#btnTheme').onclick=toggleTheme;
   $('#btnChatToggle').onclick=()=>toggleChat();
+  $('#btnSidePanel').onclick=()=>{if($('#sidePanel').classList.contains('on'))$('#sidePanel').classList.remove('on');else{closeAllPanels('sidePanel');$('#sidePanel').classList.add('on');renderSidePanel();}};
   $('#btnBell').onclick=e=>{e.stopPropagation();const p=$('#notifPanel');if(p.classList.contains('hide')){closeAllPanels('notifPanel');p.classList.remove('hide');renderNotifPanel();}else p.classList.add('hide');};
   $('#spClose').onclick=()=>$('#sidePanel').classList.remove('on');
   $$('.sp-tab').forEach(t=>t.onclick=()=>{S.sidePanel.tab=t.dataset.sp;renderSidePanel();});
@@ -1453,12 +1912,26 @@ function bindApp(){
     menu.onclick=ev=>{const act=ev.target.closest('[data-user-act]')?.dataset.userAct;if(!act)return;if(act==='shift'){showShiftModal();menu.remove();}else if(act==='logout'){if(confirm('退出登录？')){fetch(API_URL+'/api/offline',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:S.user.id})}).catch(()=>{});S.user.online=false;persist();stopRealtimeSync();Store.clearSession();location.reload();}}};
     setTimeout(()=>document.addEventListener('click',function h(ev){if(!menu.contains(ev.target)){menu.remove();document.removeEventListener('click',h);}}),10);
   };
+  $('#btnSearchToggle').onclick=e=>{
+    e.stopPropagation();
+    const existing=$('#searchDropdown');if(existing){existing.remove();return;}
+    const dd=document.createElement('div');dd.className='search-dropdown';dd.id='searchDropdown';
+    dd.style.cssText='position:fixed;width:300px;background:var(--card);border-radius:12px;box-shadow:var(--shadow-lg);border:1px solid var(--border);padding:8px;z-index:180';
+    dd.innerHTML=`<input class="inp" placeholder="搜索工单号、客户、订单…" autofocus>`;
+    document.body.appendChild(dd);
+    const rect=e.currentTarget.getBoundingClientRect();
+    dd.style.top=(rect.bottom+6)+'px';dd.style.right=(window.innerWidth-rect.right)+'px';
+    setTimeout(()=>dd.querySelector('input').focus(),50);
+    dd.querySelector('input').oninput=ev=>{const v=ev.target.value;if(S.view!=='tickets')switchView('tickets');S.filters.q=v;renderTickets();};
+    setTimeout(()=>document.addEventListener('click',function h(ev){if(!dd.contains(ev.target)&&ev.target.id!=='btnSearchToggle'){dd.remove();document.removeEventListener('click',h);}}),10);
+  };
   $('#notifClose').onclick=()=>$('#notifPanel').classList.add('hide');
   $('#notifSearch').oninput=()=>renderNotifPanel();
   document.addEventListener('click',e=>{if(!e.target.closest('#notifPanel')&&!e.target.closest('#btnBell'))$('#notifPanel')?.classList.add('hide');});
   $('#btnAdvFilter').onclick=()=>showAdvancedFilter();
   $('#btnToggleCols').onclick=e=>{
-    closeAllPopups();const cols=getAllColumns();
+    closeAllPopups();
+    const cols=getAllColumns();
     const menu=document.createElement('div');menu.className='ctx-menu';
     menu.style.cssText='position:fixed;background:var(--card);border-radius:12px;box-shadow:var(--shadow-lg);border:1px solid var(--border);padding:6px;z-index:2000;max-height:400px;overflow-y:auto';
     const r=e.currentTarget.getBoundingClientRect();menu.style.left=Math.min(r.left,window.innerWidth-240)+'px';menu.style.top=(r.bottom+4)+'px';
@@ -1470,12 +1943,19 @@ function bindApp(){
   let st;$('#filterSearch').oninput=e=>{clearTimeout(st);st=setTimeout(()=>{S.filters.q=e.target.value;renderTickets();},200);};
   $('#btnNewForm').onclick=()=>openDesigner(null);
   $('#accountRows').onclick=e=>{
-    if(e.target.closest('select,input,textarea,.copyable'))return;
-    const ap=e.target.closest('[data-approve]');if(ap){const u=S.data.users.find(x=>x.id===ap.dataset.approve);if(u){u.status='active';persist();renderAccounts();toast('已通过');}return;}
-    const ed=e.target.closest('[data-edit-acc]');if(ed){openAccountEdit(ed.dataset.editAcc);return;}
-    const del=e.target.closest('[data-del-acc]');if(del){if(!confirm('确认删除账号？'))return;S.data.users=S.data.users.filter(x=>x.id!==del.dataset.delAcc);persist();renderAccounts();toast('已删除','warn');return;}
+    if(e.target.closest('select,input,textarea,.copyable')) return;
+    const ap=e.target.closest('[data-approve]');
+    if(ap){const u=S.data.users.find(x=>x.id===ap.dataset.approve);if(u){u.status='active';persist();renderAccounts();toast('已通过');}return;}
+    const ed=e.target.closest('[data-edit-acc]');
+    if(ed){openAccountEdit(ed.dataset.editAcc);return;}
+    const del=e.target.closest('[data-del-acc]');
+    if(del){if(!confirm('确认删除账号？'))return;S.data.users=S.data.users.filter(x=>x.id!==del.dataset.delAcc);persist();renderAccounts();toast('已删除','warn');return;}
   };
-  $('#accountRows').addEventListener('change',e=>{const cb=e.target.closest('[data-acc-cb]');if(!cb)return;if(cb.checked)S.selectedAccounts.add(cb.dataset.accCb);else S.selectedAccounts.delete(cb.dataset.accCb);renderAccounts();});
+  $('#accountRows').addEventListener('change',e=>{
+    const cb=e.target.closest('[data-acc-cb]');if(!cb)return;
+    if(cb.checked)S.selectedAccounts.add(cb.dataset.accCb);else S.selectedAccounts.delete(cb.dataset.accCb);
+    renderAccounts();
+  });
   $('#accThCheck')?.addEventListener('change',e=>{if(e.target.checked)S.data.users.forEach(u=>S.selectedAccounts.add(u.id));else S.selectedAccounts.clear();renderAccounts();});
   $('#btnCreateAccount').onclick=()=>openAccountEdit(null);
   $('#btnAccBulk').onclick=()=>openAccBulkModal();
@@ -1486,8 +1966,11 @@ function bindApp(){
   $('#staffSearch')?.addEventListener('input',()=>renderStaff());
   $('#rpClose').onclick=closeTicket;
   $$('[data-close]').forEach(el=>el.onclick=()=>{const id=el.dataset.close;const e2=document.getElementById(id);if(e2)e2.classList.remove('on');});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAllPopups();['userMenu'].forEach(id=>{const el=document.getElementById(id);if(el)el.remove();});const m=document.getElementById('mModal');if(m)m.classList.remove('on');const np=document.getElementById('notifPanel');if(np)np.classList.add('hide');closeTicket();}});
-  window.addEventListener('beforeunload',()=>{if(S.user){try{navigator.sendBeacon(API_URL+'/api/offline',new Blob([JSON.stringify({userId:S.user.id})],{type:'application/json'}));}catch(e){}}});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAllPopups();['searchDropdown','userMenu'].forEach(id=>{const el=document.getElementById(id);if(el)el.remove();});const m=document.getElementById('mModal');if(m)m.classList.remove('on');const np=document.getElementById('notifPanel');if(np)np.classList.add('hide');closeTicket();}});
+  // 关闭页面时上报离线
+  window.addEventListener('beforeunload',()=>{
+    if(S.user){try{navigator.sendBeacon(API_URL+'/api/offline',new Blob([JSON.stringify({userId:S.user.id})],{type:'application/json'}));}catch(e){}}
+  });
 }
 
 /* ============ 工单详情 ============ */
@@ -1503,22 +1986,56 @@ function openRightPanel(t){
   bindTicketActions(t);bindInlineReply(t);bindQuickActions(t);
 }
 function buildQuickActions(t){
-  const adm=isAdmin();const statuses=getTicketStatuses(t);
+  const adm=isAdmin();
+  const statuses=getTicketStatuses(t);
   const currentStatus=statuses.find(s=>s.id===t.status)||statuses[0];
   const statusLabel=currentStatus?currentStatus.label:'状态';
-  return `<div class="qa-select-wrap"><button class="qa-btn qa-status" type="button"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>${esc(statusLabel)}<svg class="ico" viewBox="0 0 24 24" style="width:10px;height:10px;margin-left:-2px"><path d="M6 9l6 6 6-6"/></svg></button><select id="rpStatusSelect">${statuses.map(s=>`<option value="${s.id}" ${t.status===s.id?'selected':''}>${esc(s.label)}</option>`).join('')}</select></div><button class="qa-btn qa-plan" type="button" data-qa="plan"><svg class="ico" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>方案</button><button class="qa-btn qa-urge" type="button" data-qa="urge"><svg class="ico" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>催单</button><button class="qa-btn qa-forward" type="button" data-qa="forward"><svg class="ico" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg>转群</button>${adm?`<button class="qa-btn qa-delete" type="button" data-qa="del"><svg class="ico" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>删除</button>`:''}`;
+  return `
+    <div class="qa-select-wrap">
+      <button class="qa-btn qa-status" type="button">
+        <svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>
+        ${esc(statusLabel)}
+        <svg class="ico" viewBox="0 0 24 24" style="width:10px;height:10px;margin-left:-2px"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <select id="rpStatusSelect">
+        ${statuses.map(s=>`<option value="${s.id}" ${t.status===s.id?'selected':''}>${esc(s.label)}</option>`).join('')}
+      </select>
+    </div>
+    <button class="qa-btn qa-plan" type="button" data-qa="plan">
+      <svg class="ico" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>
+      方案
+    </button>
+    <button class="qa-btn qa-urge" type="button" data-qa="urge">
+      <svg class="ico" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+      催单
+    </button>
+    <button class="qa-btn qa-forward" type="button" data-qa="forward">
+      <svg class="ico" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg>
+      转群
+    </button>
+    ${adm?`<button class="qa-btn qa-delete" type="button" data-qa="del">
+      <svg class="ico" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      删除
+    </button>`:''}`;
 }
 function buildTicketBody(t,form){
   const st=getStatus(t);
   let fieldsHtml='';
   if(form){
     fieldsHtml=form.fields.filter(f=>f.type!=='divider'&&f.type!=='title').map(f=>{
-      const v=t.values[f.id];const full=['textarea','subform','address','attachment','image','video'].includes(f.type)?' full':'';
+      const v=t.values[f.id];
+      const full=['textarea','subform','address','attachment','image','video'].includes(f.type)?' full':'';
       let display='—',empty=true;
       if(v!==undefined&&v!==null&&v!==''&&!(Array.isArray(v)&&!v.length)){
         empty=false;
         if(Array.isArray(v)&&['attachment','image','video'].includes(f.type)){
-          display=`<div style="display:flex;flex-wrap:wrap;gap:8px">${v.map(file=>{const isImg=file.type&&file.type.startsWith('image');const isVid=file.type&&file.type.startsWith('video');if(isImg)return `<img src="${file.data}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;cursor:pointer" data-img-view>`;if(isVid)return `<video src="${file.data}" controls style="width:80px;height:80px;object-fit:cover;border-radius:8px"></video>`;return `<a href="${file.data}" download="${esc(file.name||'file')}" style="display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:8px;background:rgba(120,120,128,.08);color:var(--blue);text-decoration:none">${ICON.file}</a>`;}).join('')}</div>`;
+          display=`<div style="display:flex;flex-wrap:wrap;gap:8px">${v.map(file=>{
+            const isImg=file.type&&file.type.startsWith('image');
+            const isVid=file.type&&file.type.startsWith('video');
+            if(isImg)return `<img src="${file.data}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;cursor:pointer" data-img-view>`;
+            if(isVid)return `<video src="${file.data}" controls style="width:80px;height:80px;object-fit:cover;border-radius:8px"></video>`;
+            return `<a href="${file.data}" download="${esc(file.name||'file')}" style="display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:8px;background:rgba(120,120,128,.08);color:var(--blue);text-decoration:none">${ICON.file}</a>`;
+          }).join('')}</div>`;
         } else if(Array.isArray(v))display=v.map(x=>`<span class="chip">${esc(typeof x==='object'?(x.name||''):x)}</span>`).join('');
         else if(typeof v==='boolean')display=v?'是':'否';
         else display=`<span class="copyable" data-copy="${esc(String(v))}">${esc(String(v))}</span>`;
@@ -1527,7 +2044,9 @@ function buildTicketBody(t,form){
     }).join('');
   }
   const timeline=t.timeline||[];
-  const timelineHtml=`<div style="margin-top:18px"><div style="font-size:11px;font-weight:700;color:var(--text-3);margin-bottom:10px">操作记录</div>${timeline.length?timeline.slice().reverse().map(item=>`<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)"><div style="width:28px;height:28px;border-radius:50%;flex:0 0 28px;background:${avColor(item.who||'系统')};color:#fff;display:grid;place-items:center;font-size:10.5px;font-weight:650">${initials(item.who||'系统')}</div><div style="flex:1;min-width:0"><div style="display:flex;gap:8px;align-items:baseline;font-size:12.5px"><b>${esc(item.who||'系统')}</b><span style="font-size:10.5px;color:var(--text-3)">${fullTime(item.time)}</span></div><div style="font-size:12.5px;color:var(--text-2);margin-top:4px;white-space:pre-wrap">${esc(item.desc||'')}</div></div></div>`).join(''):'<div style="padding:16px;text-align:center;color:var(--text-3);font-size:12.5px">暂无记录</div>'}</div>`;
+  const timelineHtml=`<div style="margin-top:18px"><div style="font-size:11px;font-weight:700;color:var(--text-3);margin-bottom:10px">操作记录</div>
+    ${timeline.length?timeline.slice().reverse().map(item=>`<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)"><div style="width:28px;height:28px;border-radius:50%;flex:0 0 28px;background:${avColor(item.who||'系统')};color:#fff;display:grid;place-items:center;font-size:10.5px;font-weight:650">${initials(item.who||'系统')}</div><div style="flex:1;min-width:0"><div style="display:flex;gap:8px;align-items:baseline;font-size:12.5px"><b>${esc(item.who||'系统')}</b><span style="font-size:10.5px;color:var(--text-3)">${fullTime(item.time)}</span></div><div style="font-size:12.5px;color:var(--text-2);margin-top:4px;white-space:pre-wrap">${esc(item.desc||'')}</div></div></div>`).join(''):'<div style="padding:16px;text-align:center;color:var(--text-3);font-size:12.5px">暂无记录</div>'}
+  </div>`;
   return `<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px"><span class="bdg ${st.cls}" style="${getStatusStyle(st)}">${st.label}</span><span class="pri ${PRIORITY[t.priority].cls}">${PRIORITY[t.priority].label}</span></div><div class="detail-fields">${fieldsHtml}</div>${timelineHtml}`;
 }
 function bindTicketActions(t){
@@ -1537,7 +2056,19 @@ function bindTicketActions(t){
 function bindQuickActions(t){
   const sel=$('#rpStatusSelect');
   if(sel)sel.onchange=()=>{const nextId=sel.value;if(nextId===t.status)return;updateTicketStatus(t.id,nextId);};
-  $$('[data-qa]').forEach(btn=>{btn.onclick=()=>{const act=btn.dataset.qa;if(act==='plan')openAddPlan(t);else if(act==='urge')urgeTicket(t);else if(act==='forward')openForwardToGroup(t);else if(act==='del'){if(!confirm('确定删除工单 '+t.no+' ？此操作不可恢复。'))return;S.data.tickets=S.data.tickets.filter(x=>x.id!==t.id);persist();closeTicket();renderTickets();renderDashboard();toast('已删除','warn');}};});
+  $$('[data-qa]').forEach(btn=>{
+    btn.onclick=()=>{
+      const act=btn.dataset.qa;
+      if(act==='plan')openAddPlan(t);
+      else if(act==='urge')urgeTicket(t);
+      else if(act==='forward')openForwardToGroup(t);
+      else if(act==='del'){
+        if(!confirm('确定删除工单 '+t.no+' ？此操作不可恢复。'))return;
+        S.data.tickets=S.data.tickets.filter(x=>x.id!==t.id);
+        persist();closeTicket();renderTickets();renderDashboard();toast('已删除','warn');
+      }
+    };
+  });
 }
 function startEditField(t,el){
   if(el.querySelector('[contenteditable="true"]'))return;
@@ -1554,7 +2085,8 @@ function bindInlineReply(t){
   if(!input)return;input.value='';
   input.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendInlineReply(t);}};
   btn.onclick=()=>sendInlineReply(t);
-  attach.onclick=()=>files.click();files.value='';
+  attach.onclick=()=>files.click();
+  files.value='';
 }
 async function sendInlineReply(t){
   const input=$('#rpInlineInput'),files=$('#rpInlineFiles');
@@ -1590,18 +2122,47 @@ function urgeTicket(t){
 }
 function openForwardToGroup(t){
   const groups=myGroups();
-  if(!groups.length){toast('暂无群聊','warn');return;}
-  showModal('转群 · 发送到群聊',`<div class="form-row" style="margin-bottom:10px"><div style="display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:9px;background:rgba(120,120,128,.1)"><svg class="ico ico-sm" viewBox="0 0 24 24" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg><input id="fwdSearch" placeholder="搜索群聊名称…" style="flex:1;background:none;font-size:13px" autocomplete="off"></div></div><div id="fwdGroupList" style="max-height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:6px"></div>`,[{label:'取消',cls:'btn-g'}],true);
+  if(!groups.length){toast('暂无群聊，请先在群聊页面创建','warn');return;}
+  showModal('转群 · 发送到群聊',`
+    <div class="form-row" style="margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:9px;background:rgba(120,120,128,.1)">
+        <svg class="ico ico-sm" viewBox="0 0 24 24" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+        <input id="fwdSearch" placeholder="搜索群聊名称…" style="flex:1;background:none;font-size:13px" autocomplete="off">
+      </div>
+    </div>
+    <div id="fwdGroupList" style="max-height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:6px"></div>
+  `,[{label:'取消',cls:'btn-g'}],true);
   const renderGroups=keyword=>{
     const kw=(keyword||'').trim().toLowerCase();
     const list=kw?groups.filter(g=>g.name.toLowerCase().includes(kw)):groups;
     const box=$('#fwdGroupList');
     if(!list.length){box.innerHTML=`<div style="padding:40px;text-align:center;color:var(--text-3);font-size:12.5px">没有找到匹配的群聊</div>`;return;}
-    box.innerHTML=list.map(g=>{const lastMsg=(g.messages||[]).slice(-1)[0];const lastText=lastMsg?(lastMsg.type==='text'?String(lastMsg.content).slice(0,30):`[${lastMsg.type==='ticket'?'工单':lastMsg.type==='image'?'图片':'消息'}]`):'暂无消息';return`<div data-fwd-g="${g.id}" style="cursor:pointer;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;gap:10px;align-items:center;transition:.14s" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'"><div style="width:38px;height:38px;border-radius:10px;background:${g.avatar?'transparent':avColor(g.name)};color:#fff;display:grid;place-items:center;font-size:14px;font-weight:650;flex:0 0 38px;overflow:hidden">${g.avatar?`<img src="${g.avatar}" style="width:100%;height:100%;object-fit:cover">`:initials(g.name)}</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:620;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(g.name)}</div><div style="font-size:11px;color:var(--text-3);margin-top:2px">${g.members.length} 位成员 · ${esc(lastText)}</div></div><span style="color:var(--blue);font-size:11px">发送 →</span></div>`;}).join('');
-    box.querySelectorAll('[data-fwd-g]').forEach(el=>{el.onclick=()=>{const g=S.data.groups.find(x=>x.id===el.dataset.fwdG);if(!g)return;if(!g.ticketIds)g.ticketIds=[];if(!g.ticketIds.includes(t.id))g.ticketIds.push(t.id);g.messages=g.messages||[];g.messages.push({id:uid('msg'),type:'ticket',ticketId:t.id,ticketTitle:t.formName,time:Date.now(),senderId:S.user.id,senderName:S.user.name,forwarded:true});g.messages.push({id:uid('msg'),type:'system',content:`${S.user.name} 转发了工单 ${t.no}`,time:Date.now(),senderName:'系统'});persist();closeModal();toast(`已转发到「${g.name}」`);if(S.chatOpen&&S.currentGroupId===g.id)renderMsgs(g);};});
+    box.innerHTML=list.map(g=>{
+      const memberCount=g.members.length;
+      const lastMsg=(g.messages||[]).slice(-1)[0];
+      const lastText=lastMsg?(lastMsg.type==='text'?String(lastMsg.content).slice(0,30):`[${lastMsg.type==='ticket'?'工单':lastMsg.type==='image'?'图片':'消息'}]`):'暂无消息';
+      return`<div data-fwd-g="${g.id}" style="cursor:pointer;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;gap:10px;align-items:center;transition:.14s" onmouseover="this.style.borderColor='var(--blue)';this.style.background='rgba(0,122,255,.03)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--card)'">
+        <div style="width:38px;height:38px;border-radius:10px;background:${g.avatar?'transparent':avColor(g.name)};color:#fff;display:grid;place-items:center;font-size:14px;font-weight:650;flex:0 0 38px;overflow:hidden">${g.avatar?`<img src="${g.avatar}" style="width:100%;height:100%;object-fit:cover">`:initials(g.name)}</div>
+        <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:620;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(g.name)}</div><div style="font-size:11px;color:var(--text-3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${memberCount} 位成员 · ${esc(lastText)}</div></div>
+        <span style="color:var(--blue);font-size:11px;flex:0 0 auto">发送 →</span>
+      </div>`;
+    }).join('');
+    box.querySelectorAll('[data-fwd-g]').forEach(el=>{
+      el.onclick=()=>{
+        const g=S.data.groups.find(x=>x.id===el.dataset.fwdG);if(!g)return;
+        if(!g.ticketIds)g.ticketIds=[];
+        if(!g.ticketIds.includes(t.id))g.ticketIds.push(t.id);
+        g.messages=g.messages||[];
+        g.messages.push({id:uid('msg'),type:'ticket',ticketId:t.id,ticketTitle:t.formName,time:Date.now(),senderId:S.user.id,senderName:S.user.name,forwarded:true});
+        g.messages.push({id:uid('msg'),type:'system',content:`${S.user.name} 转发了工单 ${t.no}`,time:Date.now(),senderName:'系统'});
+        persist();closeModal();toast(`已转发到「${g.name}」`);
+        if(S.chatOpen&&S.currentGroupId===g.id)renderMsgs(g);
+      };
+    });
   };
   renderGroups('');
-  const inp=$('#fwdSearch');setTimeout(()=>inp&&inp.focus(),100);
+  const inp=$('#fwdSearch');
+  setTimeout(()=>inp&&inp.focus(),100);
   let tmr;inp.oninput=()=>{clearTimeout(tmr);tmr=setTimeout(()=>renderGroups(inp.value),150);};
 }
 
@@ -1625,10 +2186,30 @@ function renderChatPanel(){
   if(!groups.length){
     $('#chatPanel').innerHTML=`<div class="chat-panel-head"><h3 style="flex:1;font-size:13.5px;font-weight:650">群聊</h3><button class="icon-btn" id="btnNewGroupInChat" style="width:30px;height:30px">${ICON.plus}</button><button class="icon-btn" id="btnCloseChat" style="width:30px;height:30px">${ICON.x}</button></div><div style="padding:40px;text-align:center;color:var(--text-3)">暂无群聊，点击右上角 + 创建</div>`;
   }else{
-    const g=S.data.groups.find(x=>x.id===S.currentGroupId)||groups[0];S.currentGroupId=g.id;
-    $('#chatPanel').innerHTML=`<div class="chat-panel-head"><div style="width:30px;height:30px;border-radius:9px;flex:0 0 30px;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:650;background:${g.avatar?'transparent':avColor(g.name)};overflow:hidden">${g.avatar?`<img src="${g.avatar}" style="width:100%;height:100%;object-fit:cover">`:initials(g.name)}</div><h3 style="margin:0;font-size:13px;font-weight:650;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(g.name)}</h3><button class="icon-btn" id="btnCallVoice" title="语音通话" style="width:28px;height:28px">${ICON.phone}</button><button class="icon-btn" id="btnCallVideo" title="视频通话" style="width:28px;height:28px">${ICON.cam}</button><button class="icon-btn" id="btnCloseChat" style="width:28px;height:28px">${ICON.x}</button></div><div class="chat-body"><div class="msgs" id="msgs"></div><div class="chat-input-area"><div class="ctools"><button class="tool-btn" id="btnImage">${ICON.image}</button><button class="ctool-chip" id="btnSendTicket">${ICON.box} 发送工单</button><button class="tool-btn" id="btnMention">${ICON.at}</button></div><div class="cir"><textarea class="chat-input" id="chatInput" placeholder="输入消息…"></textarea><button class="send-btn" id="btnSend">发送</button></div></div></div>`;
+    const g=S.data.groups.find(x=>x.id===S.currentGroupId)||groups[0];
+    S.currentGroupId=g.id;
+    $('#chatPanel').innerHTML=`
+      <div class="chat-panel-head">
+        <div style="width:30px;height:30px;border-radius:9px;flex:0 0 30px;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:650;background:${g.avatar?'transparent':avColor(g.name)};overflow:hidden">${g.avatar?`<img src="${g.avatar}" style="width:100%;height:100%;object-fit:cover">`:initials(g.name)}</div>
+        <h3 style="margin:0;font-size:13px;font-weight:650;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(g.name)}</h3>
+        <button class="icon-btn" id="btnCallVoice" title="语音通话" style="width:28px;height:28px">${ICON.phone}</button>
+        <button class="icon-btn" id="btnCallVideo" title="视频通话" style="width:28px;height:28px">${ICON.cam}</button>
+        <button class="icon-btn" id="btnCloseChat" style="width:28px;height:28px">${ICON.x}</button>
+      </div>
+      <div class="chat-body">
+        <div class="msgs" id="msgs"></div>
+        <div class="chat-input-area">
+          <div class="ctools">
+            <button class="tool-btn" id="btnImage">${ICON.image}</button>
+            <button class="ctool-chip" id="btnSendTicket">${ICON.box} 发送工单</button>
+            <button class="tool-btn" id="btnMention">${ICON.at}</button>
+          </div>
+          <div class="cir"><textarea class="chat-input" id="chatInput" placeholder="输入消息…"></textarea><button class="send-btn" id="btnSend">发送</button></div>
+        </div>
+      </div>`;
     renderMsgs(g);
-    $('#btnCloseChat').onclick=toggleChat;$('#btnSend').onclick=()=>sendMsg(g);
+    $('#btnCloseChat').onclick=toggleChat;
+    $('#btnSend').onclick=()=>sendMsg(g);
     $('#chatInput').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg(g);}};
     $('#btnImage').onclick=()=>pickFile(g);
     $('#btnMention').onclick=()=>{$('#chatInput').value+='@';$('#chatInput').focus();};
@@ -1643,10 +2224,13 @@ function renderChatPanel(){
   });
 }
 function renderMsgs(g){
-  const me=S.user;if(!g)return;
+  const me=S.user;
+  if(!g)return;
   $('#msgs').innerHTML=(g.messages||[]).map(m=>{
     if(m.type==='system')return `<div style="text-align:center;margin:10px 0;font-size:11px;color:var(--text-3)"><span style="background:rgba(120,120,128,.14);padding:2px 10px;border-radius:99px">${esc(m.content)}</span></div>`;
-    const isMine=m.senderId===me.id;let inner='';
+    const isMine=m.senderId===me.id;
+    let inner='';
+    if(m.quote)inner+=`<div class="quote"><div class="qn">${esc(m.quote.senderName)}</div><div style="font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(m.quote.text)}</div></div>`;
     if(m.type==='text'){let txt=esc(m.content);txt=txt.replace(/@([\u4e00-\u9fa5A-Za-z0-9_]+)/g,(m2,name)=>{const u=S.data.users.find(x=>x.name===name);const cls=u&&u.id===me.id?' mention-me':'';return `<span class="mention${cls}">@${name}</span>`;});inner+=txt;}
     else if(m.type==='image')inner+=`<img src="${m.data}" data-img-view>`;
     else if(m.type==='ticket'){const t=S.data.tickets.find(x=>x.id===m.ticketId)||{};inner+=`<div style="cursor:pointer;padding:8px;border-radius:10px;background:rgba(0,122,255,.06);border:1px solid rgba(0,122,255,.2)" data-jump="${m.ticketId}"><div style="font-family:monospace;font-size:11px;color:var(--blue);font-weight:620">${t.no||''}</div><div style="font-size:12.5px;margin-top:2px">${esc(t.formName||'')}</div></div>`;}
@@ -1660,12 +2244,23 @@ function sendMsg(g){
   const input=$('#chatInput');const text=input.value.trim();if(!text)return;
   const mentions=[];const regex=/@([\u4e00-\u9fa5A-Za-z0-9_]+)/g;let m;
   while((m=regex.exec(text))!==null){const u=S.data.users.find(x=>x.name===m[1]);if(u)mentions.push(u.id);}
-  g.messages=g.messages||[];g.messages.push({id:uid('msg'),type:'text',content:text,mentions,time:Date.now(),senderId:S.user.id,senderName:S.user.name});
+  const msg={id:uid('msg'),type:'text',content:text,mentions,time:Date.now(),senderId:S.user.id,senderName:S.user.name};
+  if(S.quoteMsg){const q=S.quoteMsg;msg.quote={senderName:q.senderName,text:String(q.content||'').slice(0,60)};S.quoteMsg=null;}
+  g.messages=g.messages||[];g.messages.push(msg);
   persist();renderMsgs(g);input.value='';
 }
 function pickFile(g){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=async()=>{const f=inp.files[0];if(!f)return;const data=await fileToDataURL(f);g.messages=g.messages||[];g.messages.push({id:uid('msg'),type:'image',data,time:Date.now(),senderId:S.user.id,senderName:S.user.name});persist();renderMsgs(g);};inp.click();}
 function showAddTicketToGroup(g){
-  showModal('发送工单到群聊',`<div class="form-row" style="margin-bottom:10px"><div style="display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:9px;background:rgba(120,120,128,.1)"><svg class="ico ico-sm" viewBox="0 0 24 24" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg><input id="atkSearch" placeholder="搜索工单号 / 表单 / 客户 / 订单号…" autocomplete="off" style="flex:1;background:none;font-size:13px"><span id="atkCount" style="font-size:11px;color:var(--text-3);white-space:nowrap"></span></div></div><div id="atkList" style="max-height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:6px"></div>`,[{label:'关闭',cls:'btn-g'}],true);
+  showModal('发送工单到群聊',`
+    <div class="form-row" style="margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:9px;background:rgba(120,120,128,.1)">
+        <svg class="ico ico-sm" viewBox="0 0 24 24" style="color:var(--text-3)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+        <input id="atkSearch" placeholder="搜索工单号 / 表单 / 客户 / 订单号…" autocomplete="off" style="flex:1;background:none;font-size:13px">
+        <span id="atkCount" style="font-size:11px;color:var(--text-3);white-space:nowrap"></span>
+      </div>
+    </div>
+    <div id="atkList" style="max-height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:6px"></div>
+  `,[{label:'关闭',cls:'btn-g'}],true);
   const renderList=keyword=>{
     const kw=(keyword||'').trim().toLowerCase();
     let list=S.data.tickets.slice();
@@ -1674,11 +2269,29 @@ function showAddTicketToGroup(g){
     const box=$('#atkList');const cntEl=$('#atkCount');
     if(cntEl)cntEl.textContent=kw?`找到 ${list.length} 条`:`共 ${list.length} 条`;
     if(!list.length){box.innerHTML=`<div style="padding:40px;text-align:center;color:var(--text-3);font-size:12.5px">没有找到匹配的工单</div>`;return;}
-    box.innerHTML=list.map(t=>{const st=getStatus(t);const customer=t.values.f_customer||t.values.f_phone||'';const orderNo=t.values.f_orderno||'';return`<div data-atk="${t.id}" style="cursor:pointer;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;gap:10px;align-items:center;transition:.14s" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'"><div style="width:34px;height:34px;border-radius:9px;background:${t.formColor||'#007aff'};color:#fff;display:grid;place-items:center;font-size:13px;font-weight:650;flex:0 0 34px">${initials(t.formName)}</div><div style="flex:1;min-width:0"><div style="display:flex;gap:8px;align-items:center"><span style="font-family:monospace;color:var(--blue);font-weight:620;font-size:11.5px">${esc(t.no)}</span><span class="bdg ${st.cls}" style="font-size:10px;padding:1px 7px;${getStatusStyle(st)}">${esc(st.label)}</span></div><div style="font-size:12.5px;font-weight:560;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.formName)}${customer?' · '+esc(customer):''}</div>${orderNo?`<div style="font-size:10.5px;color:var(--text-3);margin-top:2px;font-family:monospace">订单 ${esc(orderNo)}</div>`:''}</div><span style="color:var(--text-3);font-size:11px">发送 →</span></div>`;}).join('');
-    box.querySelectorAll('[data-atk]').forEach(el=>{el.onclick=()=>{const tid=el.dataset.atk;const t=S.data.tickets.find(x=>x.id===tid);if(!t)return;g.messages=g.messages||[];g.messages.push({id:uid('msg'),type:'ticket',ticketId:t.id,ticketTitle:t.formName,time:Date.now(),senderId:S.user.id,senderName:S.user.name});persist();closeModal();renderChatPanel();toast('已发送 · '+t.no);};});
+    box.innerHTML=list.map(t=>{
+      const st=getStatus(t);const customer=t.values.f_customer||t.values.f_phone||'';const orderNo=t.values.f_orderno||'';
+      return`<div data-atk="${t.id}" style="cursor:pointer;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;gap:10px;align-items:center;transition:.14s" onmouseover="this.style.borderColor='var(--blue)';this.style.background='rgba(0,122,255,.03)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--card)'">
+        <div style="width:34px;height:34px;border-radius:9px;background:${t.formColor||'#007aff'};color:#fff;display:grid;place-items:center;font-size:13px;font-weight:650;flex:0 0 34px">${initials(t.formName)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;gap:8px;align-items:center"><span style="font-family:ui-monospace,Menlo,monospace;color:var(--blue);font-weight:620;font-size:11.5px">${esc(t.no)}</span><span class="bdg ${st.cls}" style="font-size:10px;padding:1px 7px;${getStatusStyle(st)}">${esc(st.label)}</span></div>
+          <div style="font-size:12.5px;font-weight:560;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.formName)}${customer?' · '+esc(customer):''}</div>
+          ${orderNo?`<div style="font-size:10.5px;color:var(--text-3);margin-top:2px;font-family:monospace">订单 ${esc(orderNo)}</div>`:''}
+        </div>
+        <span style="color:var(--text-3);font-size:11px;flex:0 0 auto">发送 →</span>
+      </div>`;
+    }).join('');
+    box.querySelectorAll('[data-atk]').forEach(el=>{
+      el.onclick=()=>{const tid=el.dataset.atk;const t=S.data.tickets.find(x=>x.id===tid);if(!t)return;
+        g.messages=g.messages||[];
+        g.messages.push({id:uid('msg'),type:'ticket',ticketId:t.id,ticketTitle:t.formName,time:Date.now(),senderId:S.user.id,senderName:S.user.name});
+        persist();closeModal();renderChatPanel();toast('已发送 · '+t.no);
+      };
+    });
   };
   renderList('');
-  const inp=$('#atkSearch');setTimeout(()=>inp&&inp.focus(),100);
+  const inp=$('#atkSearch');
+  setTimeout(()=>inp&&inp.focus(),100);
   let tmr;inp.oninput=()=>{clearTimeout(tmr);tmr=setTimeout(()=>renderList(inp.value),150);};
 }
 
@@ -1692,11 +2305,13 @@ function fillTicketForm(formId){
   const form=S.data.forms.find(x=>x.id===formId);if(!form)return;
   S.ntFormId=formId;S.filling={formId,values:{}};
   form.fields.forEach(x=>{if(x.defaultValue!==undefined)S.filling.values[x.id]=x.defaultValue;else if(x.type==='switch')S.filling.values[x.id]=false;else if(x.type==='subform'||x.type==='attachment'||x.type==='image'||x.type==='video')S.filling.values[x.id]=[];});
-  const values=S.filling.values;let html='';
+  const values=S.filling.values;
+  let html='';
   form.fields.forEach(f=>{
     if(f.type==='divider'){html+=`<div style="height:1px;background:var(--border);margin:8px 0"></div>`;return;}
     if(f.type==='title'){html+=`<div style="font-size:14px;font-weight:650;margin:8px 0 4px">${esc(f.label)}</div>`;return;}
-    const v=values[f.id];const req=f.required?'<span style="color:var(--red)"> *</span>':'';let input='';
+    const v=values[f.id];const req=f.required?'<span style="color:var(--red)"> *</span>':'';
+    let input='';
     switch(f.type){
       case 'text':input=`<input class="inp" data-fid="${f.id}" value="${esc(v||'')}">`;break;
       case 'textarea':input=`<textarea class="inp" data-fid="${f.id}" style="min-height:70px">${esc(v||'')}</textarea>`;break;
@@ -1709,7 +2324,10 @@ function fillTicketForm(formId){
     }
     html+=`<div class="form-row"><label style="font-weight:700">${esc(f.label)}${req}</label>${input}</div>`;
   });
-  showModal('填写工单 · '+form.name,html,[{label:'取消',cls:'btn-g'},{label:'提交',cls:'btn-p',onclick:()=>submitNtForm(form)}],true);
+  showModal('填写工单 · '+form.name,html,[
+    {label:'取消',cls:'btn-g'},
+    {label:'提交',cls:'btn-p',onclick:()=>submitNtForm(form)}
+  ],true);
   $$('#mBody [data-fid]').forEach(el=>{if(el.type==='radio'){el.onchange=()=>{values[el.dataset.fid]=el.value;};return;}el.oninput=el.onchange=()=>{values[el.dataset.fid]=el.value;};});
   $$('#mBody [data-sw]').forEach(el=>el.onclick=()=>{values[el.dataset.sw]=!values[el.dataset.sw];el.classList.toggle('on',values[el.dataset.sw]);});
 }
@@ -1719,10 +2337,12 @@ function submitNtForm(form){
     if(['divider','title','formula'].includes(f.type))continue;
     if(f.required){const v=values[f.id];if(v===undefined||v===null||v===''||(Array.isArray(v)&&!v.length)){toast(`「${f.label}」必填`,'err');return false;}}
   }
-  const firstStatus=getFormStatuses(form.id)[0];const defaultStatus=firstStatus?firstStatus.id:'pending';
+  const firstStatus=getFormStatuses(form.id)[0];
+  const defaultStatus=firstStatus?firstStatus.id:'pending';
   const now=Date.now();
   const t={id:uid('tk'),no:'TK'+String(Math.floor(20250000+S.data.tickets.length+1)),formId:form.id,formName:form.name,formColor:form.color,values:JSON.parse(JSON.stringify(values)),status:defaultStatus,priority:'medium',agent:'未分配',creator:S.user.name,createdAt:now,updatedAt:now,plans:[],urgeCount:0,timeline:[{time:now,title:'工单创建',desc:'由客服创建',who:S.user.name}]};
-  S.data.tickets.unshift(t);persist();closeModal();toast('已创建 · '+t.no);
+  S.data.tickets.unshift(t);persist();
+  closeModal();toast('已创建 · '+t.no);
   S.ticketFormFilter=form.id;S.ticketTab='pending';
   if(S.view!=='tickets')switchView('tickets');else renderTickets();
   return false;
@@ -1730,18 +2350,39 @@ function submitNtForm(form){
 
 /* ============ 表单设计器 ============ */
 function openDesigner(formId){
-  if(formId){const f=S.data.forms.find(x=>x.id===formId);if(!f)return;S.designer={formId:f.id,name:f.name,description:f.description||'',fields:JSON.parse(JSON.stringify(f.fields)),statusIds:(f.statusIds||[]).slice(),selectedFieldId:null};}
-  else S.designer={formId:null,name:'',description:'',fields:[],statusIds:[],selectedFieldId:null};
+  if(formId){
+    const f=S.data.forms.find(x=>x.id===formId);if(!f)return;
+    S.designer={formId:f.id,name:f.name,description:f.description||'',fields:JSON.parse(JSON.stringify(f.fields)),statusIds:(f.statusIds||[]).slice(),selectedFieldId:null};
+  } else {
+    S.designer={formId:null,name:'',description:'',fields:[],statusIds:[],selectedFieldId:null};
+  }
   const allStatuses=S.data.statuses||DEFAULT_STATUSES;
-  showModal(formId?'编辑表单':'新建表单',`<div class="form-row"><label>表单名称</label><input class="inp" id="dfName" value="${esc(S.designer.name)}"></div><div class="form-row"><label>表单说明</label><input class="inp" id="dfDesc" value="${esc(S.designer.description)}"></div><div class="form-row"><label style="display:flex;align-items:center;gap:6px">任务状态 <span style="font-size:11px;color:var(--text-3);font-weight:400">（不勾选则默认使用全部状态）</span><div style="flex:1"></div><button class="row-btn" id="dfStatusAll" type="button" style="font-size:11px;padding:2px 8px">全选</button><button class="row-btn" id="dfStatusNone" type="button" style="font-size:11px;padding:2px 8px">全不选</button></label><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px;border:1px solid var(--border);border-radius:10px;background:rgba(120,120,128,.03)">${allStatuses.map(s=>`<label style="display:flex;gap:8px;align-items:center;padding:6px 10px;border-radius:7px;background:var(--card);border:1px solid var(--border);cursor:pointer"><input type="checkbox" data-df-status="${s.id}" ${S.designer.statusIds.includes(s.id)?'checked':''} style="accent-color:var(--blue);width:15px;height:15px"><span class="bdg ${s.cls}" style="font-size:11px;${getStatusStyle(s)}">${esc(s.label)}</span></label>`).join('')}</div></div><div class="form-row"><label>添加字段</label><select class="inp" id="dfAddType"><option value="">选择字段类型</option>${Object.entries(FIELD_TYPES).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join('')}</select></div><div id="dfFields" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:6px">${S.designer.fields.map((f,i)=>`<div style="padding:9px 11px;border-radius:8px;background:rgba(120,120,128,.05);border:1px solid var(--border);display:flex;gap:8px;align-items:center"><span style="flex:1;font-size:12.5px">${esc(f.label)}</span><span class="chip" style="font-size:10px">${FIELD_TYPES[f.type]?.label||f.type}</span><button class="row-btn del" data-rm="${i}">✕</button></div>`).join('')}</div>`,[
+  showModal(formId?'编辑表单':'新建表单',`
+    <div class="form-row"><label>表单名称</label><input class="inp" id="dfName" value="${esc(S.designer.name)}"></div>
+    <div class="form-row"><label>表单说明</label><input class="inp" id="dfDesc" value="${esc(S.designer.description)}"></div>
+    <div class="form-row">
+      <label style="display:flex;align-items:center;gap:6px">任务状态 <span style="font-size:11px;color:var(--text-3);font-weight:400">（不勾选则默认使用全部状态）</span><div style="flex:1"></div><button class="row-btn" id="dfStatusAll" type="button" style="font-size:11px;padding:2px 8px">全选</button><button class="row-btn" id="dfStatusNone" type="button" style="font-size:11px;padding:2px 8px">全不选</button></label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px;border:1px solid var(--border);border-radius:10px;background:rgba(120,120,128,.03)">
+        ${allStatuses.map(s=>`<label style="display:flex;gap:8px;align-items:center;padding:6px 10px;border-radius:7px;background:var(--card);border:1px solid var(--border);cursor:pointer"><input type="checkbox" data-df-status="${s.id}" ${S.designer.statusIds.includes(s.id)?'checked':''} style="accent-color:var(--blue);width:15px;height:15px"><span class="bdg ${s.cls}" style="font-size:11px;${getStatusStyle(s)}">${esc(s.label)}</span><span style="font-family:monospace;font-size:10.5px;color:var(--text-3);margin-left:auto">${s.id}</span></label>`).join('')}
+      </div>
+    </div>
+    <div class="form-row"><label>添加字段</label><select class="inp" id="dfAddType"><option value="">选择字段类型</option>${Object.entries(FIELD_TYPES).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join('')}</select></div>
+    <div id="dfFields" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:6px">
+      ${S.designer.fields.map((f,i)=>`<div style="padding:9px 11px;border-radius:8px;background:rgba(120,120,128,.05);border:1px solid var(--border);display:flex;gap:8px;align-items:center"><span style="flex:1;font-size:12.5px">${esc(f.label)}</span><span class="chip" style="font-size:10px">${FIELD_TYPES[f.type]?.label||f.type}</span><button class="row-btn del" data-rm="${i}">✕</button></div>`).join('')}
+    </div>
+  `,[
     {label:'取消',cls:'btn-g'},
     {label:'保存',cls:'btn-p',onclick:()=>{
       const name=$('#dfName').value.trim();
       if(!name){toast('请填写名称','err');return false;}
       if(!S.designer.fields.length){toast('至少一个字段','err');return false;}
       const statusIds=$$('[data-df-status]:checked').map(cb=>cb.dataset.dfStatus);
-      if(S.designer.formId){const f=S.data.forms.find(x=>x.id===S.designer.formId);if(f){f.name=name;f.description=$('#dfDesc').value;f.fields=S.designer.fields;f.statusIds=statusIds;}}
-      else S.data.forms.push({id:uid('form'),name,description:$('#dfDesc').value,color:pick(['#007aff','#ff9500','#34c759','#af52de','#ff3b30']),fields:S.designer.fields,statusIds});
+      if(S.designer.formId){
+        const f=S.data.forms.find(x=>x.id===S.designer.formId);
+        if(f){f.name=name;f.description=$('#dfDesc').value;f.fields=S.designer.fields;f.statusIds=statusIds;}
+      } else {
+        S.data.forms.push({id:uid('form'),name,description:$('#dfDesc').value,color:pick(['#007aff','#ff9500','#34c759','#af52de','#ff3b30']),fields:S.designer.fields,statusIds});
+      }
       persist();renderFormCards();toast('已保存');return false;
     }}
   ],true);
@@ -1751,17 +2392,31 @@ function openDesigner(formId){
     const t=e.target.value;if(!t)return;
     const nf={id:uid('f'),type:t,label:FIELD_TYPES[t].label,required:false};
     if(['select','radio','checkbox'].includes(t))nf.options=['选项1','选项2'];
-    S.designer.fields.push(nf);S.designer.name=$('#dfName').value;S.designer.description=$('#dfDesc').value;
+    S.designer.fields.push(nf);
+    S.designer.name=$('#dfName').value;
+    S.designer.description=$('#dfDesc').value;
     S.designer.statusIds=$$('[data-df-status]:checked').map(cb=>cb.dataset.dfStatus);
     closeModal();setTimeout(()=>openDesigner(S.designer.formId),50);
   };
-  $$('[data-rm]').forEach(b=>b.onclick=()=>{S.designer.fields.splice(+b.dataset.rm,1);S.designer.name=$('#dfName').value;S.designer.description=$('#dfDesc').value;S.designer.statusIds=$$('[data-df-status]:checked').map(cb=>cb.dataset.dfStatus);closeModal();setTimeout(()=>openDesigner(S.designer.formId),50);});
+  $$('[data-rm]').forEach(b=>b.onclick=()=>{
+    S.designer.fields.splice(+b.dataset.rm,1);
+    S.designer.name=$('#dfName').value;
+    S.designer.description=$('#dfDesc').value;
+    S.designer.statusIds=$$('[data-df-status]:checked').map(cb=>cb.dataset.dfStatus);
+    closeModal();setTimeout(()=>openDesigner(S.designer.formId),50);
+  });
 }
 
 /* ============ 启动数据 ============ */
 function seedForms(){return[
-  {id:'form_return',name:'退换货申请',description:'客户申请退货或换货',color:'#ff9500',fields:[{id:'f_orderno',type:'text',label:'订单号',required:true},{id:'f_customer',type:'text',label:'客户姓名',required:true},{id:'f_phone',type:'text',label:'联系电话',required:true},{id:'f_type',type:'radio',label:'申请类型',required:true,options:['退货','换货'],defaultValue:'退货'},{id:'f_desc',type:'textarea',label:'补充描述'}]},
-  {id:'form_logistics',name:'物流异常处理',description:'物流信息未更新、丢件、延误',color:'#007aff',fields:[{id:'f_orderno',type:'text',label:'订单号',required:true},{id:'f_express_no',type:'text',label:'快递单号',required:true},{id:'f_issue',type:'radio',label:'问题类型',required:true,options:['物流停滞','丢失','延误']},{id:'f_desc',type:'textarea',label:'详细描述'}]}
+  {id:'form_return',name:'退换货申请',description:'客户申请退货或换货',color:'#ff9500',fields:[
+    {id:'f_orderno',type:'text',label:'订单号',required:true},{id:'f_customer',type:'text',label:'客户姓名',required:true},{id:'f_phone',type:'text',label:'联系电话',required:true},
+    {id:'f_type',type:'radio',label:'申请类型',required:true,options:['退货','换货'],defaultValue:'退货'},
+    {id:'f_desc',type:'textarea',label:'补充描述'}]},
+  {id:'form_logistics',name:'物流异常处理',description:'物流信息未更新、丢件、延误',color:'#007aff',fields:[
+    {id:'f_orderno',type:'text',label:'订单号',required:true},{id:'f_express_no',type:'text',label:'快递单号',required:true},
+    {id:'f_issue',type:'radio',label:'问题类型',required:true,options:['物流停滞','丢失','延误']},
+    {id:'f_desc',type:'textarea',label:'详细描述'}]}
 ];}
 function seedTickets(forms){
   const now=Date.now();
@@ -1778,25 +2433,49 @@ function seedTickets(forms){
   }
   tickets.sort((a,b)=>b.createdAt-a.createdAt);return tickets;
 }
-function persist(){clearTimeout(S.saveTimer);Store.save(S.data);S.saveTimer=setTimeout(()=>{uploadData();},250);}
+
+function persist(){
+  clearTimeout(S.saveTimer);
+  // 本地立即保存
+  Store.save(S.data);
+  // 延迟上传服务器
+  S.saveTimer=setTimeout(()=>{uploadData();},250);
+}
 function toast(msg,kind='ok',ms=2400){const el=document.createElement('div');el.className='toast'+(kind==='warn'?' warn':kind==='err'?' err':'');el.textContent=msg;$('#toasts').appendChild(el);setTimeout(()=>el.remove(),ms);}
 
 async function boot(){
   restoreTheme();
+  // 读取自定义服务器地址
+  try{const customApi=localStorage.getItem('its_api_url');if(customApi)window.__API_URL__=customApi;}catch(e){}
   try{const h=localStorage.getItem('its_hidden_cols');if(h)S.hiddenCols=JSON.parse(h);}catch(e){}
+  
+  // 优先从服务器拉数据
   let loaded=false;
-  try{const r=await apiFetch('/api/data');if(r&&r.data&&r.data.users){S.data=r.data;lastVersion=r.version||0;S.dataVersion=r.version||0;Store.save(S.data);loaded=true;}}catch(e){}
+  try{
+    const r=await apiFetch('/api/data');
+    if(r&&r.data&&r.data.users){
+      S.data=r.data;
+      lastVersion=r.version||0;
+      S.dataVersion=r.version||0;
+      Store.save(S.data);
+      loaded=true;
+    }
+  }catch(e){}
+  
+  // 服务器无数据，用本地或初始化
   if(!loaded){
     const saved=Store.load();
-    if(saved&&saved.forms&&saved.users)S.data=saved;
+    if(saved&&saved.forms&&saved.users){S.data=saved;}
     else{
       const forms=seedForms();
       const users=[{id:'u_admin',phone:'13939538389',pwd:'hong980727',name:'管理员',role:'admin',dept:'系统',status:'active',createdAt:Date.now(),avatar:null,position:'售后',shift:'全天班 09:00-22:00',shops:SHOPS.slice(0,3),permissions:['admin.all'],groups:[],showShiftOnLogin:false,online:true}];
-      S.data={users,forms,tickets:seedTickets(forms),groups:[],logistics:[],side:[],permissionGroups:[],notifications:[],statuses:JSON.parse(JSON.stringify(DEFAULT_STATUSES)),shifts:SHIFTS.slice(),positions:POSITIONS.slice(),shops:SHOPS.slice(),shiftSchedule:{},urges:[],settings:{sysName:'内部协同工单系统',viewPref:'right',defaultTab:'pending'},version:13};
+      S.data={users,forms,tickets:seedTickets(forms),groups:[],logistics:[],side:[],permissionGroups:[],notifications:[],statuses:JSON.parse(JSON.stringify(DEFAULT_STATUSES)),shifts:SHIFTS.slice(),positions:POSITIONS.slice(),shops:SHOPS.slice(),shiftSchedule:{},urges:[],settings:{sysName:'内部协同工单系统',viewPref:'right',defaultTab:'pending'},version:12};
       Store.save(S.data);
     }
+    // 上传到服务器
     try{await uploadData();}catch(e){}
   }
+  
   if(!S.data.settings)S.data.settings={sysName:'内部协同工单系统',viewPref:'right',defaultTab:'pending'};
   ['groups','logistics','side','permissionGroups','notifications','urges'].forEach(k=>{if(!S.data[k])S.data[k]=[];});
   if(!S.data.statuses)S.data.statuses=JSON.parse(JSON.stringify(DEFAULT_STATUSES));
@@ -1804,9 +2483,16 @@ async function boot(){
   if(!S.data.positions)S.data.positions=POSITIONS.slice();
   if(!S.data.shops)S.data.shops=SHOPS.slice();
   if(!S.data.shiftSchedule)S.data.shiftSchedule={};
-  S.data.users.forEach(u=>{if(u.position===undefined)u.position='';if(u.shift===undefined)u.shift='';if(!u.shops)u.shops=[];if(!u.permissions)u.permissions=[];if(!u.groups)u.groups=[];if(u.showShiftOnLogin===undefined)u.showShiftOnLogin=true;if(u.online===undefined)u.online=false;});
+  S.data.users.forEach(u=>{
+    if(u.position===undefined)u.position='';if(u.shift===undefined)u.shift='';
+    if(!u.shops)u.shops=[];if(!u.permissions)u.permissions=[];if(!u.groups)u.groups=[];
+    if(u.showShiftOnLogin===undefined)u.showShiftOnLogin=true;
+    if(u.online===undefined)u.online=false;
+  });
   S.viewPref=S.data.settings?.viewPref||'right';
   bindLogin();bindApp();
+  
+  // 自动登录
   try{
     const savedLogin=localStorage.getItem('sd_login_saved');
     if(savedLogin){
@@ -1815,11 +2501,23 @@ async function boot(){
       if($('#lgPwd'))$('#lgPwd').value=data.pwd?decodeURIComponent(atob(data.pwd)):'';
       if($('#chkRemember'))$('#chkRemember').checked=true;
       if(data.autoLogin&&$('#chkAutoLogin'))$('#chkAutoLogin').checked=true;
-      if(data.autoLogin)setTimeout(async()=>{const u=S.data.users.find(x=>x.phone===data.phone);if(u&&u.status==='active'&&u.pwd===decodeURIComponent(atob(data.pwd))){S.user=u;Store.setSession(u.id);u.online=true;persist();if(u.showShiftOnLogin!==false)showShiftModal();else enterApp();}},400);
+      if(data.autoLogin){
+        setTimeout(async ()=>{
+          const u=S.data.users.find(x=>x.phone===data.phone);
+          if(u&&u.status==='active'&&u.pwd===decodeURIComponent(atob(data.pwd))){
+            S.user=u;Store.setSession(u.id);u.online=true;persist();
+            if(u.showShiftOnLogin!==false)showShiftModal();else enterApp();
+          }
+        },400);
+      }
     }
   }catch(e){}
+  
   const sid=Store.getSession();
-  if(sid&&!S.user){const u=S.data.users.find(x=>x.id===sid);if(u&&u.status==='active'){S.user=u;u.online=true;persist();enterApp();}}
+  if(sid&&!S.user){
+    const u=S.data.users.find(x=>x.id===sid);
+    if(u&&u.status==='active'){S.user=u;u.online=true;persist();enterApp();}
+  }
 }
 document.addEventListener('DOMContentLoaded',boot);
 </script>
