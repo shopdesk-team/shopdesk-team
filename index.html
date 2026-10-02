@@ -3,6 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+  <!-- ============ 安全防护 + 水印 ============ -->
+<script>
+(function(){
+'use strict';
+document.addEventListener('contextmenu',function(e){e.preventDefault();return false;},{capture:true});
+document.addEventListener('keydown',function(e){
+  if(e.key==='F12'||e.keyCode===123){e.preventDefault();e.stopPropagation();return false;}
+  if(e.ctrlKey&&e.shiftKey&&['I','J','C','i','j','c'].indexOf(e.key)>-1){e.preventDefault();e.stopPropagation();return false;}
+  if(e.ctrlKey&&['U','u','S','s'].indexOf(e.key)>-1){e.preventDefault();e.stopPropagation();return false;}
+  if(e.metaKey&&e.altKey&&['I','J','C','i','j','c'].indexOf(e.key)>-1){e.preventDefault();e.stopPropagation();return false;}
+  if(e.metaKey&&['U','u','S','s'].indexOf(e.key)>-1){e.preventDefault();e.stopPropagation();return false;}
+  if(e.shiftKey&&e.key==='F10'){e.preventDefault();e.stopPropagation();return false;}
+},{capture:true});
+var st=document.createElement('style');
+st.textContent='*{-webkit-user-select:none!important;-moz-user-select:none!important;-ms-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important;-webkit-user-drag:none!important}input,textarea,[contenteditable="true"]{-webkit-user-select:text!important;user-select:text!important}img{-webkit-user-drag:none}@media print{body{display:none!important}}';
+document.head.appendChild(st);
+document.addEventListener('selectstart',function(e){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'&&!e.target.isContentEditable)e.preventDefault();});
+document.addEventListener('dragstart',function(e){e.preventDefault();});
+document.addEventListener('copy',function(e){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'&&!e.target.isContentEditable){e.preventDefault();try{e.clipboardData.setData('text/plain','⚠ 内容受保护，禁止复制');}catch(x){}}});
+document.addEventListener('cut',function(e){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'&&!e.target.isContentEditable)e.preventDefault();});
+document.addEventListener('mouseup',function(){if(window.getSelection&&window.getSelection().toString().length>0){var a=document.activeElement;if(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'))return;window.getSelection().removeAllRanges();}});
+try{if(window.top!==window.self){window.top.location=window.self.location;document.documentElement.innerHTML='';throw new Error('blocked');}}catch(e){document.documentElement.innerHTML='<h1 style="padding:40px;">禁止嵌入</h1>';return;}
+var ua=(navigator.userAgent||'').toLowerCase();
+var bots=['bot','spider','crawler','scraper','httrack','webcopier','wget','curl','python-requests','scrapy','phantomjs','selenium','puppeteer','playwright','headless'];
+for(var i=0;i<bots.length;i++){if(ua.indexOf(bots[i])>-1){document.documentElement.innerHTML='<h1 style="padding:40px;">403 Forbidden</h1>';throw new Error('bot');}}
+if(navigator.webdriver){document.documentElement.innerHTML='<h1 style="padding:40px;">403 Forbidden</h1>';throw new Error('webdriver');}
+var devOpen=false;var WARN_ID='__security_warn__';
+function showWarn(){if(devOpen)return;devOpen=true;var w=document.createElement('div');w.id=WARN_ID;w.style.cssText='position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.97);color:#fff;display:grid;place-items:center;text-align:center;font-family:-apple-system,"PingFang SC",sans-serif;padding:40px;';w.innerHTML='<div style="max-width:520px"><div style="font-size:72px;margin-bottom:24px">⚠️</div><div style="font-size:26px;font-weight:700;margin-bottom:16px">检测到开发者工具</div><div style="font-size:15px;opacity:.75;line-height:1.9">本系统内容受版权及公司保密协议保护。<br>请关闭开发者工具后继续使用。<br><br><span style="color:#ff453a;font-weight:600">未经授权的抓取、复制、截图外传将追究法律责任。</span></div></div>';document.documentElement.appendChild(w);}
+function hideWarn(){if(!devOpen)return;devOpen=false;var e=document.getElementById(WARN_ID);if(e)e.remove();}
+setInterval(function(){var wd=window.outerWidth-window.innerWidth;var hd=window.outerHeight-window.innerHeight;if(wd>160||hd>160){showWarn();}else{hideWarn();}},1200);
+try{var noop=function(){};var fc={log:noop,warn:noop,error:noop,info:noop,debug:noop,table:noop,dir:noop,trace:noop,group:noop,groupEnd:noop,time:noop,timeEnd:noop};Object.defineProperty(window,'console',{get:function(){return fc;},configurable:false});}catch(e){}
+var WM_ID='__watermark_layer__';var wmTimer=null;var wmUser=null;
+function makeTile(text){var c=document.createElement('canvas');var s=window.devicePixelRatio||1;c.width=360*s;c.height=220*s;var ctx=c.getContext('2d');ctx.scale(s,s);ctx.clearRect(0,0,360,220);ctx.font='13px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';ctx.fillStyle='rgba(0,0,0,0.09)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.save();ctx.translate(180,110);ctx.rotate(-22*Math.PI/180);ctx.fillText(text,0,0);ctx.restore();ctx.save();ctx.translate(180,110);ctx.rotate(-22*Math.PI/180);ctx.fillText(text,60,55);ctx.restore();return c.toDataURL('image/png');}
+function buildText(u){var n=(u&&u.name)||'未知用户';var p=(u&&u.phone)?u.phone.slice(-4):'----';var d=new Date();var y=d.getFullYear();var mo=String(d.getMonth()+1).padStart(2,'0');var da=String(d.getDate()).padStart(2,'0');var h=String(d.getHours()).padStart(2,'0');var mi=String(d.getMinutes()).padStart(2,'0');return n+' · '+p+' · '+y+'-'+mo+'-'+da+' '+h+':'+mi;}
+function applyWM(u){wmUser=u;if(!document.body){document.addEventListener('DOMContentLoaded',function(){applyWM(u);});return;}var text=buildText(u);var url=makeTile(text);var old=document.getElementById(WM_ID);if(old)old.remove();var layer=document.createElement('div');layer.id=WM_ID;layer.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:2147483000;background-image:url('+url+');background-repeat:repeat;background-size:360px 220px;user-select:none;-webkit-user-select:none;mix-blend-mode:multiply;';document.body.appendChild(layer);if(document.body.classList.contains('dark')){layer.style.mixBlendMode='screen';layer.style.filter='invert(1)';}if(wmTimer)clearInterval(wmTimer);wmTimer=setInterval(function(){if(wmUser)applyWM(wmUser);},60000);}
+function clearWM(){var e=document.getElementById(WM_ID);if(e)e.remove();if(wmTimer){clearInterval(wmTimer);wmTimer=null;}wmUser=null;}
+setInterval(function(){if(wmUser&&!document.getElementById(WM_ID)){applyWM(wmUser);}},3000);
+window.Security={applyWatermark:applyWM,clearWatermark:clearWM};
+})();
+</script>
+<!-- ============ 安全防护结束 ============ -->
 <title>内部协同工单系统</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
